@@ -1,3 +1,4 @@
 ofxGui
 ofxNDI
 ofxNDIHelper
+ofxWindowApp

@@ -1,17 +1,26 @@
 
+///---
+///
+///	TODO:
+///	
+///	+	looks like sometimes more that expected ndi sources are appearing
+///	!	crashes sometimes..
+///	+	dynamic resize input/output
+///
+///---
+
+
 #pragma once
 
 #include "ofMain.h"
 
-//we can handle many app modes to change behaviour
-#define NUM_MODES_APP 2
+//----
 
-//dependencies
-#include "ofxGui.h"
+#define USE_WEBCAM		//aux camera
+#define USE_ofxNDI_IN	//ndi input
+#define USE_ofxNDI_OUT	//ndi out
 
-//ndi
-#define USE_ofxNDI_IN
-#define USE_ofxNDI_OUT
+//----
 
 #ifdef USE_ofxNDI_OUT
 #include "ofxNDI.h"
@@ -21,66 +30,79 @@
 #endif
 #endif
 
-#define USE_WEBCAM
+//we can handle many app modes to change behaviour
+#define NUM_MODES_APP 2
 
-class ofxNDIHelper
+//dependencies
+#include "ofxGui.h"
+
+class ofxNDIHelper : public ofBaseApp
 {
-#ifdef USE_WEBCAM
-public:
-	ofVideoGrabber vidGrabber; // Webcam
-	void setupWebcam();
-	void drawWebcam();
-#endif
 
 public:
+#ifdef USE_WEBCAM
+	ofVideoGrabber vidGrabber; //Webcam
+	void setupWebcam();
+	//ofPixels videoInverted;
+	//ofTexture videoTexture;
+#endif
+	void drawWebcam();
 
 #ifdef USE_ofxNDI_OUT
-	void setupNDI_OUT();
-	//ofVideoGrabber vidGrabber; // Webcam
-	ofxNDIsender ndiSender;    // NDI sender object
-	ofFbo ndiSender_Fbo;              // Fbo used for graphics and sending
-	unsigned int senderWidth;  // Width of the sender output
-	unsigned int senderHeight; // Height of the sender output
-	char senderName[256];      // Sender name
+public:
+	void setup_NDI_OUT();
+	ofxNDIsender ndiSender;		//NDI sender object
+	ofFbo fbo_NDI_Sender;       //Fbo used for graphics and sending
+	unsigned int senderWidth;	//Width of the sender output
+	unsigned int senderHeight;	//Height of the sender output
+	char senderName[256];		//Sender name
+	void begin_NDI_OUT();		//feed the sender
+	void end_NDI_OUT();
+	void draw_NDI_OUT();
 #endif
 
 #ifdef USE_ofxNDI_IN
-	void setupNDI_IN();
-	void drawNDI_IN();
-	ofxNDIreceiver ndiReceiver; // NDI receiver
-	ofFbo ndiFbo; // Fbo to receive
-	ofTexture ndiTexture; // Texture to receive
-	ofImage ndiImage; // Image to receive
-	ofPixels ndiPixels; // Pixels to receive
-	unsigned char *ndiChars; // unsigned char image array to receive
-	//unsigned int senderWidth; // sender width and height needed to receive char pixels
-	//unsigned int senderHeight;
-	void ShowInfo();
-
-	void beginNDI_IN();
-	void endNDI_IN();
-
-	void beginNDI_OUT();
-	void endNDI_OUT();
+public:
+	void setup_NDI_IN();
+	void refresh_NDI_IN();
+	void draw_NDI_IN();
+	ofxNDIreceiver ndiReceiver;			//NDI receiver
+	ofFbo fbo_NDI_Receiver;				//Fbo to receive
+	ofTexture ndiReceiveTexture;		//Texture to receive
+	ofImage ndiReceiveImage;			//Image to receive
+	ofPixels ndiReceivePixels;			//Pixels to receive
+	unsigned char *ndiReceiveChars;		//unsigned char image array to receive
+	unsigned int receiverWidth;			//sender width and height needed to receive char pixels
+	unsigned int receiverHeight;
+	void drawInfoDevices();
 #endif
 
 	//--
 
-public:
-
 #pragma mark - ADDON ENGINE
 
-	//all params grouped
+public:
+    ofParameterGroup params_Control;;
+	ofParameter<bool> ENABLE_Addon;
+	ofParameter<bool> ENABLE_Edit;
+	ofParameter<bool> ENABLE_Webcam;
+	ofParameter<bool> mini_Webcam;
+	ofParameter<int> index_WebcamDevice;
+	ofParameter<string> name_Webcam;
+	ofParameter<bool> ENABLE_NDI_Input;
+	ofParameter<bool> mini_ndiInput;
+	ofParameter<int> index_NDI_Input;
+	ofParameter<string> name_NDI_Input;
+	ofParameter<bool> ENABLE_NDI_Output;
+	ofParameter<string> name_NDI_Output;
+
+	string NDI_InputDevices;
+	string webcam_InputDevices;
+
+public:
 	ofParameterGroup params;
-
-    //addon variables
-    ofParameterGroup params_Addon;;
-	ofParameter<bool> Addon_Active;
-	ofParameter<float> Addon_Float;
-
-    //addon methods
     
-    //----
+	//----
 
 #pragma mark - OF
 
@@ -123,11 +145,11 @@ private:
     //updating some params before save will trigs also the group callbacks
     //so we disable this callbacks just in case params updatings are required
     //in this case we will need to update gui position param
-    bool DISABLE_Callbacks = false;
+    bool DISABLE_Callbacks;
 
     //-
 
-	void Changed_params_Addon(ofAbstractParameter &e);
+	void Changed_params_Control(ofAbstractParameter &e);
 
 	//-
 
@@ -136,7 +158,7 @@ private:
 #pragma mark - CONTROL PARAMS
 
     //control params
-    ofParameterGroup params_Control;
+    ofParameterGroup params_Internal;
     ofParameter<bool> MODE_Active;
     ofParameter<bool> ENABLE_keys;
     ofParameter<bool> ENABLE_Debug;
@@ -149,7 +171,7 @@ private:
 
 #pragma mark - CALLBACKS
 
-	void Changed_params_Control(ofAbstractParameter &e);
+	void Changed_params_Internal(ofAbstractParameter &e);
 	void Changed_params(ofAbstractParameter &e);
 
 #pragma mark - OF LISTENERS
@@ -168,12 +190,11 @@ private:
     void removeMouseListeners();
 
 #pragma mark - FILE SETTINGS
-
-    string path_GLOBAL = "ofxNDIHelper/";//this is to folder all files to avoid mixing with other addons data
-    string path_Params_Control = "params_Control.xml";
+	//settings
+	string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
+	string path_Params_Internal;
+	string path_Params_Control;
     void loadParams(ofParameterGroup &g, string path);
     void saveParams(ofParameterGroup &g, string path);
 
 };
-
-//}

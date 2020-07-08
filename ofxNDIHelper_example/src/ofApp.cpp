@@ -2,24 +2,19 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-//#ifdef USE_WEBCAM
-//	int _d = 0;
-//	vidGrabber.setDeviceID(_d); // The first webcam
-//	vidGrabber.setup(640, 480); // try to grab at this size.
-//#endif
-
-	//ndi
 #ifdef USE_ofxNDI
 	NDIHelper.setup();
+#endif
+
+#ifdef USE_ofxWindowApp
+	windowApp.setFrameRate(60);
+	windowApp.setVerticalSync(true);
 #endif
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 
-//#ifdef USE_WEBCAM
-//	vidGrabber.update();
-//#endif
 #ifdef USE_ofxNDI
 	NDIHelper.update();
 #endif
@@ -28,50 +23,41 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-
-	//ndi
 #ifdef USE_ofxNDI
-	NDIHelper.beginNDI_OUT();
-	
-	//if (SHOW_Webcam.get()) 
+	NDIHelper.begin_NDI_OUT();
 	{
+		//webcam
 		NDIHelper.drawWebcam();
-	}
 
-	NDIHelper.endNDI_OUT();
-#endif
+		//ndi input
+		NDIHelper.draw_NDI_IN();
+	}
+	NDIHelper.end_NDI_OUT();
 
 	//-
+	
+	////webcam
+	//NDIHelper.drawWebcam();
 
-	//ndi
-#ifdef USE_ofxNDI
-	//NDIHelper.draw();
+	//draw ndi out
+	NDIHelper.draw_NDI_OUT();
+	
+	//-
 
+	//gui
 	NDIHelper.drawGui();
 #endif
 }
 
-//#ifdef USE_WEBCAM
-//#undef USE_WEBCAM
-//#endif
-//
-//#ifdef USE_WEBCAM
-////--------------------------------------------------------------
-//void ofApp::drawCamera() {
-//	//video
-//	ofSetColor(255, 255, 255, 255);
-//	ofRectangle videoRect(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
-//	videoRect.scaleTo(ofGetWindowRect());
-//	vidGrabber.draw(videoRect.x, videoRect.y, videoRect.width, videoRect.height);
-//}
-//#endif
-
 //--------------------------------------------------------------
 void ofApp::exit()
 {
-	//ndi
 #ifdef USE_ofxNDI
 	NDIHelper.exit();
+#endif
+
+#ifdef USE_ofxWindowApp
+	windowApp.exit();
 #endif
 }
 
@@ -117,7 +103,6 @@ void ofApp::mouseExited(int x, int y) {
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
-	//ndi
 #ifdef USE_ofxNDI
 	NDIHelper.windowResized(w, h);
 #endif
