@@ -197,4 +197,31 @@ private:
     void loadParams(ofParameterGroup &g, string path);
     void saveParams(ofParameterGroup &g, string path);
 
+	//--
+
+private:
+	//--------------------------------------------------------------
+	void CheckFolder(string _path)
+	{
+		ofLogNotice(__FUNCTION__) << _path;
+
+		ofDirectory dataDirectory(ofToDataPath(_path, true));
+
+		//check if folder path exist
+		if (!dataDirectory.isDirectory())
+		{
+			ofLogError(__FUNCTION__) << "FOLDER NOT FOUND! TRYING TO CREATE...";
+
+			//try to create folder
+			bool b = dataDirectory.createDirectory(ofToDataPath(_path, true));
+
+			//debug if creation has been succeded
+			if (b) ofLogNotice(__FUNCTION__) << "CREATED '" << _path << "'  SUCCESSFULLY!";
+			else ofLogError(__FUNCTION__) << "UNABLE TO CREATE '" << _path << "' FOLDER!";
+		}
+		else
+		{
+			ofLogNotice(__FUNCTION__) << "OK! LOCATED FOLDER: '" << _path << "'";//nothing to do
+		}
+	}
 };

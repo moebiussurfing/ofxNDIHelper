@@ -41,13 +41,13 @@ void ofxNDIHelper::end_NDI_OUT()
 
 	//if (ENABLE_NDI_Output.get()) 
 	//{
-		ofColor(255);
-		ndiSender.SendImage(fbo_NDI_Sender);//send processed
-		//ndiSender.SendImage(fbo_NDI_Sender, false);//send processed
-		//ndiSender.SendImage(vidGrabber.getPixels());//send clean webcam
-		//Draw the fbo result fitted to the display window
-		//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
-	//}
+	ofColor(255);
+	ndiSender.SendImage(fbo_NDI_Sender);//send processed
+	//ndiSender.SendImage(fbo_NDI_Sender, false);//send processed
+	//ndiSender.SendImage(vidGrabber.getPixels());//send clean webcam
+	//Draw the fbo result fitted to the display window
+	//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
+//}
 
 }
 
@@ -169,10 +169,20 @@ void ofxNDIHelper::setup()
 
 	//gui
 
-	//theme
-	string str = "fonts/overpass-mono-bold.otf";
-	ofxGuiSetFont(path_GLOBAL + str, 9);//TODO: allow default OF_TTF
-
+	//ofxGui theme
+	string str = "overpass-mono-bold.otf";
+	string pathFont = "assets/fonts/" + str;
+	ofFile file(pathFont);
+	//must check this font file is detected
+	if (file.exists())
+	{
+		ofxGuiSetFont(pathFont, 9);
+		ofLogNotice(__FUNCTION__) << "LOADED FILE '" << pathFont << "'";
+	}
+	else
+	{
+		ofLogError(__FUNCTION__) << "FILE '" << pathFont << "' NOT FOUND!";
+	}
 	ofxGuiSetDefaultHeight(20);
 	ofxGuiSetBorderColor(32);
 	ofxGuiSetFillColor(ofColor(48));
@@ -194,6 +204,8 @@ void ofxNDIHelper::setup()
 	g3.minimize();
 	g31.minimize();
 
+	//----
+
 	//startup
 
 	ofLogNotice(__FUNCTION__) << "STARTUP INIT";
@@ -201,8 +213,8 @@ void ofxNDIHelper::setup()
 
 	MODE_Active = true;
 
-	loadParams(params_Internal, path_GLOBAL + path_Params_Internal);
-	loadParams(params_Control, path_GLOBAL + path_Params_Control);
+	//loadParams(params_Internal, path_GLOBAL + path_Params_Internal);
+	//loadParams(params_Control, path_GLOBAL + path_Params_Control);
 
 	//set gui position after window setup/resizing
 	windowResized(screenW, screenH);
@@ -227,6 +239,9 @@ void ofxNDIHelper::setup()
 	refresh_NDI_IN();
 
 	//-
+
+	loadParams(params_Internal, path_GLOBAL + path_Params_Internal);
+	loadParams(params_Control, path_GLOBAL + path_Params_Control);
 }
 
 //--------------------------------------------------------------
@@ -773,6 +788,8 @@ void ofxNDIHelper::setKey_MODE_App(int k)
 void ofxNDIHelper::setPathGlobal(string s)//must call before setup. disabled by default
 {
 	path_GLOBAL = s;
+
+	CheckFolder(path_GLOBAL);
 }
 
 //--------------------------------------------------------------
@@ -1049,7 +1066,7 @@ void ofxNDIHelper::refresh_NDI_IN() {
 	}
 	else
 		ofLogNotice(__FUNCTION__) << "No NDI senders found";
-}
+	}
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_NDI_IN() {
@@ -1185,3 +1202,4 @@ void ofxNDIHelper::draw_NDI_IN() {
 }
 
 #endif
+
