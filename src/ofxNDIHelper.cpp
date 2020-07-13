@@ -45,10 +45,10 @@ void ofxNDIHelper::end_NDI_OUT()
 	ndiSender.SendImage(fbo_NDI_Sender);//send processed
 	//ndiSender.SendImage(fbo_NDI_Sender, false);//send processed
 	//ndiSender.SendImage(vidGrabber.getPixels());//send clean webcam
+
 	//Draw the fbo result fitted to the display window
 	//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
-//}
-
+	//}
 }
 
 //--------------------------------------------------------------
@@ -212,9 +212,6 @@ void ofxNDIHelper::setup()
 	DISABLE_Callbacks = false;
 
 	MODE_Active = true;
-
-	//loadParams(params_Internal, path_GLOBAL + path_Params_Internal);
-	//loadParams(params_Control, path_GLOBAL + path_Params_Control);
 
 	//set gui position after window setup/resizing
 	windowResized(screenW, screenH);
@@ -1066,7 +1063,7 @@ void ofxNDIHelper::refresh_NDI_IN() {
 	}
 	else
 		ofLogNotice(__FUNCTION__) << "No NDI senders found";
-	}
+}
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_NDI_IN() {
