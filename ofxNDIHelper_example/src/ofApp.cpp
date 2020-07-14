@@ -23,26 +23,33 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	ofBackground(32);
+
 #ifdef USE_ofxNDI
-	NDIHelper.begin_NDI_OUT();
-	{
-		//webcam
-		NDIHelper.drawWebcam();
 
-		//ndi input
-		NDIHelper.draw_NDI_IN();
-	}
-	NDIHelper.end_NDI_OUT();
+	NDIHelper.draw();
 
-	//-
+	//----
+
+	//NDIHelper.begin_NDI_OUT();
+	//{
+	//	//webcam
+	//	NDIHelper.drawWebcam();
+	//
+	//	//ndi input
+	//	NDIHelper.draw_NDI_IN();
+	//}
+	//NDIHelper.end_NDI_OUT();
+
+	////-
+	//
+	//////webcam
+	////NDIHelper.drawWebcam();
+
+	////draw ndi out
+	//NDIHelper.draw_NDI_OUT();
 	
-	////webcam
-	//NDIHelper.drawWebcam();
-
-	//draw ndi out
-	NDIHelper.draw_NDI_OUT();
-	
-	//-
+	//----
 
 	//gui
 	NDIHelper.drawGui();
