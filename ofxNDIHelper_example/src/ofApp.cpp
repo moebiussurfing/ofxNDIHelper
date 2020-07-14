@@ -16,6 +16,22 @@ void ofApp::setup() {
 void ofApp::update() {
 
 #ifdef USE_ofxNDI
+	NDIHelper.begin_NDI_OUT();
+	{
+		//layers one upper others:
+
+		//1. webcam
+		NDIHelper.drawWebcamOut();
+
+		//2. ndi input
+		NDIHelper.draw_NDI_IN_Preview();
+	}
+	NDIHelper.end_NDI_OUT();
+#endif
+
+	//----
+
+#ifdef USE_ofxNDI
 	NDIHelper.update();
 #endif
 
@@ -27,32 +43,24 @@ void ofApp::draw() {
 
 #ifdef USE_ofxNDI
 
-	NDIHelper.draw();
+	//----
+	
+	//////webcam
+	////NDIHelper.drawWebcam_Preview();
+
+	////draw ndi out
+	//NDIHelper.draw_NDI_OUT_Preview();
 
 	//----
 
-	//NDIHelper.begin_NDI_OUT();
-	//{
-	//	//webcam
-	//	NDIHelper.drawWebcam();
-	//
-	//	//ndi input
-	//	NDIHelper.draw_NDI_IN();
-	//}
-	//NDIHelper.end_NDI_OUT();
-
-	////-
-	//
-	//////webcam
-	////NDIHelper.drawWebcam();
-
-	////draw ndi out
-	//NDIHelper.draw_NDI_OUT();
+	//draw monitor
+	NDIHelper.draw();
 	
 	//----
 
 	//gui
 	NDIHelper.drawGui();
+
 #endif
 }
 

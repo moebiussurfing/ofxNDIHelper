@@ -3,9 +3,16 @@
 ///
 ///	TODO:
 ///	
+///	+	layout:
+///			finish move ndi input text into text box
+///			move ndi out to right border
+///			add positions to each preview
+///			dynamic draggable/resizable previews?
 ///	+	looks like sometimes more that expected ndi sources are appearing
-///	!	crashes sometimes..
-///	+	dynamic resize input/output
+///	+	split webCam as helper addon 
+///	+	ndi input port settings as names not index port
+///
+///	!	startup requires disable/enable ndi input to refresh index input...?
 ///
 ///---
 
@@ -81,7 +88,8 @@ public:
 	void setupWebcam(int index);//setup webcam from device index
 	void restartWebcam();//restart camera using the current index camera
 	void exitWebcam();//store camera device name to xml
-	void drawWebcam();
+	void drawWebcam_Preview();
+	void drawWebcamOut();
 	void drawWebcamInfo(int x, int y);
 	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
 	//int _d;
@@ -101,14 +109,14 @@ public:
 	char senderName[256];		//Sender name
 	void begin_NDI_OUT();		//feed the sender
 	void end_NDI_OUT();
-	void draw_NDI_OUT();
+	void draw_NDI_OUT_Preview();
 #endif
 
 #ifdef USE_ofxNDI_IN
 public:
 	void setup_NDI_IN();
 	void refresh_NDI_IN();
-	void draw_NDI_IN();
+	void draw_NDI_IN_Preview();
 	ofxNDIreceiver ndiReceiver;			//NDI receiver
 	ofFbo fbo_NDI_Receiver;				//Fbo to receive
 	ofTexture ndiReceiveTexture;		//Texture to receive
@@ -139,6 +147,7 @@ public:
 
 	ofParameter<bool> ENABLE_NDI_Output;
 	ofParameter<bool> ENABLE_Draw_NDI_Output;
+	ofParameter<bool> mini_ndiOutput;
 	ofParameter<string> name_NDI_Output;
 
 	string NDI_InputDevices;

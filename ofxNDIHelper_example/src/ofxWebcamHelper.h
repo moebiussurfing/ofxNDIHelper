@@ -12,7 +12,7 @@
 //	void setupWebcam(int index);//setup webcam from device index
 //	void restartWebcam();//restart camera using the current index camera
 //	void exitWebcam();//store camera device name to xml
-//	void drawWebcam();
+//	void drawWebcam_Preview();
 //	void drawWebcamInfo(int x, int y);
 //	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
 //	//int _d;
