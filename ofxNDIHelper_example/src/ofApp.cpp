@@ -24,7 +24,7 @@ void ofApp::update() {
 		NDIHelper.drawWebcamOut();
 
 		//2. ndi input
-		NDIHelper.draw_NDI_IN_Preview();
+		NDIHelper.draw_Preview_NDI_IN();
 	}
 	NDIHelper.end_NDI_OUT();
 #endif
@@ -46,10 +46,10 @@ void ofApp::draw() {
 	//----
 	
 	//////webcam
-	////NDIHelper.drawWebcam_Preview();
+	////NDIHelper.draw_Preview_Webcam();
 
 	////draw ndi out
-	//NDIHelper.draw_NDI_OUT_Preview();
+	//NDIHelper.draw_Preview_NDI_OUT();
 
 	//----
 

@@ -47,39 +47,6 @@ class ofxNDIHelper : public ofBaseApp
 {
 public:
 
-	ofTrueTypeFont font;
-
-	//--------------------------------------------------------------
-	void drawTextBoxed(string text, int x, int y)
-	{
-		ofPushStyle();
-		int _alpha = 200;//bbox
-		int pad = 20;
-
-		if (!font.isLoaded()) {
-			ofDrawBitmapStringHighlight(text, x, y);
-		}
-		else {
-			//bbox
-			ofSetColor(0, _alpha);
-			ofFill();
-			ofRectangle _r(font.getStringBoundingBox(text, x, y));
-			_r.setWidth(_r.getWidth() + pad);
-			_r.setHeight(_r.getHeight() + pad);
-			_r.setX(_r.getPosition().x - pad / 2.);
-			_r.setY(_r.getPosition().y - pad / 2.);
-			ofDrawRectangle(_r);
-
-			//text
-			ofSetColor(255, 255);
-			ofNoFill();
-			font.drawString(text, x, y);
-		}
-
-		ofPopStyle();
-	}
-
-
 public:
 	//webcam
 #ifdef USE_WEBCAM
@@ -88,9 +55,9 @@ public:
 	void setupWebcam(int index);//setup webcam from device index
 	void restartWebcam();//restart camera using the current index camera
 	void exitWebcam();//store camera device name to xml
-	void drawWebcam_Preview();
+	void draw_Preview_Webcam();
 	void drawWebcamOut();
-	void drawWebcamInfo(int x, int y);
+	//void drawWebcamInfo(int x, int y);
 	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
 	//int _d;
 	ofParameter<bool> mini_Webcam;
@@ -109,14 +76,14 @@ public:
 	char senderName[256];		//Sender name
 	void begin_NDI_OUT();		//feed the sender
 	void end_NDI_OUT();
-	void draw_NDI_OUT_Preview();
+	void draw_Preview_NDI_OUT();
 #endif
 
 #ifdef USE_ofxNDI_IN
 public:
 	void setup_NDI_IN();
 	void refresh_NDI_IN();
-	void draw_NDI_IN_Preview();
+	void draw_Preview_NDI_IN();
 	ofxNDIreceiver ndiReceiver;			//NDI receiver
 	ofFbo fbo_NDI_Receiver;				//Fbo to receive
 	ofTexture ndiReceiveTexture;		//Texture to receive
@@ -152,6 +119,7 @@ public:
 
 	string NDI_InputDevices;
 	string webcam_InputDevices;
+	bool bDoRestartup = false;
 
 public:
 	ofParameterGroup params;
@@ -177,6 +145,7 @@ public:
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
+	void setGuiToggleVisible();
 	void setPathGlobal(string s);//must call before setup. disabled by default
 	void setLogLevel(ofLogLevel level);
 	void setAutoSave(bool b)
@@ -280,4 +249,60 @@ private:
 			ofLogNotice(__FUNCTION__) << "OK! LOCATED FOLDER: '" << _path << "'";//nothing to do
 		}
 	}
+
+	//layout
+	int xpad = 20;//previews
+	int ypad = 20;//previews
+	float wPreview = 320;
+
+	//--
+
+	//text box
+	ofTrueTypeFont font;
+	float rounded = 5.0;
+	int pad = 30;
+
+	//--------------------------------------------------------------
+	void drawTextBoxed(string text, int x, int y, float rounded = 0.f)
+	{
+		ofPushStyle();
+		int _alpha = 200;//bbox
+
+		if (!font.isLoaded()) {
+			ofDrawBitmapStringHighlight(text, x, y);
+		}
+		else {
+			//bbox
+			ofSetColor(0, _alpha);
+			ofFill();
+			ofRectangle _r(font.getStringBoundingBox(text, x, y));
+			_r.setWidth(_r.getWidth() + pad);
+			_r.setHeight(_r.getHeight() + pad);
+			_r.setX(_r.getPosition().x - pad / 2.);
+			_r.setY(_r.getPosition().y - pad / 2.);
+			
+			if (rounded == 0.f) ofDrawRectangle(_r);
+			else ofDrawRectRounded(_r, rounded);
+
+			//text
+			ofSetColor(255, 255);
+			ofNoFill();
+			font.drawString(text, x, y);
+		}
+
+		ofPopStyle();
+	}
+	//--------------------------------------------------------------
+	float getBbTextBoxed(string text) {
+
+		if (!font.isLoaded()) {
+			//ofDrawBitmapStringHighlight(text, 0, 0);
+			//return bb//TODO:
+			return 200;
+		}
+		else {
+			return (font.getStringBoundingBox(text, 0, 0)).getWidth() + pad;
+		}
+	}
+
 };

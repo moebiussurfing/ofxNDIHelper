@@ -52,7 +52,7 @@ void ofxNDIHelper::end_NDI_OUT()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_NDI_OUT_Preview()//TODO:mini
+void ofxNDIHelper::draw_Preview_NDI_OUT()//TODO:mini
 {
 	if (ENABLE_NDI_Output.get())
 	{
@@ -71,13 +71,10 @@ void ofxNDIHelper::draw_NDI_OUT_Preview()//TODO:mini
 		}
 		else//mini
 		{
-			int xpad = 10;
-
-			//float xx = xpad;
-			float yy = fbo_NDI_Sender.getHeight() * 0.5;
-			float ww = fbo_NDI_Sender.getWidth() * 0.25;
-			float xx = xpad + 20 + ww;
-			float hh = fbo_NDI_Sender.getHeight() * 0.25;
+			float ww = wPreview;
+			float hh = ww * (16 / 9.f);
+			float xx = xpad + 2 * (xpad + ww);
+			float yy = ofGetHeight() - hh - ypad;
 
 			//TODO:?
 			ofRectangle rw = ofGetWindowRect();
@@ -106,7 +103,11 @@ void ofxNDIHelper::setup()
 	//log mode
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
 
-	font.load(OF_TTF_MONO, 10);
+	//gui help display font
+	string str = "overpass-mono-bold.otf";
+	string pathFont = "assets/fonts/" + str;
+	bool b = font.load(pathFont, 10);
+	if (!b) b = font.load(OF_TTF_MONO, 10);
 
 	//--
 
@@ -244,18 +245,18 @@ void ofxNDIHelper::setup()
 	//gui
 
 	//ofxGui theme
-	string str = "overpass-mono-bold.otf";
-	string pathFont = "assets/fonts/" + str;
-	ofFile file(pathFont);
+	string strG = "overpass-mono-bold.otf";
+	string pathFontG = "assets/fonts/" + str;
+	ofFile file(pathFontG);
 	//must check this font file is detected
 	if (file.exists())
 	{
-		ofxGuiSetFont(pathFont, 9);
-		ofLogNotice(__FUNCTION__) << "LOADED FILE '" << pathFont << "'";
+		ofxGuiSetFont(pathFontG, 9);
+		ofLogNotice(__FUNCTION__) << "LOADED FILE '" << pathFontG << "'";
 	}
 	else
 	{
-		ofLogError(__FUNCTION__) << "FILE '" << pathFont << "' NOT FOUND!";
+		ofLogError(__FUNCTION__) << "FILE '" << pathFontG << "' NOT FOUND!";
 	}
 	ofxGuiSetDefaultHeight(20);
 	ofxGuiSetBorderColor(32);
@@ -321,6 +322,13 @@ void ofxNDIHelper::setup()
 	refresh_NDI_IN();
 
 	//-
+
+	//workaround
+	if (ENABLE_Webcam.get()) {
+		bDoRestartup = true;
+		ENABLE_Webcam = false;
+		vidGrabber.close();
+	}
 }
 
 //--------------------------------------------------------------
@@ -328,6 +336,19 @@ void ofxNDIHelper::update()
 {
 
 #ifdef USE_WEBCAM
+	//-
+
+	//workaround
+	//restart camera after startup to make sure will be initialized fine.
+	float _timeWait = 5.0;
+	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60))) {//in x seconds at 60fps
+		//vidGrabber.close();
+		restartWebcam();
+		ENABLE_Webcam = true;
+	}
+
+	//-
+
 	if (ENABLE_Webcam.get()) {
 		//ofBackground(100, 100, 100);
 
@@ -377,14 +398,14 @@ void ofxNDIHelper::draw() {
 
 	//ndi out
 	if (ENABLE_NDI_Output.get() && ENABLE_Draw_NDI_Output.get()) {
-		draw_NDI_OUT_Preview();
+		draw_Preview_NDI_OUT();
 	}
 
 	//-
 
 	//ndi in
 	if (ENABLE_NDI_Input.get() && ENABLE_Draw_NDI_Input.get()) {
-		draw_NDI_IN_Preview();
+		draw_Preview_NDI_IN();
 	}
 
 	//-
@@ -393,7 +414,7 @@ void ofxNDIHelper::draw() {
 #ifdef USE_WEBCAM
 	if (ENABLE_Webcam.get() && ENABLE_Draw_Webcam.get())
 	{
-		drawWebcam_Preview();
+		draw_Preview_Webcam();
 	}
 #endif
 }
@@ -514,15 +535,15 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 		//{
 		//}
 
-		//custom with modifiers
-		if (key == OF_KEY_UP && mod_ALT)
-		{
-			ofLogNotice(__FUNCTION__) << "";
-		}
-		else if (key == OF_KEY_UP)
-		{
-			ofLogNotice(__FUNCTION__) << "";
-		}
+		////custom with modifiers
+		//if (key == OF_KEY_UP && mod_ALT)
+		//{
+		//	ofLogNotice(__FUNCTION__) << "KEY UP";
+		//}
+		//else if (key == OF_KEY_UP)
+		//{
+		//	ofLogNotice(__FUNCTION__) << "";
+		//}
 
 		//general
 		if (key == key_MODE_App)
@@ -531,15 +552,15 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 			i++;
 			MODE_App = i % NUM_MODES_APP;
 		}
-		else if (key == 'g')
+		else if (key == 'G')
 		{
 			SHOW_Gui = !SHOW_Gui;
 		}
-		else if (key == 'h')
+		else if (key == 'H')
 		{
 			SHOW_Help = !SHOW_Help;
 		}
-		else if (key == 'd')
+		else if (key == 'D')
 		{
 			ENABLE_Debug = !ENABLE_Debug;
 		}
@@ -586,7 +607,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 			//webcam
 
 #ifdef USE_WEBCAM
-			if (key == 'i') {
+			if (key == 'I') {
 				//webcam
 				auto _devs = vidGrabber.listDevices();
 				index_WebcamDevice++;
@@ -607,7 +628,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 	//--
 
 	//key enabler
-	if (key == 'k')
+	if (key == 'K')
 	{
 		ENABLE_keys = !ENABLE_keys;
 		ofLogNotice(__FUNCTION__) << "KEYS: " << (ENABLE_keys ? "ON" : "OFF");
@@ -714,6 +735,12 @@ void ofxNDIHelper::setActive(bool b)
 void ofxNDIHelper::setGuiVisible(bool b)
 {
 	SHOW_Gui = b;
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::setGuiToggleVisible()
+{
+	SHOW_Gui = !SHOW_Gui;
 }
 
 
@@ -1138,7 +1165,7 @@ void ofxNDIHelper::setupWebcam() {
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::drawWebcam_Preview() {
+void ofxNDIHelper::draw_Preview_Webcam() {
 	if (ENABLE_Webcam.get())
 	{
 		ofPushStyle();
@@ -1157,12 +1184,10 @@ void ofxNDIHelper::drawWebcam_Preview() {
 		}
 		else//mini
 		{
-			int xpad = 10;
-
-			float xx = xpad;
-			float yy = vidGrabber.getHeight() * 0.2;
-			float ww = vidGrabber.getWidth() * 0.25;
-			float hh = vidGrabber.getHeight() * 0.25;
+			float ww = wPreview;
+			float xx = xpad + 0 * (xpad + ww);
+			float hh = ww * (16 / 9.f);
+			float yy = ofGetHeight() - hh - ypad;
 
 			ofRectangle rw = ofGetWindowRect();
 			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
@@ -1196,26 +1221,6 @@ void ofxNDIHelper::drawWebcamOut() {
 	vidGrabber.draw(r.x, r.y, r.width, r.height);
 
 	ofPopStyle();
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::drawWebcamInfo(int x, int y) {
-	string str;
-	str = "";
-
-	//display all devices
-	//display device name
-	//str += ">" + name_Webcam.get();// +"\n";
-	str += "" + _dName.get() + " [" + ofToString(index_WebcamDevice.get()) + "]";
-	//str += " [" + ofToString(index_WebcamDevice.get()) + "]";
-	str += " " + ofToString(vidGrabber.isInitialized() ? "[ON]" : "[OFF]") + "\n";
-	str += "\n";
-	str += "WEBCAM INPUT DEVICES:\n";
-	str += webcam_InputDevices + "\n";
-	str += "PRESS i: TO SELECT NEXT DEVICE";
-	//str += "\nI: restart device";
-
-	drawTextBoxed(str, x, y);
 }
 
 //--------------------------------------------------------------
@@ -1293,13 +1298,32 @@ void ofxNDIHelper::drawInfoDevices() {
 	int l = 20;
 	int i = 0;
 
+	float _spacing = 10;
+
 	//-
 
-//webcam
+	//webcam
 #ifdef USE_WEBCAM
 	if (ENABLE_Webcam.get())
 	{
-		drawWebcamInfo(x, y);
+		//drawWebcamInfo(x, y);
+		string str;
+		str = "";
+
+		str += "WEBCAM INPUT DEVICES\n";
+		//display all devices
+		//display device name
+		//str += ">" + name_Webcam.get();// +"\n";
+		str += "" + _dName.get() + " [" + ofToString(index_WebcamDevice.get()) + "]";
+		//str += " [" + ofToString(index_WebcamDevice.get()) + "]";
+		str += " " + ofToString(vidGrabber.isInitialized() ? "[ON]" : "[OFF]") + "\n";
+		str += "\n";
+		str += webcam_InputDevices + "\n";
+		str += "PRESS i: TO SELECT NEXT DEVICE";
+		//str += "\nI: restart device";
+
+		drawTextBoxed(str, x, y, rounded);
+		x += getBbTextBoxed(str) + _spacing;
 	}
 #endif
 
@@ -1307,105 +1331,67 @@ void ofxNDIHelper::drawInfoDevices() {
 
 	//ndi in
 
-	i = 0;
-	x += 350;
+	//x += 350;
 	if (ENABLE_NDI_Input.get()) {
+		string str = "";
+		str += "NDI INPUT DEVICES\n";
 
-		//string str = "";
-		//str += "NDI INPUT DEVICES:\n";
-		//char str[256];
-		//int _nsendersRemote = ndiReceiver.GetSenderCount();
-		//if (_nsendersRemote > 0) {
-
-		//	if (ndiReceiver.ReceiverCreated()) {
-		//		if (ndiReceiver.ReceiverConnected()) {
-		//			//Show received sender information and received fps
-		//			sprintf_s(str, 256, "[%s] (%dx%d/%4.2fp) (fps %2.0f)", ndiReceiver.GetSenderName().c_str(), 
-		//				ndiReceiver.GetSenderWidth(), 
-		//				ndiReceiver.GetSenderHeight(), 
-		//				ndiReceiver.GetSenderFps(), ndiReceiver.GetFps());
-		//		}
-		//		else {
-		//			//Nothing received
-		//			sprintf_s(str, 256, "> %s", ndiReceiver.GetSenderName().c_str());
-		//		}
-		//	}
-		//	ofDrawBitmapStringHighlight(str, x, y + l * i++);
-		//	//i++;
-
-		//	if (_nsendersRemote == 1) {
-		//		ofDrawBitmapStringHighlight("1 NET SOURCE", x, y + l * i++);
-		//	}
-		//	else {
-		//		sprintf_s(str, 256, "%d NET SOURCES.", _nsendersRemote);
-		//		string str2(str);
-		//		str2 += " SPACE: LIST SENDERS";
-		//		ofDrawBitmapStringHighlight(str2, x, y + l * i++);
-		//	}
-		//}
-		//else {
-		//	ofDrawBitmapStringHighlight("CONNECTING...", x, y + l * i++);
-		//}
-
-		////ndi input devices list
-		//if (NDI_InputDevices.size() > 0) ofDrawBitmapStringHighlight(NDI_InputDevices, x, y + l * i++);
-
-
-		//--
-
-		char str[256];
-		ofDrawBitmapStringHighlight("NDI INPUT DEVICES", x, y + l * i++);
 		int nsenders = ndiReceiver.GetSenderCount();
 		if (nsenders > 0) {
-
 			if (ndiReceiver.ReceiverCreated()) {
 				if (ndiReceiver.ReceiverConnected()) {
 					//Show received sender information and received fps
-					sprintf_s(str, 256, "[%s] (%dx%d/%4.2fp) (fps %2.0f)", ndiReceiver.GetSenderName().c_str(), ndiReceiver.GetSenderWidth(), ndiReceiver.GetSenderHeight(), ndiReceiver.GetSenderFps(), ndiReceiver.GetFps());
+					str += "(" + ofToString(ndiReceiver.GetSenderName().c_str()) + ")";
+					str += "\n(" + ofToString(ndiReceiver.GetSenderWidth());
+					str += "x" + ofToString(ndiReceiver.GetSenderHeight());
+					str += "/" + ofToString(ndiReceiver.GetSenderFps()) + ")";
+					str += " (FPS" + ofToString(ndiReceiver.GetFps()) + ")\n";
 				}
 				else {
 					//Nothing received
-					sprintf_s(str, 256, "> %s", ndiReceiver.GetSenderName().c_str());
+					str += "> " + ofToString(ndiReceiver.GetSenderName().c_str());
 				}
 			}
-			ofDrawBitmapStringHighlight(str, x, y + l * i++);
-			//i++;
 
 			if (nsenders == 1) {
-				ofDrawBitmapStringHighlight("1 NET SOURCE", x, y + l * i++);
+				str += "\n1 NET SOURCE";
 			}
 			else {
-				sprintf_s(str, 256, "%d NET SOURCES.", nsenders);
-				string str2(str);
-				str2 += " SPACE: LIST SENDERS";
-				ofDrawBitmapStringHighlight(str2, x, y + l * i++);
+				str += "\n" + ofToString(nsenders) + " NET SOURCES.";
+				str += " SPACE: LIST SENDERS\n";
 			}
 		}
 		else {
-			ofDrawBitmapStringHighlight("CONNECTING...", x, y + l * i++);
+			str += "CONNECTING...\n";
 		}
 		//ndi input devices list
-		if (NDI_InputDevices.size() > 0) ofDrawBitmapStringHighlight(NDI_InputDevices, x, y + l * i++);
+		if (NDI_InputDevices.size() > 0) str += NDI_InputDevices;
+
+		//--
+
+		drawTextBoxed(str, x, y, rounded);
+		x += getBbTextBoxed(str) + _spacing;
 	}
 
 	//-
 
 	//ndi out
 
-	i = 0;
+	//i = 0;
 	//x += 650;
-	x = ofGetWidth() - 300;//right
+	//x = ofGetWidth() - 300;//right
 
 	if (ENABLE_NDI_Output.get()) {
 		//Show what it is sending
 		if (ndiSender.SenderCreated()) {
 			string str = "";
-			str += "NDI OUPUT DEVICE:\n";
+			str += "NDI OUPUT DEVICE\n";
 			str += "PORT NAME: " + ofToString(senderName) + "\n";
 			str += ofToString(senderWidth) + "x" + ofToString(senderHeight) + "\n";
 			str += "FPS: " + ofToString((int)ofGetFrameRate()) + " APP / " + ofToString(ndiSender.GetFps()) + " NDI";
 
-			drawTextBoxed(str, x, y);
+			drawTextBoxed(str, x, y, rounded);
+			x += getBbTextBoxed(str) + _spacing;
 		}
 	}
 }
@@ -1512,7 +1498,7 @@ void ofxNDIHelper::setup_NDI_IN() {
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_NDI_IN_Preview() {
+void ofxNDIHelper::draw_Preview_NDI_IN() {
 	if (ENABLE_NDI_Input.get()) {
 
 		//Receive ofTexture
@@ -1537,7 +1523,7 @@ void ofxNDIHelper::draw_NDI_IN_Preview() {
 		if (!mini_ndiInput.get())//full size 
 		{
 			ofRectangle r(0, 0, ndiReceiveTexture.getWidth(), ndiReceiveTexture.getHeight());
-		
+
 			r.scaleTo(ofGetWindowRect());
 			//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
 			//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_STRETCH_TO_FILL);
@@ -1547,12 +1533,10 @@ void ofxNDIHelper::draw_NDI_IN_Preview() {
 		}
 		else//mini
 		{
-			int xpad = 10;
-
-			float xx = xpad;
-			float yy = ndiReceiveTexture.getHeight() * 0.5;
-			float ww = ndiReceiveTexture.getWidth() * 0.25;
-			float hh = ndiReceiveTexture.getHeight() * 0.25;
+			float ww = wPreview;
+			float xx = xpad + 1 * (xpad + ww);
+			float hh = ww * (16/9.f);
+			float yy = ofGetHeight() - hh - ypad;
 
 			ofRectangle rw = ofGetWindowRect();
 			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
