@@ -3,13 +3,13 @@
 ///
 ///	TODO:
 ///	
-///	+	layout:
-///			finish move ndi input text into text box
-///			move ndi out to right border
-///			add positions to each preview
+///	+	remove mini preview from webcam from output
+///	+	improved selector/patching webcam or ndi input to output
+///	+	layout
+///			fix previews resize when app window changes
 ///			dynamic draggable/resizable previews?
 ///	+	looks like sometimes more that expected ndi sources are appearing
-///	+	split webCam as helper addon 
+///	+	split webCam as a new helper addon 
 ///	+	ndi input port settings as names not index port
 ///
 ///	!	startup requires disable/enable ndi input to refresh index input...?
