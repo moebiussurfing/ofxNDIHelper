@@ -1190,6 +1190,7 @@ void ofxNDIHelper::draw_Preview_Webcam() {
 			float yy = ofGetHeight() - hh - ypad;
 
 			ofRectangle rw = ofGetWindowRect();
+			//rw.scaleTo(ofRectangle(xx, yy, ww, hh), OF_SCALEMODE_FILL);
 			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
 
 			vidGrabber.draw(rw.x, rw.y, rw.width, rw.height);
@@ -1213,7 +1214,7 @@ void ofxNDIHelper::drawWebcamOut() {
 	ofSetColor(255, 255);
 
 	ofRectangle r(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
-	r.scaleTo(ofGetWindowRect());
+	r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
 	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
 	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_STRETCH_TO_FILL);
 	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
