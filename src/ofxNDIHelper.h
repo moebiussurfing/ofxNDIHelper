@@ -36,6 +36,7 @@
 #include "ofxNDI.h"
 #endif
 #endif
+#include "ofxInteractiveRect.h"
 
 //we can handle many app modes to change behaviour
 #define NUM_MODES_APP 2
@@ -45,7 +46,39 @@
 
 class ofxNDIHelper : public ofBaseApp
 {
+
+#pragma mark - OF
 public:
+
+	ofxNDIHelper();
+	~ofxNDIHelper();
+
+	void setup();
+	void update();
+	void draw();
+	void exit();
+
+	void drawGui();
+
+	void windowResized(int w, int h);
+
+	//-
+
+#pragma mark - API
+
+	void setActive(bool b);
+	void setGuiVisible(bool b);
+	void setGuiToggleVisible();
+	void setPathGlobal(string s);//must call before setup. disabled by default
+	void setLogLevel(ofLogLevel level);
+	void setAutoSave(bool b)
+	{
+		ENABLE_AutoSave = b;
+	}
+
+	void setKey_MODE_App(int k);
+
+	//--
 
 public:
 	//webcam
@@ -124,36 +157,24 @@ public:
 public:
 	ofParameterGroup params;
 
-	//----
+	//--
 
-#pragma mark - OF
+public:
+	// mini preview rectangles positions and sizes
+	ofxInteractiveRect rectNdiIn = { "rectNdiIn" };
+	ofxInteractiveRect rectNdiOut = { "rectNdiOut" };
+	ofxInteractiveRect rectWebcam = { "rectWebcam" };
+	ofParameter<bool> bLockRatio;
+	ofParameter<bool> bResetRects;
+	string path_rectNdiIn = "_NDI_In_Mini";
+	string path_rectNdiOut = "_NDI_Out_Mini";
+	string path_rectWebcam = "_Webcam_Mini";
 
-	ofxNDIHelper();
-	~ofxNDIHelper();
-
-	void setup();
-	void update();
-	void draw();
-	void exit();
-
-	void drawGui();
-
-	//public
-	void windowResized(int w, int h);
-
-#pragma mark - API
-
-	void setActive(bool b);
-	void setGuiVisible(bool b);
-	void setGuiToggleVisible();
-	void setPathGlobal(string s);//must call before setup. disabled by default
-	void setLogLevel(ofLogLevel level);
-	void setAutoSave(bool b)
-	{
-		ENABLE_AutoSave = b;
-	}
-
-	void setKey_MODE_App(int k);
+	// default layout
+	int xPadPreview = 50;
+	int yPadPreview = 400;
+	float wPreview = 320;
+	void resetMiniPreviews();
 
 	//-
 
@@ -250,14 +271,9 @@ private:
 		}
 	}
 
-	//layout
-	int xpad = 20;//previews
-	int ypad = 20;//previews
-	float wPreview = 320;
-
 	//--
 
-	//text box
+	// text box
 	ofTrueTypeFont font;
 	float rounded = 5.0;
 	int pad = 30;

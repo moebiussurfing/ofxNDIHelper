@@ -7,9 +7,9 @@ ofxNDIHelper::ofxNDIHelper()
 {
 	DISABLE_Callbacks = true;
 
-	//path for settings
+	// path for settings
 	//setPathGlobal("ofxNDIHelper/");
-	path_GLOBAL = "ofxNDIHelper/";//this is to folder all files to avoid mixing with other addons data
+	path_GLOBAL = "ofxNDIHelper/";// this is to folder all files to avoid mixing with other addons data
 
 	path_Params_Internal = "params_Internal.xml";
 	path_Params_Control = "params_Control.xml";
@@ -18,10 +18,10 @@ ofxNDIHelper::ofxNDIHelper()
 	path_WebcamSettings = "webcam_Settings.xml";
 #endif
 
-	setActive(true);//add key and mouse listeners
+	setActive(true);// add key and mouse listeners
 }
 
-//feed
+// feed
 //--------------------------------------------------------------
 void ofxNDIHelper::begin_NDI_OUT()
 {
@@ -42,24 +42,24 @@ void ofxNDIHelper::end_NDI_OUT()
 
 		//--
 
-		//do the sending
+		// do the sending
 
 		ofColor(255);
 		ndiSender.SendImage(fbo_NDI_Sender);
-		//ndiSender.SendImage(fbo_NDI_Sender, false);//send processed
-		//ndiSender.SendImage(vidGrabber.getPixels());//send clean webcam
+		//ndiSender.SendImage(fbo_NDI_Sender, false);// send processed
+		//ndiSender.SendImage(vidGrabber.getPixels());// send clean webcam
 	}
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Preview_NDI_OUT()//TODO:mini
+void ofxNDIHelper::draw_Preview_NDI_OUT()// TODO:mini
 {
 	if (ENABLE_NDI_Output.get())
 	{
 		ofPushStyle();
 		ofSetColor(255, 255);
 
-		if (!mini_ndiOutput.get())//full size 
+		if (!mini_ndiOutput.get())// full size 
 		{
 			ofRectangle r(0, 0, fbo_NDI_Sender.getWidth(), fbo_NDI_Sender.getHeight());
 			r.scaleTo(ofGetWindowRect());
@@ -69,26 +69,21 @@ void ofxNDIHelper::draw_Preview_NDI_OUT()//TODO:mini
 
 			fbo_NDI_Sender.draw(r.x, r.y, r.width, r.height);
 		}
-		else//mini
+		else// mini
 		{
-			float ww = wPreview;
-			float hh = ww * (16 / 9.f);
-			float xx = xpad + 2 * (xpad + ww);
-			float yy = ofGetHeight() - hh - ypad;
-
-			//TODO:?
-			ofRectangle rw = ofGetWindowRect();
-			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
-
-			fbo_NDI_Sender.draw(rw.x, rw.y, rw.width, rw.height);
-
-			//bb border
+			if (bLockRatio.get()) {
+				float _ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
+				rectNdiOut.height = rectNdiOut.width * _ratio;
+			}
+			fbo_NDI_Sender.draw(rectNdiOut.x, rectNdiOut.y, rectNdiOut.width, rectNdiOut.height);
+			rectNdiOut.draw();
+			// bb border
 			ofNoFill();
 			ofSetColor(0);
 			ofSetLineWidth(2.0);
-			ofDrawRectangle(rw);
-
-			ofDrawBitmapStringHighlight("NDI OUT", rw.x + 4 - 1, rw.y - 5);
+			ofDrawRectangle(rectNdiOut);
+			// info
+			ofDrawBitmapStringHighlight("NDI OUT", rectNdiOut.x + 4 - 1, rectNdiOut.y - 5);
 		}
 
 		//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -100,10 +95,10 @@ void ofxNDIHelper::draw_Preview_NDI_OUT()//TODO:mini
 //--------------------------------------------------------------
 void ofxNDIHelper::setup()
 {
-	//log mode
+	// log mode
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
 
-	//gui help display font
+	// gui help display font
 	string str = "overpass-mono-bold.otf";
 	string pathFont = "assets/fonts/" + str;
 	bool b = font.load(pathFont, 10);
@@ -111,36 +106,39 @@ void ofxNDIHelper::setup()
 
 	//--
 
-	//window
+	// window
 	screenW = ofGetWidth();
 	screenH = ofGetHeight();
 
 	//--
 
-	//params control (addon variables)
+	// params control (addon variables)
 	ENABLE_Addon.set("ENABLE", true);
 	ENABLE_Edit.set("EDIT", true);
+	bLockRatio.set("LOCK RATIO", true);
+	bResetRects.set("RESET", false);
+	bResetRects.setSerializable(false);
 
-	//ndi in
+	// ndi in
 	ENABLE_NDI_Input.set("ENABLE NDI INPUT", false);
 	ENABLE_Draw_NDI_Input.set("DRAW NDI INPUT", true);
 	mini_ndiInput.set("MINI INPUT", false);
 	index_NDI_Input.set("DEVICE NDI INPUT", 0, 0, 1);
 	name_NDI_Input.set("NDI_IN", "ofxNDIHelperIN");
 
-	//ndi out
+	// ndi out
 	ENABLE_NDI_Output.set("ENABLE NDI OUTPUT", false);
 	ENABLE_Draw_NDI_Output.set("DRAW NDI OUTPUT", true);
 	mini_ndiOutput.set("MINI OUTPUT", false);
 	name_NDI_Output.set("NDI_OUT", "ofxNDIHelperOUT");
 
-	//exclude from settings
+	// exclude from settings
 	name_NDI_Input.setSerializable(false);
-	//name_NDI_Output.setSerializable(false);
+	// name_NDI_Output.setSerializable(false);
 
 	//--
 
-	//webcam
+	// webcam
 #ifdef USE_WEBCAM
 	ENABLE_Webcam.set("ENABLE WEBCAM", false);
 	ENABLE_Draw_Webcam.set("DRAW WEBCAM", true);
@@ -161,7 +159,7 @@ void ofxNDIHelper::setup()
 
 	//--
 
-	//ndi in
+	// ndi in
 	ofParameterGroup gNdiI{ "NDI INPUT" };
 	gNdiI.add(ENABLE_NDI_Input);
 	gNdiI.add(ENABLE_Draw_NDI_Input);
@@ -169,7 +167,7 @@ void ofxNDIHelper::setup()
 	gNdiI.add(index_NDI_Input);
 	gNdiI.add(name_NDI_Input);
 
-	//ndi out
+	// ndi out
 	ofParameterGroup gNdiO{ "NDI OUTPUT" };
 	gNdiO.add(ENABLE_NDI_Output);
 	gNdiO.add(ENABLE_Draw_NDI_Output);
@@ -178,6 +176,9 @@ void ofxNDIHelper::setup()
 
 	SHOW_Help.set("HELP", false);
 
+	rectNdiOut.enableEdit();
+	rectNdiOut.setRect(200, 200, 200, 400);
+
 	//-
 
 	//group
@@ -185,22 +186,24 @@ void ofxNDIHelper::setup()
 	params_Control.add(ENABLE_Addon);
 	params_Control.add(SHOW_Help);
 	params_Control.add(ENABLE_Edit);
+	params_Control.add(bLockRatio);
+	params_Control.add(bResetRects);
 
-	//webcam
+	// webcam
 #ifdef USE_WEBCAM
 	params_Control.add(gWebcam);
 #endif
 	params_Control.add(gNdiI);
 	params_Control.add(gNdiO);
 
-	//callback
+	// callback
 	ofAddListener(params_Control.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Control);
 
 	//-
 
-	//addon control(internal)
+	// addon control(internal)
 
-	//params
+	// params
 	MODE_Active.set("ACTIVE", true);
 	ENABLE_keys.set("KEYS", true);
 	MODE_App.set("APP MODE", 0, 0, NUM_MODES_APP - 1);
@@ -215,7 +218,7 @@ void ofxNDIHelper::setup()
 		glm::vec2(screenW, screenH)
 	);
 
-	//params control (internal)
+	// params control (internal)
 	params_Internal.setName("INTERNAL");
 	params_Internal.add(MODE_App);
 	params_Internal.add(MODE_App_Name);
@@ -227,28 +230,28 @@ void ofxNDIHelper::setup()
 	params_Internal.add(SHOW_Gui);
 	params_Internal.add(Gui_Position);
 
-	//callback
+	// callback
 	ofAddListener(params_Internal.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Internal);
 
 	//-
 
-	//all params
+	// all params
 	params.setName("ofxNDIHelper");
 	params.add(params_Control);
 	params.add(params_Internal);
 
-	//callback
+	// callback
 	ofAddListener(params.parameterChangedE(), this, &ofxNDIHelper::Changed_params);
 
 	//--
 
-	//gui
+	// gui
 
-	//ofxGui theme
+	// ofxGui theme
 	string strG = "overpass-mono-bold.otf";
 	string pathFontG = "assets/fonts/" + str;
 	ofFile file(pathFontG);
-	//must check this font file is detected
+	// must check this font file is detected
 	if (file.exists())
 	{
 		ofxGuiSetFont(pathFontG, 9);
@@ -266,25 +269,25 @@ void ofxNDIHelper::setup()
 
 	//--
 
-	//setup gui
+	// setup gui
 	gui_Control.setup("ofxNDIHelper");
-	gui_Control.add(params);//add control (internal) and addon params
+	gui_Control.add(params);// add control (internal) and addon params
 
-	//collapse groups
-	auto &g0 = gui_Control.getGroup("ofxNDIHelper");//1st level
-	auto &g2 = g0.getGroup("CONTROL");//2nd level
-	auto &g3 = g0.getGroup("INTERNAL");//2nd level
-	auto &g31 = g3.getGroup("GUI POSITION");//3nd level
+	// collapse groups
+	auto &g0 = gui_Control.getGroup("ofxNDIHelper");// 1st level
+	auto &g2 = g0.getGroup("CONTROL");// 2nd level
+	auto &g3 = g0.getGroup("INTERNAL");// 2nd level
+	auto &g31 = g3.getGroup("GUI POSITION");// 3nd level
 
-	//g0.minimize();
-	//g2.minimize();
+	// g0.minimize();
+	// g2.minimize();
 	g3.minimize();
 	g31.minimize();
 
 	//--
 
-	//sources / modules
-	//must be called before the loading of settings bc how callbacks are running..
+	// sources / modules
+	// must be called before the loading of settings bc how callbacks are running..
 #ifdef USE_WEBCAM
 	setupWebcam();
 #endif
@@ -303,17 +306,17 @@ void ofxNDIHelper::setup()
 
 	//----
 
-	//startup
+	// startup
 
 	ofLogNotice(__FUNCTION__) << "STARTUP";
 	DISABLE_Callbacks = false;
 
 	MODE_Active = true;
 
-	//set gui position after window setup/resizing
+	// set gui position after window setup/resizing
 	windowResized(screenW, screenH);
 
-	//file settings
+	// file settings
 	loadParams(params_Internal, path_GLOBAL + path_Params_Internal);
 	loadParams(params_Control, path_GLOBAL + path_Params_Control);
 
@@ -323,12 +326,18 @@ void ofxNDIHelper::setup()
 
 	//-
 
-	//workaround
+	// workaround
 	if (ENABLE_Webcam.get()) {
 		bDoRestartup = true;
 		ENABLE_Webcam = false;
 		vidGrabber.close();
 	}
+
+	// mini preview rectangles positions and sizes
+	resetMiniPreviews();
+	rectNdiIn.loadSettings(path_rectNdiIn, path_GLOBAL,false);
+	rectNdiOut.loadSettings(path_rectNdiOut, path_GLOBAL, false);
+	rectWebcam.loadSettings(path_rectWebcam, path_GLOBAL, false);
 }
 
 //--------------------------------------------------------------
@@ -338,10 +347,10 @@ void ofxNDIHelper::update()
 #ifdef USE_WEBCAM
 	//-
 
-	//workaround
-	//restart camera after startup to make sure will be initialized fine.
+	// workaround
+	// restart camera after startup to make sure will be initialized fine.
 	float _timeWait = 5.0;
-	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60))) {//in x seconds at 60fps
+	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60))) {// in x seconds at 60fps
 		//vidGrabber.close();
 		restartWebcam();
 		ENABLE_Webcam = true;
@@ -368,16 +377,16 @@ void ofxNDIHelper::update()
 
 	//--
 
-	//autosave
-	//ENABLE_AutoSave = false;
+	// autosave
+	// ENABLE_AutoSave = false;
 	if (ENABLE_AutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
 		ofLogLevel _logPre = ofGetLogLevel();
-		ofSetLogLevel(OF_LOG_SILENT);//bypass this logs
+		ofSetLogLevel(OF_LOG_SILENT);// bypass this logs
 
 		DISABLE_Callbacks = true;
 
-		//get gui position before save
+		// get gui position before save
 		Gui_Position = glm::vec2(gui_Control.getPosition());
 		saveParams(params_Internal, path_GLOBAL + path_Params_Internal);
 		saveParams(params_Control, path_GLOBAL + path_Params_Control);
@@ -396,21 +405,21 @@ void ofxNDIHelper::draw() {
 
 	//-
 
-	//ndi out
+	// ndi out
 	if (ENABLE_NDI_Output.get() && ENABLE_Draw_NDI_Output.get()) {
 		draw_Preview_NDI_OUT();
 	}
 
 	//-
 
-	//ndi in
+	// ndi in
 	if (ENABLE_NDI_Input.get() && ENABLE_Draw_NDI_Input.get()) {
 		draw_Preview_NDI_IN();
 	}
 
 	//-
 
-	//webcam
+	// webcam
 #ifdef USE_WEBCAM
 	if (ENABLE_Webcam.get() && ENABLE_Draw_Webcam.get())
 	{
@@ -424,19 +433,19 @@ void ofxNDIHelper::drawGui()
 {
 	if (SHOW_Gui)
 	{
-		//edit mode
+		// edit mode
 		if (MODE_App == 1)
 		{
 			if (SHOW_Help.get())
 			{
-				//Show what it is receiving
+				// Show what it is receiving
 				drawInfoDevices();
 			}
 		}
 
 		//-
 
-		//gui panel
+		// gui panel
 		gui_Control.draw();
 	}
 }
@@ -444,7 +453,7 @@ void ofxNDIHelper::drawGui()
 //--------------------------------------------------------------
 void ofxNDIHelper::exit()
 {
-	//webcam
+	// webcam
 #ifdef USE_WEBCAM
 	exitWebcam();
 #endif
@@ -452,26 +461,30 @@ void ofxNDIHelper::exit()
 	//-
 
 #ifdef USE_ofxNDI_OUT
-	//The sender must be released 
-	//or NDI sender discovery will still find it
+	// The sender must be released 
+	// or NDI sender discovery will still find it
 	ndiSender.ReleaseSender();
 #endif
 
 	//--
 
-	//get gui position before save
+	// get gui position before save
 	Gui_Position = glm::vec2(gui_Control.getPosition());
 
 	saveParams(params_Internal, path_GLOBAL + path_Params_Internal);
 	saveParams(params_Control, path_GLOBAL + path_Params_Control);
+
+	rectNdiIn.saveSettings(path_rectNdiIn, path_GLOBAL, false);
+	rectNdiOut.saveSettings(path_rectNdiOut, path_GLOBAL, false);
+	rectWebcam.saveSettings(path_rectWebcam, path_GLOBAL , false);
 }
 
 //--------------------------------------------------------------
 ofxNDIHelper::~ofxNDIHelper()
 {
-	setActive(false);//remove keys and mouse listeners
+	setActive(false);// remove keys and mouse listeners
 
-	//remove params callbacks listeners
+	// remove params callbacks listeners
 	ofRemoveListener(params.parameterChangedE(), this, &ofxNDIHelper::Changed_params);
 	ofRemoveListener(params_Internal.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Internal);
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Control);
@@ -496,18 +509,18 @@ void ofxNDIHelper::windowResized(int w, int h)
 
 	//-
 
-	//user gui deopending on window dimensions
+	// user gui deopending on window dimensions
 	//gui_Control.setPosition(screenW * 0.5 - 200, screenH - 200);
 }
 
-//keys
+// keys
 //--------------------------------------------------------------
 void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 {
 	const int &key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << "keyPressed: " << (char)key << " [" << key << "]";
 
-	//modifiers
+	// modifiers
 	bool mod_COMMAND = eventArgs.hasModifier(OF_KEY_COMMAND);
 	bool mod_CONTROL = eventArgs.hasModifier(OF_KEY_CONTROL);
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
@@ -524,7 +537,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 
 	//-
 
-	//disabler for all keys. (independent from MODE_Active)
+	// disabler for all keys. (independent from MODE_Active)
 	if (ENABLE_keys)
 	{
 		////custom
@@ -545,7 +558,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 		//	ofLogNotice(__FUNCTION__) << "";
 		//}
 
-		//general
+		// general
 		if (key == key_MODE_App)
 		{
 			int i = MODE_App;
@@ -567,16 +580,16 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 
 		//----
 
-		//edit mode
+		// edit mode
 		if (MODE_App == 1)
 		{
 			//----
 
-			//ndi input
+			// ndi input
 
 #ifdef USE_ofxNDI_IN
 			char name[256];
-			int index = key - 48;//slect by key numbers
+			int index = key - 48;// slect by key numbers
 
 			int _nsendersRemote = ndiReceiver.GetSenderCount();
 			index_NDI_Input.setMax(_nsendersRemote - 1);
@@ -585,10 +598,10 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 				refresh_NDI_IN();
 			}
 
-			//numbers
+			// numbers
 			else if (_nsendersRemote > 0 && index >= 0 && index < _nsendersRemote) {
-				//Update the receiver with the returned index
-				//Returns false if the current sender is selected
+				// Update the receiver with the returned index
+				// Returns false if the current sender is selected
 				if (ndiReceiver.SetSenderIndex(index)) {
 					index_NDI_Input = index;
 					ofLogNotice(__FUNCTION__) << "Selected [" << ndiReceiver.GetSenderName(index) << "]";
@@ -604,18 +617,18 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 #endif
 			//----
 
-			//webcam
+			// webcam
 
 #ifdef USE_WEBCAM
 			if (key == 'I') {
-				//webcam
+				// webcam
 				auto _devs = vidGrabber.listDevices();
 				index_WebcamDevice++;
 				if (index_WebcamDevice.get() > _devs.size() - 1) index_WebcamDevice = 0;
 				_dName = _devs[index_WebcamDevice].deviceName;
 				name_Webcam = _dName;
 
-				//select cam device
+				// select cam device
 				vidGrabber.close();
 				vidGrabber.setDeviceID(index_WebcamDevice.get());
 				vidGrabber.setup(1920, 1080);
@@ -627,7 +640,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 
 	//--
 
-	//key enabler
+	// key enabler
 	if (key == 'K')
 	{
 		ENABLE_keys = !ENABLE_keys;
@@ -642,6 +655,8 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 			ofLogNotice(__FUNCTION__) << "KEYS ENABLED BACK";
 		}
 	}
+
+	//---
 }
 
 //--------------------------------------------------------------
@@ -668,7 +683,7 @@ void ofxNDIHelper::removeKeysListeners()
 	ofRemoveListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
 }
 
-//mouse
+// mouse
 //--------------------------------------------------------------
 void ofxNDIHelper::mouseDragged(ofMouseEventArgs &eventArgs)
 {
@@ -716,7 +731,7 @@ void ofxNDIHelper::removeMouseListeners()
 //--------------------------------------------------------------
 void ofxNDIHelper::setActive(bool b)
 {
-	//* disables all keys and mouse interaction listeners from the addon
+	// * disables all keys and mouse interaction listeners from the addon
 
 	MODE_Active = b;
 	if (!b)
@@ -746,7 +761,7 @@ void ofxNDIHelper::setGuiToggleVisible()
 
 #pragma mark - CALLBACKS
 
-//all params
+// all params
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed_params(ofAbstractParameter &e)
 {
@@ -754,7 +769,7 @@ void ofxNDIHelper::Changed_params(ofAbstractParameter &e)
 	//{
 	//	string name = e.getName();
 
-	//	//exclude debugs
+	//	// exclude debugs
 	//	if (name != "exclude"
 	//		&& name != "exclude")
 	//	{
@@ -762,14 +777,14 @@ void ofxNDIHelper::Changed_params(ofAbstractParameter &e)
 
 	//	}
 
-	//	//params
+	//	// params
 	//	if (name == "")
 	//	{
 	//	}
 	//}
 }
 
-//addon engine params
+// addon engine params
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 {
@@ -777,7 +792,7 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 	{
 		string name = e.getName();
 
-		//exclude debugs
+		// exclude debugs
 		if (name != "exclude"
 			&& name != "exclude")
 		{
@@ -790,11 +805,15 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 		{
 			if (ENABLE_Edit.get())
 			{
-				MODE_App = 1;//edit
+				MODE_App = 1;// edit
 
 				if (ENABLE_NDI_Input.get()) {
 					refresh_NDI_IN();
 				}
+
+				rectNdiIn.enableEdit();
+				rectNdiOut.enableEdit();
+				rectWebcam.enableEdit();
 
 				//--
 
@@ -808,12 +827,22 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 			else
 			{
 				MODE_App = 0;
+
+				rectNdiIn.disableEdit();
+				rectNdiOut.disableEdit();
+				rectWebcam.disableEdit();
 			}
+		}
+		else if (name == bResetRects.getName() && bResetRects)
+		{
+			bResetRects = false;
+			
+			resetMiniPreviews();
 		}
 
 		//--
 
-		//webcam
+		// webcam
 #ifdef USE_WEBCAM
 		else if (name == ENABLE_Webcam.getName())
 		{
@@ -828,7 +857,7 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 
 		//--
 
-		//ndi in 
+		// ndi in 
 		else if (name == "ENABLE NDI INPUT" && ENABLE_NDI_Input.get())
 		{
 			setup_NDI_IN();
@@ -870,7 +899,7 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 
 		//--
 
-		//ndi out
+		// ndi out
 		else if (name == "ENABLE NDI OUTPUT")
 		{
 			if (ENABLE_NDI_Output.get()) {
@@ -888,7 +917,7 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 	}
 }
 
-//addon control (internal) params
+// addon control (internal) params
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed_params_Internal(ofAbstractParameter &e)
 {
@@ -896,7 +925,7 @@ void ofxNDIHelper::Changed_params_Internal(ofAbstractParameter &e)
 	{
 		string name = e.getName();
 
-		//exclude debugs
+		// exclude debugs
 		if (name != "exclude"
 			&& name != "exclude")
 		{
@@ -904,7 +933,7 @@ void ofxNDIHelper::Changed_params_Internal(ofAbstractParameter &e)
 
 		}
 
-		//control params
+		// control params
 		if (name == "")
 		{
 		}
@@ -926,7 +955,7 @@ void ofxNDIHelper::Changed_params_Internal(ofAbstractParameter &e)
 			}
 		}
 
-		//filter params
+		// filter params
 		if (name == "GUI POSITION")
 		{
 			gui_Control.setPosition(Gui_Position.get().x, Gui_Position.get().y);
@@ -960,7 +989,7 @@ void ofxNDIHelper::setKey_MODE_App(int k)
 #pragma mark - FILE SETTINGS
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setPathGlobal(string s)//must call before setup. disabled by default
+void ofxNDIHelper::setPathGlobal(string s)// must call before setup. disabled by default
 {
 	path_GLOBAL = s;
 
@@ -987,16 +1016,16 @@ void ofxNDIHelper::saveParams(ofParameterGroup &g, string path)
 
 //--
 
-//webcam
+// webcam
 #ifdef USE_WEBCAM
 
-//TODO:
+// TODO:
 //--------------------------------------------------------------
 void ofxNDIHelper::restartWebcam() {
-	//must close before reopen
+	// must close before reopen
 	vidGrabber.close();
 
-	//start device
+	// start device
 	//if (ENABLE_Webcam.get()) 
 	{
 		vidGrabber.setDeviceID(index_WebcamDevice.get());
@@ -1007,25 +1036,25 @@ void ofxNDIHelper::restartWebcam() {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setupWebcam(int index) {
-	//will load from index (index_WebcamDevice) not from name 
+	// will load from index (index_WebcamDevice) not from name 
 
-	//get back a list of devices.
+	// get back a list of devices.
 	vidGrabber.setVerbose(true);
 	vector<ofVideoDevice> _devs = vidGrabber.listDevices();
 	index_WebcamDevice.setMax(_devs.size() - 1);
 
-	//get all dev names
+	// get all dev names
 	webcam_InputDevices = "";
 	for (size_t i = 0; i < _devs.size(); i++)
 	{
-		//queue devices names
+		// queue devices names
 		webcam_InputDevices += "[" + ofToString(i) + "] " + _devs[i].deviceName;
 		if (i != _devs.size() - 1) webcam_InputDevices += "\n";
 	}
 
 	//-
 
-	//check valid index and clamp
+	// check valid index and clamp
 	bool bError = false;
 	if (index_WebcamDevice > _devs.size() - 1) {
 		ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
@@ -1034,12 +1063,12 @@ void ofxNDIHelper::setupWebcam(int index) {
 		bError = true;
 	}
 
-	if (!bError) {//valid index
+	if (!bError) {// valid index
 
-		//must close before reopen
+		// must close before reopen
 		vidGrabber.close();
 
-		//start device
+		// start device
 		//if (ENABLE_Webcam.get()) 
 		{
 			vidGrabber.setDeviceID(index_WebcamDevice.get());
@@ -1049,7 +1078,7 @@ void ofxNDIHelper::setupWebcam(int index) {
 
 		//--
 
-		//debug connected
+		// debug connected
 		bool _isConnected = vidGrabber.isInitialized();
 		ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
 		if (!_isConnected) {
@@ -1069,38 +1098,38 @@ void ofxNDIHelper::setupWebcam(int index) {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setupWebcam() {
-	//will initialized the device from the loaded name from the xml settings, not from the index number!
-	//that's because the index of a device could be changed if a new device is connected.
+	// will initialized the device from the loaded name from the xml settings, not from the index number!
+	// that's because the index of a device could be changed if a new device is connected.
 
-	//get back a list of devices.
+	// get back a list of devices.
 	vidGrabber.setVerbose(true);
 	vector<ofVideoDevice> _devs = vidGrabber.listDevices();
 
-	//get all dev names
+	// get all dev names
 	webcam_InputDevices = "";
 	index_WebcamDevice.setMax(_devs.size() - 1);
 	ofLogNotice(__FUNCTION__) << "LIST WEBCAM DEVICES:";
 
-	//log list devices
+	// log list devices
 	for (size_t i = 0; i < _devs.size(); i++)
 	{
-		//queue devices names
+		// queue devices names
 		webcam_InputDevices += "[" + ofToString(i) + "] " + _devs[i].deviceName;
 		if (i != _devs.size() - 1) webcam_InputDevices += "\n";
 
 		if (_devs[i].bAvailable) {
-			//log the device
+			// log the device
 			ofLogNotice(__FUNCTION__) << _devs[i].id << ": " << _devs[i].deviceName;
 		}
 		else {
-			//log the device and note it as unavailable
+			// log the device and note it as unavailable
 			ofLogNotice(__FUNCTION__) << _devs[i].id << ": " << _devs[i].deviceName << " - unavailable ";
 		}
 	}
 
 	//--
 
-	//load settings file
+	// load settings file
 
 	ofXml _xml;
 	bool _isLoaded;
@@ -1111,7 +1140,7 @@ void ofxNDIHelper::setupWebcam() {
 
 	//--
 
-	//start device
+	// start device
 	//DISABLE_Callbacks = true;
 
 	index_WebcamDevice = -1;
@@ -1124,8 +1153,8 @@ void ofxNDIHelper::setupWebcam() {
 			}
 		}
 	}
-	if (index_WebcamDevice == -1) {//error. try to load first device...
-		index_WebcamDevice = 0;//select cam device
+	if (index_WebcamDevice == -1) {// error. try to load first device...
+		index_WebcamDevice = 0;// select cam device
 
 		if (index_WebcamDevice < _devs.size()) {
 			_dName = _devs[index_WebcamDevice].deviceName;
@@ -1141,10 +1170,10 @@ void ofxNDIHelper::setupWebcam() {
 
 	//--
 
-	//must close before reopen
+	// must close before reopen
 	vidGrabber.close();
 
-	//start device
+	// start device
 	//if (ENABLE_Webcam.get()) 
 	{
 		vidGrabber.setDeviceID(index_WebcamDevice.get());
@@ -1154,7 +1183,7 @@ void ofxNDIHelper::setupWebcam() {
 
 	//--
 
-	////debug connected
+	//// debug connected
 	//bool _isConnected = vidGrabber.isInitialized();
 	//ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
 	//if (!_isConnected) {
@@ -1173,7 +1202,7 @@ void ofxNDIHelper::draw_Preview_Webcam() {
 
 		ofRectangle r(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
 
-		if (!mini_Webcam.get())//full size 
+		if (!mini_Webcam.get())// full size 
 		{
 			r.scaleTo(ofGetWindowRect());
 			//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
@@ -1182,31 +1211,57 @@ void ofxNDIHelper::draw_Preview_Webcam() {
 
 			vidGrabber.draw(r.x, r.y, r.width, r.height);
 		}
-		else//mini
+		else// mini
 		{
-			float ww = wPreview;
-			float xx = xpad + 0 * (xpad + ww);
-			float hh = ww * (16 / 9.f);
-			float yy = ofGetHeight() - hh - ypad;
-
-			ofRectangle rw = ofGetWindowRect();
-			//rw.scaleTo(ofRectangle(xx, yy, ww, hh), OF_SCALEMODE_FILL);
-			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
-
-			vidGrabber.draw(rw.x, rw.y, rw.width, rw.height);
-
+			if (bLockRatio.get()) {
+				float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
+				rectWebcam.height = rectWebcam.width * _ratio;
+			}
+			vidGrabber.draw(rectWebcam.x, rectWebcam.y, rectWebcam.width, rectWebcam.height);
+			rectWebcam.draw();
 			//bb border
 			ofNoFill();
 			ofSetColor(0);
 			ofSetLineWidth(2.0);
-			ofDrawRectangle(rw);
-
-			ofDrawBitmapStringHighlight("WEBCAM: " + _dName.get(), rw.x + 4 - 1, rw.y - 5);
+			ofDrawRectangle(rectWebcam);
+			//info
+			ofDrawBitmapStringHighlight("WEBCAM: " + _dName.get(), rectWebcam.x + 4 - 1, rectWebcam.y - 5);
 		}
 
 		ofPopStyle();
 	}
 }
+
+//--------------------------------------------------------------
+void ofxNDIHelper::resetMiniPreviews() {
+
+	// reset mini previews layout
+	float _xx = xPadPreview;
+	float _yy = yPadPreview;
+	float _ratio;
+	float _pad = 30;
+
+	_ratio = ndiReceiveTexture.getHeight() / ndiReceiveTexture.getWidth();
+	rectNdiIn.width = wPreview;
+	rectNdiIn.height = rectNdiIn.width * _ratio;
+	rectNdiIn.x = _xx;
+	rectNdiIn.y = _yy;
+
+	_yy += _pad + rectNdiIn.height;
+	_ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
+	rectNdiOut.width = wPreview;
+	rectNdiOut.height = rectNdiOut.width * _ratio;
+	rectNdiOut.x = _xx;
+	rectNdiOut.y = _yy;
+
+	_yy += _pad + rectNdiOut.height;
+	_ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
+	rectWebcam.width = wPreview;
+	rectWebcam.height = rectWebcam.width * _ratio;
+	rectWebcam.x = _xx;
+	rectWebcam.y = _yy;
+}
+
 
 //--------------------------------------------------------------
 void ofxNDIHelper::drawWebcamOut() {
@@ -1247,15 +1302,15 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	const std::string str = name_NDI_Output.get();
 	strcpy_s(senderName, 256, str.c_str()); //Set the sender name
 
-	//Set the dimensions of the sender output here
-	//This is independent of the size of the display window
-	//Sender dimensions and fps are not known yet
+	// Set the dimensions of the sender output here
+	// This is independent of the size of the display window
+	// Sender dimensions and fps are not known yet
 	//senderWidth = (unsigned char)ofGetWidth();
 	//senderHeight = (unsigned char)ofGetHeight();
 	senderWidth = 1920;
 	senderHeight = 1080;
 
-	//fbo settings
+	// fbo settings
 	ofFbo::Settings settings;
 	settings.internalformat = GL_RGBA;
 	settings.width = senderWidth;
@@ -1266,20 +1321,20 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	ofClear(0, 0, 0, 255);
 	fbo_NDI_Sender.end();
 
-	////Create an RGBA fbo for collection of data
+	//// Create an RGBA fbo for collection of data
 	//fbo_NDI_Sender.allocate(senderWidth, senderHeight, GL_RGBA);
 
-	//Optionally set fbo readback using OpenGL pixel buffers
-	ndiSender.SetReadback(); //Change to false to compare
+	// Optionally set fbo readback using OpenGL pixel buffers
+	ndiSender.SetReadback(); // Change to false to compare
 
-	//Set NDI asynchronous sending for best performance
+	// Set NDI asynchronous sending for best performance
 	ndiSender.SetAsync();
 
 	////Create a new sender - default RGBA for ofPixels
 	//ndiSender.CreateSender("Openframeworks NDI webcam", (unsigned int)vidGrabber.getWidth(), (unsigned int)vidGrabber.getHeight());
 	//ofLogNotice(__FUNCTION__) << "Created NDI sender [Openframeworks NDI webcam] (" << vidGrabber.getWidth() << "x" << vidGrabber.getHeight() << ")" ;
 
-	//Create a sender with default RGBA output format
+	// Create a sender with default RGBA output format
 	ndiSender.CreateSender(senderName, senderWidth, senderHeight);
 	//ndiSender.CreateSender("OF TEST", senderWidth, senderHeight);
 
@@ -1303,7 +1358,7 @@ void ofxNDIHelper::drawInfoDevices() {
 
 	//-
 
-	//webcam
+	// webcam
 #ifdef USE_WEBCAM
 	if (ENABLE_Webcam.get())
 	{
@@ -1312,8 +1367,8 @@ void ofxNDIHelper::drawInfoDevices() {
 		str = "";
 
 		str += "WEBCAM INPUT DEVICES\n";
-		//display all devices
-		//display device name
+		// display all devices
+		// display device name
 		//str += ">" + name_Webcam.get();// +"\n";
 		str += "" + _dName.get() + " [" + ofToString(index_WebcamDevice.get()) + "]";
 		//str += " [" + ofToString(index_WebcamDevice.get()) + "]";
@@ -1330,7 +1385,7 @@ void ofxNDIHelper::drawInfoDevices() {
 
 	//--
 
-	//ndi in
+	// ndi in
 
 	//x += 350;
 	if (ENABLE_NDI_Input.get()) {
@@ -1341,7 +1396,7 @@ void ofxNDIHelper::drawInfoDevices() {
 		if (nsenders > 0) {
 			if (ndiReceiver.ReceiverCreated()) {
 				if (ndiReceiver.ReceiverConnected()) {
-					//Show received sender information and received fps
+					// Show received sender information and received fps
 					str += "(" + ofToString(ndiReceiver.GetSenderName().c_str()) + ")";
 					str += "\n(" + ofToString(ndiReceiver.GetSenderWidth());
 					str += "x" + ofToString(ndiReceiver.GetSenderHeight());
@@ -1349,7 +1404,7 @@ void ofxNDIHelper::drawInfoDevices() {
 					str += " (FPS" + ofToString(ndiReceiver.GetFps()) + ")\n";
 				}
 				else {
-					//Nothing received
+					// Nothing received
 					str += "> " + ofToString(ndiReceiver.GetSenderName().c_str());
 				}
 			}
@@ -1365,7 +1420,7 @@ void ofxNDIHelper::drawInfoDevices() {
 		else {
 			str += "CONNECTING...\n";
 		}
-		//ndi input devices list
+		// ndi input devices list
 		if (NDI_InputDevices.size() > 0) str += NDI_InputDevices;
 
 		//--
@@ -1376,14 +1431,14 @@ void ofxNDIHelper::drawInfoDevices() {
 
 	//-
 
-	//ndi out
+	// ndi out
 
 	//i = 0;
 	//x += 650;
-	//x = ofGetWidth() - 300;//right
+	//x = ofGetWidth() - 300;// right
 
 	if (ENABLE_NDI_Output.get()) {
-		//Show what it is sending
+		// Show what it is sending
 		if (ndiSender.SenderCreated()) {
 			string str = "";
 			str += "NDI OUPUT DEVICE\n";
@@ -1399,14 +1454,14 @@ void ofxNDIHelper::drawInfoDevices() {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::refresh_NDI_IN() {
-	////deep setup
+	//// deep setup
 	//setup_NDI_IN();
 
 	char name[256];
 	int nsenders = ndiReceiver.GetSenderCount();
 	index_NDI_Input.setMax(nsenders - 1);
 
-	//List all the senders
+	// List all the senders
 	if (nsenders > 0) {
 		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
 		NDI_InputDevices = "";
@@ -1440,10 +1495,10 @@ void ofxNDIHelper::setup_NDI_IN() {
 
 	//--
 
-	//TODO:
+	// TODO:
 
-	//ofFbo
-	////receiver dimensions and fps are not known yet
+	// ofFbo
+	//// receiver dimensions and fps are not known yet
 	//receiverWidth = (unsigned char)ofGetWidth();
 	//receiverHeight = (unsigned char)ofGetHeight();
 	receiverWidth = 1920;
@@ -1451,19 +1506,19 @@ void ofxNDIHelper::setup_NDI_IN() {
 
 	fbo_NDI_Receiver.allocate(receiverWidth, receiverHeight, GL_RGBA);
 
-	//Clear the fbo so the first frame draw is black
+	// Clear the fbo so the first frame draw is black
 	fbo_NDI_Receiver.begin();
 	ofClear(0, 0, 0, 255);
 	fbo_NDI_Receiver.end();
 
-	//ofTexture
+	// ofTexture
 	ndiReceiveTexture.allocate(receiverWidth, receiverHeight, GL_RGBA);
-	////ofImage
+	//// ofImage
 	//ndiReceiveImage.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_COLOR_ALPHA);
-	////ofPixels
+	//// ofPixels
 	//ndiReceivePixels.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_COLOR_ALPHA);
 
-	//unsigned char pixels
+	// unsigned char pixels
 	ndiReceiveChars = new unsigned char[receiverWidth*receiverHeight * 4];
 
 	//index_NDI_Input.setMax(ndiReceiver.GetSenderCount() - 1);
@@ -1478,8 +1533,8 @@ void ofxNDIHelper::setup_NDI_IN() {
 	char name[256];
 
 	if (nsenders > 0 && index >= 0 && index < nsenders) {
-		//Update the receiver with the returned index
-		//Returns false if the current sender is selected
+		// Update the receiver with the returned index
+		// Returns false if the current sender is selected
 		if (ndiReceiver.SetSenderIndex(index)) {
 			ofLogNotice(__FUNCTION__) << "Selected [" << ndiReceiver.GetSenderName(index) << "]";
 			ndiReceiver.GetSenderName(name, 256, index);
@@ -1502,12 +1557,12 @@ void ofxNDIHelper::setup_NDI_IN() {
 void ofxNDIHelper::draw_Preview_NDI_IN() {
 	if (ENABLE_NDI_Input.get()) {
 
-		//Receive ofTexture
+		// Receive ofTexture
 		ndiReceiver.ReceiveImage(ndiReceiveTexture);//read to texture
 
 		//-
 
-		////draw
+		//// draw
 		////ndiReceiveTexture.draw(0, 0, ofGetWidth(), ofGetHeight());
 		//if (!mini_ndiInput.get()) {
 		//	ndiReceiveTexture.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -1521,7 +1576,7 @@ void ofxNDIHelper::draw_Preview_NDI_IN() {
 		ofPushStyle();
 		ofSetColor(255, 255);
 
-		if (!mini_ndiInput.get())//full size 
+		if (!mini_ndiInput.get())// full size 
 		{
 			ofRectangle r(0, 0, ndiReceiveTexture.getWidth(), ndiReceiveTexture.getHeight());
 
@@ -1532,25 +1587,21 @@ void ofxNDIHelper::draw_Preview_NDI_IN() {
 
 			ndiReceiveTexture.draw(r.x, r.y, r.width, r.height);
 		}
-		else//mini
+		else// mini
 		{
-			float ww = wPreview;
-			float xx = xpad + 1 * (xpad + ww);
-			float hh = ww * (16/9.f);
-			float yy = ofGetHeight() - hh - ypad;
-
-			ofRectangle rw = ofGetWindowRect();
-			rw.scaleTo(ofRectangle(xx, yy, ww, hh));
-
-			ndiReceiveTexture.draw(rw.x, rw.y, rw.width, rw.height);
-
-			//bb border
+			if (bLockRatio.get()) {
+				float _ratio = ndiReceiveTexture.getHeight() / ndiReceiveTexture.getWidth();
+				rectNdiIn.height = rectNdiIn.width * _ratio;
+			}
+			ndiReceiveTexture.draw(rectNdiIn.x, rectNdiIn.y, rectNdiIn.width, rectNdiIn.height);
+			rectNdiIn.draw();
+			// bb border
 			ofNoFill();
 			ofSetColor(0);
 			ofSetLineWidth(2.0);
-			ofDrawRectangle(rw);
-
-			ofDrawBitmapStringHighlight("NDI IN", rw.x + 4 - 1, rw.y - 5);
+			ofDrawRectangle(rectNdiIn);
+			// info
+			ofDrawBitmapStringHighlight("NDI In", rectNdiIn.x + 4 - 1, rectNdiIn.y - 5);
 		}
 
 		ofPopStyle();
