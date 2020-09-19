@@ -1,15 +1,15 @@
 # ofxNDIHelper
 
 ## Overview
-a helper addon for **openFrameworks** to handle `NDI input/output` ports and `webcam` input devices with previews and settings.
+a helper addon for **openFrameworks** to handle **NDI input/output** ports and **webcam** input devices with **previews** and **settings**.
 
 ## Screenshot
 ![Alt text](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
-- List and `select NDI channels` and `webcam` devices.
-- `Store and recall settings` of selected ports by name.
-- `Mini preview` channels with `resizeable layout`: size and position.
+- List and **select NDI channels** and **webcam** devices.
+- **Store and recall settings** of selected ports by name.
+- **Mini preview** channels with **resizeable layout**.
 
 ```.cpp
 //setup()
@@ -47,13 +47,14 @@ NDIHelper.drawGui();
 -
 
 ## Dependencies
-* https://github.com/leadedge/ofxNDI
+* https://github.com/leadedge/ofxNDI  
+  https://github.com/roymacdonald/ofxScaleDragRect  Already included into `/libs`, no need to add into your project. Thanks **@roymacdonald**!  
 
 ## Tested systems
 - **Windows10** / **VS2017** / **OF 0.11**
 
 ## Author
-moebiusSurfing, 2020.
+moebiusSurfing, 2020.  
 (ManuMolina) 
 
 ## License
