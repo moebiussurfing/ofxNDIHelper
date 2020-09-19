@@ -48,7 +48,8 @@ NDIHelper.drawGui();
 
 ## Dependencies
 * https://github.com/leadedge/ofxNDI  
-  https://github.com/roymacdonald/ofxScaleDragRect  Already included into `/libs`, no need to add into your project. Thanks **@roymacdonald**!  
+  https://github.com/roymacdonald/ofxScaleDragRect  
+  Already included into `/libs`, no need to add into your project. Thanks **@roymacdonald**!  
 
 ## Tested systems
 - **Windows10** / **VS2017** / **OF 0.11**
