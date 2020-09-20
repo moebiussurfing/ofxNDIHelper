@@ -1347,14 +1347,10 @@ void ofxNDIHelper::setup_NDI_OUT() {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::drawInfoDevices() {
+	
+	float _padx = 15;
+	float _pady = 26;
 	int x, y;
-	x = 50;
-	y = 40;
-
-	int l = 20;
-	int i = 0;
-
-	float _spacing = 10;
 
 	//-
 
@@ -1378,8 +1374,10 @@ void ofxNDIHelper::drawInfoDevices() {
 		str += "PRESS i: TO SELECT NEXT DEVICE";
 		//str += "\nI: restart device";
 
+		x = rectWebcam.x + _padx;
+		y = rectWebcam.y + rectWebcam.getHeight() + _pady;
+
 		drawTextBoxed(str, x, y, rounded);
-		x += getBbTextBoxed(str) + _spacing;
 	}
 #endif
 
@@ -1387,7 +1385,6 @@ void ofxNDIHelper::drawInfoDevices() {
 
 	// ndi in
 
-	//x += 350;
 	if (ENABLE_NDI_Input.get()) {
 		string str = "";
 		str += "NDI INPUT DEVICES\n";
@@ -1425,17 +1422,15 @@ void ofxNDIHelper::drawInfoDevices() {
 
 		//--
 
+		x = rectNdiIn.x + _padx;
+		y = rectNdiIn.y + rectNdiIn.getHeight() + _pady;
+
 		drawTextBoxed(str, x, y, rounded);
-		x += getBbTextBoxed(str) + _spacing;
 	}
 
 	//-
 
 	// ndi out
-
-	//i = 0;
-	//x += 650;
-	//x = ofGetWidth() - 300;// right
 
 	if (ENABLE_NDI_Output.get()) {
 		// Show what it is sending
@@ -1446,8 +1441,10 @@ void ofxNDIHelper::drawInfoDevices() {
 			str += ofToString(senderWidth) + "x" + ofToString(senderHeight) + "\n";
 			str += "FPS: " + ofToString((int)ofGetFrameRate()) + " APP / " + ofToString(ndiSender.GetFps()) + " NDI";
 
+			x = rectNdiOut.x + _padx;
+			y = rectNdiOut.y + rectNdiOut.getHeight() + _pady;
+
 			drawTextBoxed(str, x, y, rounded);
-			x += getBbTextBoxed(str) + _spacing;
 		}
 	}
 }
