@@ -1,15 +1,15 @@
 # ofxNDIHelper
 
 ## Overview
-a helper addon for **openFrameworks** to handle **NDI input/output** ports and **webcam** input devices with **previews** and **settings**.
+Helper addon for **openFrameworks** to handle **NDI input**/**output** ports and **webcam** input devices with **customizable layout of previews** and **auto store/recall settings**.
 
 ## Screenshot
-![Alt text](/readme_images/Capture.PNG?raw=true "Capture.PNG")
+![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
 - List and **select NDI channels** and **webcam** devices.
-- **Store and recall settings** of selected ports by name.
-- **Mini preview** channels with **resizeable layout**.
+- Auto **store and recall settings** of selected ports by name.
+- **Mini preview** channels with **customizable layout**.
 
 ```.cpp
 //setup()
