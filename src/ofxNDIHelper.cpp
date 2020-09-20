@@ -114,7 +114,7 @@ void ofxNDIHelper::setup()
 
 	// params control (addon variables)
 	ENABLE_Addon.set("ENABLE", true);
-	ENABLE_Edit.set("EDIT", true);
+	ENABLE_Edit.set("EDIT MODE", true);
 	bLockRatio.set("LOCK RATIO", true);
 	bResetRects.set("RESET", false);
 	bResetRects.setSerializable(false);
@@ -184,9 +184,9 @@ void ofxNDIHelper::setup()
 	//group
 	params_Control.setName("CONTROL");
 	params_Control.add(ENABLE_Addon);
-	params_Control.add(SHOW_Help);
 	params_Control.add(ENABLE_Edit);
 	params_Control.add(bLockRatio);
+	params_Control.add(SHOW_Help);
 	params_Control.add(bResetRects);
 
 	// webcam
@@ -801,7 +801,7 @@ void ofxNDIHelper::Changed_params_Control(ofAbstractParameter &e)
 
 		//--
 
-		if (name == "EDIT")
+		if (name == ENABLE_Edit.getName())
 		{
 			if (ENABLE_Edit.get())
 			{
@@ -1348,20 +1348,20 @@ void ofxNDIHelper::setup_NDI_OUT() {
 //--------------------------------------------------------------
 void ofxNDIHelper::drawInfoDevices() {
 	
-	float _padx = 15;
-	float _pady = 26;
+	float _padx = 14;
+	float _pady = 23;
 	int x, y;
 
 	//-
 
 	// webcam
+
 #ifdef USE_WEBCAM
 	if (ENABLE_Webcam.get())
 	{
 		//drawWebcamInfo(x, y);
 		string str;
 		str = "";
-
 		str += "WEBCAM INPUT DEVICES\n";
 		// display all devices
 		// display device name
@@ -1433,7 +1433,7 @@ void ofxNDIHelper::drawInfoDevices() {
 	// ndi out
 
 	if (ENABLE_NDI_Output.get()) {
-		// Show what it is sending
+		// Show what it's sending
 		if (ndiSender.SenderCreated()) {
 			string str = "";
 			str += "NDI OUPUT DEVICE\n";

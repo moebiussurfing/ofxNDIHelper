@@ -275,7 +275,7 @@ private:
 
 	// text box
 	ofTrueTypeFont font;
-	float rounded = 5.0;
+	float rounded = 3.0;
 	int pad = 30;
 
 	//--------------------------------------------------------------
