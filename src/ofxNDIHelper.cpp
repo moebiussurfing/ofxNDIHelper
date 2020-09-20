@@ -488,6 +488,8 @@ ofxNDIHelper::~ofxNDIHelper()
 	ofRemoveListener(params.parameterChangedE(), this, &ofxNDIHelper::Changed_params);
 	ofRemoveListener(params_Internal.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Internal);
 	ofRemoveListener(params_Control.parameterChangedE(), this, &ofxNDIHelper::Changed_params_Control);
+
+	exit();
 }
 
 //--------------------------------------------------------------
