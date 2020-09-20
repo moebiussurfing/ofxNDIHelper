@@ -6,10 +6,10 @@
 
 ## can exclude some sttings files
 
-#*.XML
-#*.xml
-#*.JSON
-#*.json
+*.XML
+*.xml
+*.JSON
+*.json
 
 #*/bin/*
 #!*/bin/data/
