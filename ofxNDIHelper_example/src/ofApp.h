@@ -32,4 +32,6 @@ public:
 #ifdef USE_ofxWindowApp
 	ofxWindowApp windowApp;
 #endif
+
+	ofImage image;
 };

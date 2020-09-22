@@ -52,7 +52,7 @@ void ofxNDIHelper::end_NDI_OUT()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Preview_NDI_OUT()// TODO:mini
+void ofxNDIHelper::draw_Preview_NDI_OUT()// TODO: mini
 {
 	if (ENABLE_NDI_Output.get())
 	{
@@ -83,7 +83,7 @@ void ofxNDIHelper::draw_Preview_NDI_OUT()// TODO:mini
 			ofSetLineWidth(2.0);
 			ofDrawRectangle(rectNdiOut);
 			// info
-			ofDrawBitmapStringHighlight("NDI OUT", rectNdiOut.x + 4 - 1, rectNdiOut.y - 5);
+			if (SHOW_Help) ofDrawBitmapStringHighlight("NDI OUT", rectNdiOut.x + 4 - 1, rectNdiOut.y - 5);
 		}
 
 		//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -99,10 +99,12 @@ void ofxNDIHelper::setup()
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
 
 	// gui help display font
-	string str = "overpass-mono-bold.otf";
-	string pathFont = "assets/fonts/" + str;
-	bool b = font.load(pathFont, 10);
-	if (!b) b = font.load(OF_TTF_MONO, 10);
+	//string _str = "overpass-mono-bold.otf";
+	string _str = "telegrama_render.otf";
+	string _pathFont = "assets/fonts/" + _str;
+	float _size = 7;
+	bool b = font.load(_pathFont, _size);
+	if (!b) b = font.load(OF_TTF_MONO, _size);
 
 	//--
 
@@ -248,13 +250,14 @@ void ofxNDIHelper::setup()
 	// gui
 
 	// ofxGui theme
-	string strG = "overpass-mono-bold.otf";
-	string pathFontG = "assets/fonts/" + str;
+	//string strG = "overpass-mono-bold.otf";
+	string strG = "telegrama_render.otf";
+	string pathFontG = "assets/fonts/" + _str;
 	ofFile file(pathFontG);
 	// must check this font file is detected
 	if (file.exists())
 	{
-		ofxGuiSetFont(pathFontG, 9);
+		ofxGuiSetFont(pathFontG, 7);
 		ofLogNotice(__FUNCTION__) << "LOADED FILE '" << pathFontG << "'";
 	}
 	else
@@ -1227,7 +1230,7 @@ void ofxNDIHelper::draw_Preview_Webcam() {
 			ofSetLineWidth(2.0);
 			ofDrawRectangle(rectWebcam);
 			//info
-			ofDrawBitmapStringHighlight("WEBCAM: " + _dName.get(), rectWebcam.x + 4 - 1, rectWebcam.y - 5);
+			if (SHOW_Help) ofDrawBitmapStringHighlight("WEBCAM: " + _dName.get(), rectWebcam.x + 4 - 1, rectWebcam.y - 5);
 		}
 
 		ofPopStyle();
@@ -1367,14 +1370,14 @@ void ofxNDIHelper::drawInfoDevices() {
 		str += "WEBCAM INPUT DEVICES\n";
 		// display all devices
 		// display device name
-		//str += ">" + name_Webcam.get();// +"\n";
+		//_str += ">" + name_Webcam.get();// +"\n";
 		str += "" + _dName.get() + " [" + ofToString(index_WebcamDevice.get()) + "]";
-		//str += " [" + ofToString(index_WebcamDevice.get()) + "]";
+		//_str += " [" + ofToString(index_WebcamDevice.get()) + "]";
 		str += " " + ofToString(vidGrabber.isInitialized() ? "[ON]" : "[OFF]") + "\n";
 		str += "\n";
 		str += webcam_InputDevices + "\n";
 		str += "PRESS i: TO SELECT NEXT DEVICE";
-		//str += "\nI: restart device";
+		//_str += "\nI: restart device";
 
 		x = rectWebcam.x + _padx;
 		y = rectWebcam.y + rectWebcam.getHeight() + _pady;
@@ -1400,7 +1403,7 @@ void ofxNDIHelper::drawInfoDevices() {
 					str += "\n(" + ofToString(ndiReceiver.GetSenderWidth());
 					str += "x" + ofToString(ndiReceiver.GetSenderHeight());
 					str += "/" + ofToString(ndiReceiver.GetSenderFps()) + ")";
-					str += " (FPS" + ofToString(ndiReceiver.GetFps()) + ")\n";
+					str += " (" + ofToString(ndiReceiver.GetFps()) + " FPS)\n";
 				}
 				else {
 					// Nothing received
@@ -1600,7 +1603,7 @@ void ofxNDIHelper::draw_Preview_NDI_IN() {
 			ofSetLineWidth(2.0);
 			ofDrawRectangle(rectNdiIn);
 			// info
-			ofDrawBitmapStringHighlight("NDI In", rectNdiIn.x + 4 - 1, rectNdiIn.y - 5);
+			if(SHOW_Help) ofDrawBitmapStringHighlight("NDI In", rectNdiIn.x + 4 - 1, rectNdiIn.y - 5);
 		}
 
 		ofPopStyle();

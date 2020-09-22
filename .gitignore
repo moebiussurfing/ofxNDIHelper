@@ -550,3 +550,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+ofxNDIHelper_example/bin/data/ofxNDIHelper/params_Control.xml
+ofxNDIHelper_example/bin/data/ofxNDIHelper/params_Internal.xml
+ofxNDIHelper_example/bin/data/ofxNDIHelper/settings_NDI_In_Mini.xml
+ofxNDIHelper_example/bin/data/ofxNDIHelper/settings_NDI_Out_Mini.xml
+ofxNDIHelper_example/bin/data/ofxNDIHelper/settings_Webcam_Mini.xml
+ofxNDIHelper_example/bin/data/ofxNDIHelper/webcam_Settings.xml

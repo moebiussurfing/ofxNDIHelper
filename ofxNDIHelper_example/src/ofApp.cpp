@@ -10,6 +10,8 @@ void ofApp::setup() {
 	windowApp.setFrameRate(60);
 	windowApp.setVerticalSync(true);
 #endif
+
+	image.loadImage("pattern1.jpg");
 }
 
 //--------------------------------------------------------------
@@ -18,10 +20,14 @@ void ofApp::update() {
 #ifdef USE_ofxNDI
 	NDIHelper.begin_NDI_OUT();
 	{
+		//ofBackground(32);
+		image.draw(0, 0, ofGetWidth(), ofGetHeight());
+
 		//layers one upper others:
 
 		//1. webcam
-		NDIHelper.drawWebcamOut();
+		//NDIHelper.drawWebcamOut();
+		NDIHelper.draw_Preview_Webcam();
 
 		//2. ndi input
 		NDIHelper.draw_Preview_NDI_IN();
@@ -39,12 +45,13 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	ofBackground(32);
+	//ofBackground(32);
+	image.draw(0, 0, ofGetWidth(), ofGetHeight());
 
 #ifdef USE_ofxNDI
 
 	//----
-	
+
 	//////webcam
 	////NDIHelper.draw_Preview_Webcam();
 
@@ -55,7 +62,7 @@ void ofApp::draw() {
 
 	//draw monitor
 	NDIHelper.draw();
-	
+
 	//----
 
 	//gui
