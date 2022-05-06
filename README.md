@@ -1,21 +1,21 @@
 # ofxNDIHelper
 
 ## Overview
-Helper addon for **openFrameworks** to handle **NDI input**/**output** ports and input **webcam** devices with **customizable layout of previews** and **auto store/recall settings**.
+Helper add-on for **openFrameworks** to handle **NDI Input**/**Output** ports and input **Webcam** devices with **customizable layout of previews** and **auto store/recall settings**.
 
 ## Screenshot
 ![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
-- List and **select NDI channels** and **webcam** devices.
+- List and **select NDI Devices** and **Webcam** devices.
 - Auto **store and recall settings** of selected ports by name.
-- **Mini preview** channels with easy **customizable layout** using mouse.
+- **Mini Preview** channels with easy **customizable layout** using mouse.
 
 ```.cpp
-//setup()
+// setup()
 NDIHelper.setup();
 
-//update()
+// update()
 NDIHelper.begin_NDI_OUT();
 {
 	//1. webcam
@@ -28,10 +28,10 @@ NDIHelper.end_NDI_OUT();
 
 //draw()
 
-//////webcam
+////// webcam
 ////NDIHelper.draw_Preview_Webcam();
 
-////draw ndi out
+//// draw ndi out
 //NDIHelper.draw_Preview_NDI_OUT();
 
 //----
@@ -43,15 +43,11 @@ NDIHelper.draw();
 NDIHelper.drawGui();
 ```
 
-## TODO / IDEAS
--
-
 ## Dependencies
-* https://github.com/leadedge/ofxNDI  
-  https://github.com/roymacdonald/ofxScaleDragRect  
-  Already included into `/libs`, no need to add into your project. Thanks **@roymacdonald**!  
+* [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers) 
+* OfxGui [ OF Core ]
 
-## Tested systems
+## Tested Systems
 - **Windows10** / **VS2017** / **OF 0.11**
 
 ## Author
