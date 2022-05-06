@@ -1,20 +1,22 @@
 
-///---
-///
-///	TODO:
-///	
-///	+	remove mini preview from webcam from output
-///	+	improved selector/patching webcam or ndi input to output
-///	+	layout
-///			fix previews resize when app window changes
-///			dynamic draggable/resizable previews?
-///	+	looks like sometimes more that expected ndi sources are appearing
-///	+	split webCam as a new helper addon 
-///	+	ndi input port settings as names not index port
-///
-///	!	startup requires disable/enable ndi input to refresh index input...?
-///
-///---
+//---
+
+/*
+	TODO:
+
+	+	remove mini preview from webcam from output
+	+	improved selector/patching webcam or ndi input to output
+	+	layout
+			fix previews resize when app window changes
+			dynamic draggable/resizable previews?
+	+	looks like sometimes more that expected ndi sources are appearing
+	+	split webCam as a new helper addon
+	+	ndi input port settings as names not index port
+
+	!	startup requires disable/enable ndi input to refresh index input...?
+*/
+
+//---
 
 
 #pragma once
@@ -23,9 +25,9 @@
 
 //----
 
-#define USE_WEBCAM		//aux camera
-#define USE_ofxNDI_IN	//ndi input
-#define USE_ofxNDI_OUT	//ndi out
+#define USE_WEBCAM // aux camera
+#define USE_ofxNDI_IN // ndi input
+#define USE_ofxNDI_OUT // ndi out
 
 //----
 
@@ -36,35 +38,29 @@
 #include "ofxNDI.h"
 #endif
 #endif
+
+// dependencies
+#include "ofxGui.h"
 #include "ofxInteractiveRect.h"
 
-//we can handle many app modes to change behaviour
-#define NUM_MODES_APP 2
-
-//dependencies
-#include "ofxGui.h"
+//----
 
 class ofxNDIHelper : public ofBaseApp
 {
 
-#pragma mark - OF
 public:
 
 	ofxNDIHelper();
 	~ofxNDIHelper();
 
 	void setup();
+	void setupParams();
+	void startup();
 	void update();
 	void draw();
 	void exit();
-
 	void drawGui();
-
 	void windowResized(int w, int h);
-
-	//-
-
-#pragma mark - API
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
@@ -73,15 +69,17 @@ public:
 	void setLogLevel(ofLogLevel level);
 	void setAutoSave(bool b)
 	{
-		ENABLE_AutoSave = b;
+		bAutoSave = b;
 	}
 
-	void setKey_MODE_App(int k);
+	//void setKey_MODE_App(int k);
 
 	//--
 
 public:
-	//webcam
+
+	// webcam
+
 #ifdef USE_WEBCAM
 	ofVideoGrabber vidGrabber;
 	void setupWebcam();//setup webcam from name device nor index
@@ -101,6 +99,7 @@ public:
 
 #ifdef USE_ofxNDI_OUT
 public:
+
 	void setup_NDI_OUT();
 	ofxNDIsender ndiSender;		//NDI sender object
 	ofFbo fbo_NDI_Sender;       //Fbo used for graphics and sending
@@ -114,6 +113,7 @@ public:
 
 #ifdef USE_ofxNDI_IN
 public:
+
 	void setup_NDI_IN();
 	void refresh_NDI_IN();
 	void draw_Preview_NDI_IN();
@@ -130,36 +130,37 @@ public:
 
 	//--
 
-#pragma mark - ADDON ENGINE
-
 public:
-	ofParameterGroup params_Control;;
-	ofParameter<bool> ENABLE_Addon;
-	ofParameter<bool> ENABLE_Edit;
-	ofParameter<bool> ENABLE_Webcam;
-	ofParameter<bool> ENABLE_Draw_Webcam;
 
-	ofParameter<bool> ENABLE_NDI_Input;
-	ofParameter<bool> ENABLE_Draw_NDI_Input;
-	ofParameter<bool> mini_ndiInput;
-	ofParameter<int> index_NDI_Input;
+	ofParameterGroup params_AppsSettings;
+
+	ofParameter<bool> bEdit;
+	ofParameter<bool> bWebcam;
+	ofParameter<bool> bDraw_Webcam;
+
+	ofParameter<bool> bNDI_Input;
+	ofParameter<bool> bDraw_NDI_Input;
+	ofParameter<bool> bNDI_Input_Mini;
+	ofParameter<int> NDI_Input_Index;
 	ofParameter<string> name_NDI_Input;
 
-	ofParameter<bool> ENABLE_NDI_Output;
-	ofParameter<bool> ENABLE_Draw_NDI_Output;
-	ofParameter<bool> mini_ndiOutput;
+	ofParameter<bool> bNDI_Output;
+	ofParameter<bool> bDraw_NDI_Output;
+	ofParameter<bool> bNDI_Output_Mini;
 	ofParameter<string> name_NDI_Output;
 
-	string NDI_InputDevices;
-	string webcam_InputDevices;
+	string name_NDI_InputDevices;
+	string name_Webcam_InputDevices;
 	bool bDoRestartup = false;
 
 public:
+
 	ofParameterGroup params;
 
 	//--
 
 public:
+
 	// mini preview rectangles positions and sizes
 	ofxInteractiveRect rectNdiIn = { "rectNdiIn" };
 	ofxInteractiveRect rectNdiOut = { "rectNdiOut" };
@@ -180,66 +181,65 @@ public:
 
 private:
 
-	//updating some params before save will trigs also the group callbacks
-	//so we disable this callbacks just in case params updatings are required
-	//in this case we will need to update gui position param
-	bool DISABLE_Callbacks;
+	// updating some params before save will trigs also the group callbacks
+	// so we disable this callbacks just in case params updating's are required
+	// in this case we will need to update gui position param
+	bool bDISABLECALLBACKS;
 
-	int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
+	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 	int screenW, screenH;
 
-	//autosave
-	ofParameter<bool> ENABLE_AutoSave;
+	// autosave
+	ofParameter<bool> bAutoSave;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
 	//-
 
-	void Changed_params_Control(ofAbstractParameter &e);
+	void Changed_Params_AppSettings(ofAbstractParameter &e);
 
 	//-
 
-#pragma mark - ADDON TEMPLATE STUFF
+	// control params
 
-#pragma mark - CONTROL PARAMS
+public:
 
-	//control params
+	ofParameter<bool> bGui_Controls;
+	ofParameter<bool> bGui;
+
+private:
+
 	ofParameterGroup params_Internal;
-	ofParameter<bool> MODE_Active;
-	ofParameter<bool> ENABLE_keys;
-	ofParameter<bool> ENABLE_Debug;
-	ofParameter<bool> SHOW_Gui;
+	ofParameter<bool> bActive;
+	ofParameter<bool> bKeys;
+	ofParameter<bool> bDebug;
 	ofParameter<glm::vec2> Gui_Position;
-	ofParameter<bool> SHOW_Help;
-	ofParameter<int> MODE_App;
-	ofParameter<string> MODE_App_Name;
+	ofParameter<bool> bHelp;
+	//ofParameter<int> MODE_App;
+	//ofParameter<string> MODE_App_Name;
+
 	ofxPanel gui_Control;
 
-#pragma mark - CALLBACKS
+	//void Changed_params_Internal(ofAbstractParameter &e);
+	//void Changed_params(ofAbstractParameter &e);
 
-	void Changed_params_Internal(ofAbstractParameter &e);
-	void Changed_params(ofAbstractParameter &e);
-
-#pragma mark - OF LISTENERS
-
-	//keys
+	// keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
 	void keyReleased(ofKeyEventArgs &eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	//mouse
+	// mouse
 	void mouseDragged(ofMouseEventArgs &eventArgs);
 	void mousePressed(ofMouseEventArgs &eventArgs);
 	void mouseReleased(ofMouseEventArgs &eventArgs);
 	void addMouseListeners();
 	void removeMouseListeners();
 
-#pragma mark - FILE SETTINGS
-	//settings
+	// settings
 	string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
-	string path_Params_Internal;
-	string path_Params_Control;
+	//string path_Params_Internal;
+	string path_Params_AppSettings;
 	void loadParams(ofParameterGroup &g, string path);
 	void saveParams(ofParameterGroup &g, string path);
 
@@ -253,7 +253,7 @@ private:
 
 		ofDirectory dataDirectory(ofToDataPath(_path, true));
 
-		//check if folder path exist
+		// check if folder path exist
 		if (!dataDirectory.isDirectory())
 		{
 			ofLogError(__FUNCTION__) << "FOLDER NOT FOUND! TRYING TO CREATE...";
@@ -261,7 +261,7 @@ private:
 			//try to create folder
 			bool b = dataDirectory.createDirectory(ofToDataPath(_path, true));
 
-			//debug if creation has been succeded
+			//debug if creation has been succeeded
 			if (b) ofLogNotice(__FUNCTION__) << "CREATED '" << _path << "'  SUCCESSFULLY!";
 			else ofLogError(__FUNCTION__) << "UNABLE TO CREATE '" << _path << "' FOLDER!";
 		}
@@ -296,7 +296,7 @@ private:
 			_r.setHeight(_r.getHeight() + pad);
 			_r.setX(_r.getPosition().x - pad / 2.);
 			_r.setY(_r.getPosition().y - pad / 2.);
-			
+
 			if (rounded == 0.f) ofDrawRectangle(_r);
 			else ofDrawRectRounded(_r, rounded);
 

@@ -3,7 +3,7 @@
 ////--------------------------------------------------------------
 //ofxNDIHelper::ofxNDIHelper()
 //{
-//	DISABLE_Callbacks = true;
+//	bDISABLECALLBACKS = true;
 //
 //	path_WebcamSettings = "webcam_Settings.xml";
 //}

@@ -1,82 +1,89 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup() {
+void ofApp::setup()
+{
 #ifdef USE_ofxNDI
 	NDIHelper.setup();
 #endif
 
-	image.loadImage("pattern1.jpg");
+	image.loadImage("assets/image.jpg");
+
+	gui.setup("ofApp");
+	gui.add(bDrawImage);
+	gui.add(NDIHelper.bGui);
+	gui.add(NDIHelper.bGui_Controls);
 }
 
 //--------------------------------------------------------------
-void ofApp::update() {
+void ofApp::update()
+{
 
 #ifdef USE_ofxNDI
+
+	// Draw inside to feed the NDI Video Output.
+	// that's the signal we will send!
+
 	NDIHelper.begin_NDI_OUT();
 	{
-		//ofBackground(32);
-		image.draw(0, 0, ofGetWidth(), ofGetHeight());
+		// Layers one upper others:
 
-		// layers one upper others:
+		// 0. Draw a simple and animated scene:
+		if (bDrawImage) drawScene();
+		else ofBackground(32);
 
-		// 1. webcam
+		// 1. Draw the Webcam
 		//NDIHelper.drawWebcamOut();
 		NDIHelper.draw_Preview_Webcam();
 
-		// 2. ndi input
+		// 2. Draw the NDI Input
 		NDIHelper.draw_Preview_NDI_IN();
 	}
 	NDIHelper.end_NDI_OUT();
-#endif
 
 	//----
 
-#ifdef USE_ofxNDI
 	NDIHelper.update();
 #endif
 
 }
 
 //--------------------------------------------------------------
-void ofApp::draw() {
-	//ofBackground(32);
-	image.draw(0, 0, ofGetWidth(), ofGetHeight());
+void ofApp::draw()
+{
+	// 0. Draw a simple and animated scene:
+	if (bDrawImage) drawScene();
+	else ofBackground(32);
+
+	//--
 
 #ifdef USE_ofxNDI
 
 	//----
 
-	////// webcam
-	////NDIHelper.draw_Preview_Webcam();
-
-	//// draw ndi out
-	//NDIHelper.draw_Preview_NDI_OUT();
-
-	//----
-
-	// draw monitor
+	// Draw monitor
 	NDIHelper.draw();
 
 	//----
 
-	// gui
+	// Gui
 	NDIHelper.drawGui();
 
+	//----
+
+/*
+	// Other useful methods:
+	// Preview Webcam
+	NDIHelper.draw_Preview_Webcam();
+
+	// Preview NDI Out
+	NDIHelper.draw_Preview_NDI_OUT();
+*/
+
 #endif
-}
 
-//--------------------------------------------------------------
-void ofApp::exit()
-{
-#ifdef USE_ofxNDI
-	NDIHelper.exit();
-#endif
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-
+// ofApp Gui
+	gui.draw();
 }
 
 //--------------------------------------------------------------

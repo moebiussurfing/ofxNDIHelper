@@ -1,4 +1,0 @@
-ofxGui
-ofxNDI
-ofxNDIHelper
-ofxWindowApp
