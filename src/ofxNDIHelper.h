@@ -1,20 +1,22 @@
 
-///---
-///
-///	TODO:
-///	
-///	+	remove mini preview from webcam from output
-///	+	improved selector/patching webcam or ndi input to output
-///	+	layout
-///			fix previews resize when app window changes
-///			dynamic draggable/resizable previews?
-///	+	looks like sometimes more that expected ndi sources are appearing
-///	+	split webCam as a new helper addon 
-///	+	ndi input port settings as names not index port
-///
-///	!	startup requires disable/enable ndi input to refresh index input...?
-///
-///---
+//---
+
+/*
+	TODO:
+
+	+	remove mini preview from webcam from output
+	+	improved selector/patching webcam or ndi input to output
+	+	layout
+			fix previews resize when app window changes
+			dynamic draggable/resizable previews?
+	+	looks like sometimes more that expected ndi sources are appearing
+	+	split webCam as a new helper addon
+	+	ndi input port settings as names not index port
+
+	!	startup requires disable/enable ndi input to refresh index input...?
+*/
+
+//---
 
 
 #pragma once
@@ -23,9 +25,9 @@
 
 //----
 
-#define USE_WEBCAM		//aux camera
-#define USE_ofxNDI_IN	//ndi input
-#define USE_ofxNDI_OUT	//ndi out
+#define USE_WEBCAM // aux camera
+#define USE_ofxNDI_IN // ndi input
+#define USE_ofxNDI_OUT // ndi out
 
 //----
 
@@ -36,71 +38,74 @@
 #include "ofxNDI.h"
 #endif
 #endif
-#include "ofxInteractiveRect.h"
 
-//we can handle many app modes to change behaviour
-#define NUM_MODES_APP 2
-
-//dependencies
+// dependencies
 #include "ofxGui.h"
+#include "ofxInteractiveRect.h"
+//#include "ofxSurfingHelpers.h"
+#include "ofxSurfing_ofxGui.h"
+
+//----
 
 class ofxNDIHelper : public ofBaseApp
 {
 
-#pragma mark - OF
 public:
 
 	ofxNDIHelper();
 	~ofxNDIHelper();
 
 	void setup();
+	void setup_Params();
+	void startup();
 	void update();
 	void draw();
 	void exit();
-
-	void drawGui();
-
+	void draw_Gui();
 	void windowResized(int w, int h);
-
-	//-
-
-#pragma mark - API
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setGuiToggleVisible();
-	void setPathGlobal(string s);//must call before setup. disabled by default
+	void setPathGlobal(std::string s);//must call before setup. disabled by default
 	void setLogLevel(ofLogLevel level);
 	void setAutoSave(bool b)
 	{
-		ENABLE_AutoSave = b;
+		bAutoSave = b;
 	}
 
-	void setKey_MODE_App(int k);
+	//void setKey_MODE_App(int k);
 
 	//--
 
+private:
+	ofParameterGroup params_Webcam{ "WEBCAM" };
+	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
+	ofParameterGroup params_NDI_Output{ "NDI OUTPUT" };
+
 public:
-	//webcam
+
+	// webcam
+
 #ifdef USE_WEBCAM
 	ofVideoGrabber vidGrabber;
-	void setupWebcam();//setup webcam from name device nor index
-	void setupWebcam(int index);//setup webcam from device index
-	void restartWebcam();//restart camera using the current index camera
-	void exitWebcam();//store camera device name to xml
+	void setup_Webcam();//setup webcam from name device nor index
+	void setup_Webcam(int index);//setup webcam from device index
+	void restart_Webcam();//restart camera using the current index camera
+	void exit_Webcam();//store camera device name to xml
 	void draw_Preview_Webcam();
-	void drawWebcamOut();
-	//void drawWebcamInfo(int x, int y);
+	void draw_WebcamOut();
+
 	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
-	//int _d;
 	ofParameter<bool> mini_Webcam;
 	ofParameter<int> index_WebcamDevice;
 	ofParameter<string> name_Webcam;
-	string path_WebcamSettings;
+	std::string path_WebcamSettings;
 #endif
 
 #ifdef USE_ofxNDI_OUT
 public:
+
 	void setup_NDI_OUT();
 	ofxNDIsender ndiSender;		//NDI sender object
 	ofFbo fbo_NDI_Sender;       //Fbo used for graphics and sending
@@ -114,6 +119,7 @@ public:
 
 #ifdef USE_ofxNDI_IN
 public:
+
 	void setup_NDI_IN();
 	void refresh_NDI_IN();
 	void draw_Preview_NDI_IN();
@@ -125,135 +131,135 @@ public:
 	unsigned char *ndiReceiveChars;		//unsigned char image array to receive
 	unsigned int receiverWidth;			//sender width and height needed to receive char pixels
 	unsigned int receiverHeight;
-	void drawInfoDevices();
+	void draw_InfoDevices();
 #endif
 
 	//--
 
-#pragma mark - ADDON ENGINE
-
 public:
-	ofParameterGroup params_Control;;
-	ofParameter<bool> ENABLE_Addon;
-	ofParameter<bool> ENABLE_Edit;
-	ofParameter<bool> ENABLE_Webcam;
-	ofParameter<bool> ENABLE_Draw_Webcam;
 
-	ofParameter<bool> ENABLE_NDI_Input;
-	ofParameter<bool> ENABLE_Draw_NDI_Input;
-	ofParameter<bool> mini_ndiInput;
-	ofParameter<int> index_NDI_Input;
-	ofParameter<string> name_NDI_Input;
+	ofParameterGroup params_AppsSettings;
 
-	ofParameter<bool> ENABLE_NDI_Output;
-	ofParameter<bool> ENABLE_Draw_NDI_Output;
-	ofParameter<bool> mini_ndiOutput;
-	ofParameter<string> name_NDI_Output;
+	ofParameter<bool> bEdit;
+	ofParameter<bool> bWebcam;
+	ofParameter<bool> bDraw_Webcam;
 
-	string NDI_InputDevices;
-	string webcam_InputDevices;
+	ofParameter<bool> bNDI_Input;
+	ofParameter<bool> bDraw_NDI_Input;
+	ofParameter<bool> bNDI_Input_Mini;
+	ofParameter<int> NDI_Input_Index;
+	ofParameter<std::string> name_NDI_Input;
+
+	ofParameter<bool> bNDI_Output;
+	ofParameter<bool> bDraw_NDI_Output;
+	ofParameter<bool> bNDI_Output_Mini;
+	ofParameter<std::string> name_NDI_Output;
+
+	std::string name_NDI_InputDevices;
+	std::string name_Webcam_InputDevices;
 	bool bDoRestartup = false;
 
 public:
-	ofParameterGroup params;
+
+	ofParameterGroup params_User;
 
 	//--
 
 public:
+
 	// mini preview rectangles positions and sizes
 	ofxInteractiveRect rectNdiIn = { "rectNdiIn" };
 	ofxInteractiveRect rectNdiOut = { "rectNdiOut" };
 	ofxInteractiveRect rectWebcam = { "rectWebcam" };
 	ofParameter<bool> bLockRatio;
-	ofParameter<bool> bResetRects;
-	string path_rectNdiIn = "_NDI_In_Mini";
-	string path_rectNdiOut = "_NDI_Out_Mini";
-	string path_rectWebcam = "_Webcam_Mini";
+	ofParameter<bool> bReset;
+	std::string path_rectNdiIn = "_NDI_In_Mini";
+	std::string path_rectNdiOut = "_NDI_Out_Mini";
+	std::string path_rectWebcam = "_Webcam_Mini";
 
 	// default layout
 	int xPadPreview = 50;
 	int yPadPreview = 400;
 	float wPreview = 320;
-	void resetMiniPreviews();
+	void reset_Mini_Previews();
 
 	//-
 
 private:
 
-	//updating some params before save will trigs also the group callbacks
-	//so we disable this callbacks just in case params updatings are required
-	//in this case we will need to update gui position param
-	bool DISABLE_Callbacks;
+	// updating some params before save will trigs also the group callbacks
+	// so we disable this callbacks just in case params updating's are required
+	// in this case we will need to update gui position param
+	bool bDISABLECALLBACKS;
 
-	int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
+	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 	int screenW, screenH;
 
-	//autosave
-	ofParameter<bool> ENABLE_AutoSave;
+	// autosave
+	ofParameter<bool> bAutoSave;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 5000;
 
 	//-
 
-	void Changed_params_Control(ofAbstractParameter &e);
+	void Changed_Params_AppSettings(ofAbstractParameter &e);
 
 	//-
 
-#pragma mark - ADDON TEMPLATE STUFF
+	// control params
 
-#pragma mark - CONTROL PARAMS
+public:
 
-	//control params
+	ofParameter<bool> bGui_Controls;
+	ofParameter<bool> bGui;
+
+private:
+
 	ofParameterGroup params_Internal;
-	ofParameter<bool> MODE_Active;
-	ofParameter<bool> ENABLE_keys;
-	ofParameter<bool> ENABLE_Debug;
-	ofParameter<bool> SHOW_Gui;
-	ofParameter<glm::vec2> Gui_Position;
-	ofParameter<bool> SHOW_Help;
-	ofParameter<int> MODE_App;
-	ofParameter<string> MODE_App_Name;
-	ofxPanel gui_Control;
+	ofParameter<bool> bActive;
+	ofParameter<bool> bKeys;
+	ofParameter<bool> bDebug;
+	ofParameter<glm::vec2> position_Gui;
+	ofParameter<bool> bHelp;
+	//ofParameter<int> MODE_App;
+	//ofParameter<std::string> MODE_App_Name;
 
-#pragma mark - CALLBACKS
+	ofxPanel gui_User;
 
-	void Changed_params_Internal(ofAbstractParameter &e);
-	void Changed_params(ofAbstractParameter &e);
+	//void Changed_params_Internal(ofAbstractParameter &e);
+	//void Changed_params(ofAbstractParameter &e);
 
-#pragma mark - OF LISTENERS
-
-	//keys
+	// keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
 	void keyReleased(ofKeyEventArgs &eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	//mouse
+	// mouse
 	void mouseDragged(ofMouseEventArgs &eventArgs);
 	void mousePressed(ofMouseEventArgs &eventArgs);
 	void mouseReleased(ofMouseEventArgs &eventArgs);
 	void addMouseListeners();
 	void removeMouseListeners();
 
-#pragma mark - FILE SETTINGS
-	//settings
-	string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
-	string path_Params_Internal;
-	string path_Params_Control;
-	void loadParams(ofParameterGroup &g, string path);
-	void saveParams(ofParameterGroup &g, string path);
+	// settings
+	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
+	//std::string path_Params_Internal;
+	std::string path_Params_AppSettings;
+	void loadParams(ofParameterGroup &g, std::string path);
+	void saveParams(ofParameterGroup &g, std::string path);
 
 	//--
 
 private:
 	//--------------------------------------------------------------
-	void CheckFolder(string _path)
+	void CheckFolder(std::string _path)
 	{
 		ofLogNotice(__FUNCTION__) << _path;
 
 		ofDirectory dataDirectory(ofToDataPath(_path, true));
 
-		//check if folder path exist
+		// check if folder path exist
 		if (!dataDirectory.isDirectory())
 		{
 			ofLogError(__FUNCTION__) << "FOLDER NOT FOUND! TRYING TO CREATE...";
@@ -261,7 +267,7 @@ private:
 			//try to create folder
 			bool b = dataDirectory.createDirectory(ofToDataPath(_path, true));
 
-			//debug if creation has been succeded
+			//debug if creation has been succeeded
 			if (b) ofLogNotice(__FUNCTION__) << "CREATED '" << _path << "'  SUCCESSFULLY!";
 			else ofLogError(__FUNCTION__) << "UNABLE TO CREATE '" << _path << "' FOLDER!";
 		}
@@ -279,7 +285,7 @@ private:
 	int pad = 30;
 
 	//--------------------------------------------------------------
-	void drawTextBoxed(string text, int x, int y, float rounded = 0.f)
+	void drawTextBoxed(std::string text, int x, int y, float rounded = 0.f)
 	{
 		ofPushStyle();
 		int _alpha = 200;//bbox
@@ -296,7 +302,7 @@ private:
 			_r.setHeight(_r.getHeight() + pad);
 			_r.setX(_r.getPosition().x - pad / 2.);
 			_r.setY(_r.getPosition().y - pad / 2.);
-			
+
 			if (rounded == 0.f) ofDrawRectangle(_r);
 			else ofDrawRectRounded(_r, rounded);
 
@@ -309,7 +315,7 @@ private:
 		ofPopStyle();
 	}
 	//--------------------------------------------------------------
-	float getBbTextBoxed(string text) {
+	float getBbTextBoxed(std::string text) {
 
 		if (!font.isLoaded()) {
 			//ofDrawBitmapStringHighlight(text, 0, 0);

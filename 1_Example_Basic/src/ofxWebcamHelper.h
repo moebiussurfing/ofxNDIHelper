@@ -8,10 +8,10 @@
 //public:
 //
 //	ofVideoGrabber vidGrabber;
-//	void setupWebcam();//setup webcam from name device nor index
-//	void setupWebcam(int index);//setup webcam from device index
-//	void restartWebcam();//restart camera using the current index camera
-//	void exitWebcam();//store camera device name to xml
+//	void setup_Webcam();//setup webcam from name device nor index
+//	void setup_Webcam(int index);//setup webcam from device index
+//	void restart_Webcam();//restart camera using the current index camera
+//	void exit_Webcam();//store camera device name to xml
 //	void draw_Preview_Webcam();
 //	void drawWebcamInfo(int x, int y);
 //	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
