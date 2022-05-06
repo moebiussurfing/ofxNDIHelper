@@ -33,7 +33,7 @@ void ofApp::update()
 		else ofBackground(32);
 
 		// 1. Draw the Webcam
-		//NDIHelper.drawWebcamOut();
+		//NDIHelper.draw_WebcamOut();
 		NDIHelper.draw_Preview_Webcam();
 
 		// 2. Draw the NDI Input
@@ -67,7 +67,7 @@ void ofApp::draw()
 	//----
 
 	// Gui
-	NDIHelper.drawGui();
+	NDIHelper.draw_Gui();
 
 	//----
 

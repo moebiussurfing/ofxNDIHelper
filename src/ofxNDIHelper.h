@@ -42,6 +42,8 @@
 // dependencies
 #include "ofxGui.h"
 #include "ofxInteractiveRect.h"
+//#include "ofxSurfingHelpers.h"
+#include "ofxSurfing_ofxGui.h"
 
 //----
 
@@ -54,18 +56,18 @@ public:
 	~ofxNDIHelper();
 
 	void setup();
-	void setupParams();
+	void setup_Params();
 	void startup();
 	void update();
 	void draw();
 	void exit();
-	void drawGui();
+	void draw_Gui();
 	void windowResized(int w, int h);
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setGuiToggleVisible();
-	void setPathGlobal(string s);//must call before setup. disabled by default
+	void setPathGlobal(std::string s);//must call before setup. disabled by default
 	void setLogLevel(ofLogLevel level);
 	void setAutoSave(bool b)
 	{
@@ -76,25 +78,29 @@ public:
 
 	//--
 
+private:
+	ofParameterGroup params_Webcam{ "WEBCAM" };
+	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
+	ofParameterGroup params_NDI_Output{ "NDI OUTPUT" };
+
 public:
 
 	// webcam
 
 #ifdef USE_WEBCAM
 	ofVideoGrabber vidGrabber;
-	void setupWebcam();//setup webcam from name device nor index
-	void setupWebcam(int index);//setup webcam from device index
-	void restartWebcam();//restart camera using the current index camera
-	void exitWebcam();//store camera device name to xml
+	void setup_Webcam();//setup webcam from name device nor index
+	void setup_Webcam(int index);//setup webcam from device index
+	void restart_Webcam();//restart camera using the current index camera
+	void exit_Webcam();//store camera device name to xml
 	void draw_Preview_Webcam();
-	void drawWebcamOut();
-	//void drawWebcamInfo(int x, int y);
+	void draw_WebcamOut();
+
 	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
-	//int _d;
 	ofParameter<bool> mini_Webcam;
 	ofParameter<int> index_WebcamDevice;
 	ofParameter<string> name_Webcam;
-	string path_WebcamSettings;
+	std::string path_WebcamSettings;
 #endif
 
 #ifdef USE_ofxNDI_OUT
@@ -125,7 +131,7 @@ public:
 	unsigned char *ndiReceiveChars;		//unsigned char image array to receive
 	unsigned int receiverWidth;			//sender width and height needed to receive char pixels
 	unsigned int receiverHeight;
-	void drawInfoDevices();
+	void draw_InfoDevices();
 #endif
 
 	//--
@@ -142,20 +148,20 @@ public:
 	ofParameter<bool> bDraw_NDI_Input;
 	ofParameter<bool> bNDI_Input_Mini;
 	ofParameter<int> NDI_Input_Index;
-	ofParameter<string> name_NDI_Input;
+	ofParameter<std::string> name_NDI_Input;
 
 	ofParameter<bool> bNDI_Output;
 	ofParameter<bool> bDraw_NDI_Output;
 	ofParameter<bool> bNDI_Output_Mini;
-	ofParameter<string> name_NDI_Output;
+	ofParameter<std::string> name_NDI_Output;
 
-	string name_NDI_InputDevices;
-	string name_Webcam_InputDevices;
+	std::string name_NDI_InputDevices;
+	std::string name_Webcam_InputDevices;
 	bool bDoRestartup = false;
 
 public:
 
-	ofParameterGroup params;
+	ofParameterGroup params_User;
 
 	//--
 
@@ -166,16 +172,16 @@ public:
 	ofxInteractiveRect rectNdiOut = { "rectNdiOut" };
 	ofxInteractiveRect rectWebcam = { "rectWebcam" };
 	ofParameter<bool> bLockRatio;
-	ofParameter<bool> bResetRects;
-	string path_rectNdiIn = "_NDI_In_Mini";
-	string path_rectNdiOut = "_NDI_Out_Mini";
-	string path_rectWebcam = "_Webcam_Mini";
+	ofParameter<bool> bReset;
+	std::string path_rectNdiIn = "_NDI_In_Mini";
+	std::string path_rectNdiOut = "_NDI_Out_Mini";
+	std::string path_rectWebcam = "_Webcam_Mini";
 
 	// default layout
 	int xPadPreview = 50;
 	int yPadPreview = 400;
 	float wPreview = 320;
-	void resetMiniPreviews();
+	void reset_Mini_Previews();
 
 	//-
 
@@ -213,12 +219,12 @@ private:
 	ofParameter<bool> bActive;
 	ofParameter<bool> bKeys;
 	ofParameter<bool> bDebug;
-	ofParameter<glm::vec2> Gui_Position;
+	ofParameter<glm::vec2> position_Gui;
 	ofParameter<bool> bHelp;
 	//ofParameter<int> MODE_App;
-	//ofParameter<string> MODE_App_Name;
+	//ofParameter<std::string> MODE_App_Name;
 
-	ofxPanel gui_Control;
+	ofxPanel gui_User;
 
 	//void Changed_params_Internal(ofAbstractParameter &e);
 	//void Changed_params(ofAbstractParameter &e);
@@ -237,17 +243,17 @@ private:
 	void removeMouseListeners();
 
 	// settings
-	string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
-	//string path_Params_Internal;
-	string path_Params_AppSettings;
-	void loadParams(ofParameterGroup &g, string path);
-	void saveParams(ofParameterGroup &g, string path);
+	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data
+	//std::string path_Params_Internal;
+	std::string path_Params_AppSettings;
+	void loadParams(ofParameterGroup &g, std::string path);
+	void saveParams(ofParameterGroup &g, std::string path);
 
 	//--
 
 private:
 	//--------------------------------------------------------------
-	void CheckFolder(string _path)
+	void CheckFolder(std::string _path)
 	{
 		ofLogNotice(__FUNCTION__) << _path;
 
@@ -279,7 +285,7 @@ private:
 	int pad = 30;
 
 	//--------------------------------------------------------------
-	void drawTextBoxed(string text, int x, int y, float rounded = 0.f)
+	void drawTextBoxed(std::string text, int x, int y, float rounded = 0.f)
 	{
 		ofPushStyle();
 		int _alpha = 200;//bbox
@@ -309,7 +315,7 @@ private:
 		ofPopStyle();
 	}
 	//--------------------------------------------------------------
-	float getBbTextBoxed(string text) {
+	float getBbTextBoxed(std::string text) {
 
 		if (!font.isLoaded()) {
 			//ofDrawBitmapStringHighlight(text, 0, 0);
