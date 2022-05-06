@@ -1,0 +1,5 @@
+ofxGui
+ofxNDI
+ofxNDIHelper
+ofxSurfingHelpers
+ofxWindowApp
