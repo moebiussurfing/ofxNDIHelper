@@ -26,8 +26,8 @@
 //----
 
 #define USE_WEBCAM // aux camera
-#define USE_ofxNDI_IN // ndi input
-#define USE_ofxNDI_OUT // ndi out
+#define USE_ofxNDI_IN // NDI input
+#define USE_ofxNDI_OUT // NDI out
 
 //----
 
