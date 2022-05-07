@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
+
 #ifdef USE_ofxNDI
 	NDIHelper.setup();
 #endif
@@ -33,11 +34,11 @@ void ofApp::update()
 		// 0. Draw a simple and animated scene:
 		drawScene();
 
-		// 1. Draw the Webcam
+		// 1. Draw the connected Webcam
 		NDIHelper.draw_Preview_Webcam();
 		//NDIHelper.draw_WebcamOut(); //-> Another useful method
 
-		// 2. Draw the NDI Input
+		// 2. Draw the receiving from NDI Input
 		NDIHelper.draw_Preview_NDI_IN();
 	}
 	NDIHelper.end_NDI_OUT();
@@ -45,6 +46,7 @@ void ofApp::update()
 	//----
 
 	NDIHelper.update();
+
 #endif
 
 }
@@ -82,13 +84,17 @@ void ofApp::draw()
 
 #endif
 
+//----
+
 // ofApp Gui
 	gui.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
+
 #ifdef USE_ofxNDI
 	NDIHelper.windowResized(w, h);
 #endif
+
 }

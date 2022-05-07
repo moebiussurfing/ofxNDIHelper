@@ -141,6 +141,7 @@ public:
 	ofParameterGroup params_AppsSettings;
 
 	ofParameter<bool> bEdit;
+	bool bEdit_PRE;
 	ofParameter<bool> bWebcam;
 	ofParameter<bool> bDraw_Webcam;
 
