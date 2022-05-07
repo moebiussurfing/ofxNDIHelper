@@ -1,54 +1,76 @@
 # ofxNDIHelper
 
 ## Overview
-Helper add-on for **openFrameworks** to handle **NDI Input**/**Output** ports and input **Webcam** devices with **customizable layout of previews** and **auto store/recall settings**.
+Helper add-on for **openFrameworks** to handle **NDI Input**/**Output** ports and input **Webcam** devices with **customizable layout of previews** and **auto store settings**.
 
 ## Screenshot
 ![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
-- List and **select NDI Devices** and **Webcam** devices.
+- Add a NDI manager to your apps.
+- List, select and feed **NDI Devices** and route **Webcam** devices.
 - Auto **store and recall settings** of selected ports by name.
-- **Mini Preview** channels with easy **customizable layout** using mouse.
+- Draggable **Mini Previews**  with easy **customizable layout** mouse.
 
+## Example
 ```.cpp
-// setup()
-NDIHelper.setup();
-
-// update()
-NDIHelper.begin_NDI_OUT();
+void ofApp::setup()
 {
-	//1. webcam
-	NDIHelper.drawWebcamOut();
-
-	//2. ndi input
-	NDIHelper.draw_Preview_NDI_IN();
+	NDIHelper.setup();
 }
-NDIHelper.end_NDI_OUT();
 
-//draw()
+void ofApp::update()
+{
+	// Draw inside to feed the NDI Video Output.
+	// that's the signal we will send!
 
-////// webcam
-////NDIHelper.draw_Preview_Webcam();
+	NDIHelper.begin_NDI_OUT();
+	{
+		// Layers one upper others:
 
-//// draw ndi out
-//NDIHelper.draw_Preview_NDI_OUT();
+		// 0. Draw a simple and animated scene:
+		drawScene();
 
-//----
+		// 1. Draw the connected Webcam
+		NDIHelper.draw_Preview_Webcam();
+		//NDIHelper.draw_WebcamOut(); //-> Another useful method
 
-//draw monitor
-NDIHelper.draw();
+		// 2. Draw the receiving from NDI Input
+		NDIHelper.draw_Preview_NDI_IN();
+	}
+	NDIHelper.end_NDI_OUT();
 
-//gui
-NDIHelper.drawGui();
+	NDIHelper.update();
+}
+
+void ofApp::draw()
+{
+	// Draw monitor
+	NDIHelper.draw();
+
+	// Gui
+	NDIHelper.draw_Gui();
+
+/*
+	// Other useful methods:
+
+	// Preview Webcam
+	NDIHelper.draw_Preview_Webcam();
+
+	// Preview NDI Out
+	NDIHelper.draw_Preview_NDI_OUT();
+*/
+}
 ```
 
 ## Dependencies
-* [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers) 
-* OfxGui [ OF Core ]
+* [ofxNDI](https://github.com/leadedge/ofxNDI)
+* [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
+* ofxGui [ OF Core ]
+* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) [ Optional ]
 
 ## Tested Systems
-- **Windows10** / **VS2017** / **OF 0.11**
+- **Windows 10** / **VS 2017** / **OF 0.11**
 
 ## Author
 moebiusSurfing, 2020.  
