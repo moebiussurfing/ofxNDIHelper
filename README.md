@@ -7,9 +7,9 @@ Helper add-on for **openFrameworks** to handle **NDI Input**/**Output** ports an
 ![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
-- Add an NDI manager to your apps fast.
+- Add an **NDI Manager** to your apps **fast**.
 - List, select and feed **NDI Devices** and route **Webcam** devices.
-- Auto **store and recall settings** of selected ports by name.
+- Auto **store and recall settings**.
 - Draggable **Mini Previews**  with easy **customizable layout** mouse.
 
 ## Example
@@ -77,4 +77,4 @@ moebiusSurfing, 2020-2022.
 ( ManuMolina ) 
 
 ## License
-MIT License.
+MIT License

@@ -11,6 +11,9 @@
 *.JSON
 *.json
 
+*.ps1
+*.bat
+
 #*/bin/*
 #!*/bin/data/
 #[Bb]in/
