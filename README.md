@@ -1,16 +1,16 @@
 # ofxNDIHelper
 
 ## Overview
-Helper add-on for **openFrameworks** to handle **NDI Input**/**Output** ports and input **Webcam** devices with **customizable layout of previews** and **auto store settings**.
+Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) **Input**/**Output** ports and input **Webcam** devices with **customizable layout of previews** and **auto store settings**.
 
 ## Screenshot
 ![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
 
 ## Features
-- Add an **NDI Manager** to your apps **fast**.
-- List, select and feed **NDI Devices** and route **Webcam** devices.
-- Auto **store and recall settings**.
-- Draggable **Mini Previews**  with easy **customizable layout** mouse.
+- Add an **NDI Manager** to your apps **fast**: send and receive.
+- List, select and feed **NDI Devices** and route a **Webcam** device.
+- Auto **store and recall** settings and layout.
+- Draggable **Mini Previews**  with easy **customizable**.
 
 ## Example
 ```.cpp
