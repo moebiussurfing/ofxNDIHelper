@@ -7,6 +7,8 @@ void ofApp::setup()
 	NDIHelper.setup();
 #endif
 
+	//--
+
 	image.loadImage("assets/image.jpg");
 
 	gui.setup("ofApp");
@@ -29,12 +31,11 @@ void ofApp::update()
 		// Layers one upper others:
 
 		// 0. Draw a simple and animated scene:
-		if (bDrawImage) drawScene();
-		else ofBackground(32);
+		drawScene();
 
 		// 1. Draw the Webcam
-		//NDIHelper.draw_WebcamOut();
 		NDIHelper.draw_Preview_Webcam();
+		//NDIHelper.draw_WebcamOut(); //-> Another useful method
 
 		// 2. Draw the NDI Input
 		NDIHelper.draw_Preview_NDI_IN();
@@ -51,9 +52,7 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	// 0. Draw a simple and animated scene:
-	if (bDrawImage) drawScene();
-	else ofBackground(32);
+	//drawScene();
 
 	//--
 
@@ -73,6 +72,7 @@ void ofApp::draw()
 
 /*
 	// Other useful methods:
+
 	// Preview Webcam
 	NDIHelper.draw_Preview_Webcam();
 

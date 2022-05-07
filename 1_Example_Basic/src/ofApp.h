@@ -11,7 +11,8 @@
 #include "ofxGui.h"
 #include "ofxWindowApp.h"
 
-class ofApp : public ofBaseApp {
+class ofApp : public ofBaseApp
+{
 
 public:
 
@@ -26,6 +27,8 @@ public:
 	ofxNDIHelper NDIHelper;
 #endif
 
+	//--
+
 	// window
 	ofxWindowApp windowApp;
 
@@ -37,14 +40,20 @@ public:
 
 	// A simple and animated scene using an image:
 	//--------------------------------------------------------------
-	void drawScene() {
+	void drawScene() 
+	{
+		if (!bDrawImage) {
+			ofBackground(32);
+			return;
+		}
+
 		ofPushMatrix();
 		const float noiseAmnt = 0.07f;
 		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
 		float scale = ofMap(ofxSurfingHelpers::Bounce(), 0, 1, 1, 1.08f);
 		float noise = ofMap(ofxSurfingHelpers::Noise(), -1, 1, -noiseAmnt, noiseAmnt);
-		int xOffset = -noise * 500;
-		int vOffset = noise * 200;
+		int xOffset = noise * 500;
+		int vOffset = noise * 300;
 		ofScale(scale + noise);
 		image.draw(xOffset - ofGetWidth() / 2, vOffset - ofGetHeight() / 2, ofGetWidth(), ofGetHeight());
 		ofPopMatrix();

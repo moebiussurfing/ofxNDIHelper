@@ -42,7 +42,7 @@
 // dependencies
 #include "ofxGui.h"
 #include "ofxInteractiveRect.h"
-//#include "ofxSurfingHelpers.h"
+#include "ofxSurfingHelpers.h"
 #include "ofxSurfing_ofxGui.h"
 
 //----
@@ -165,23 +165,31 @@ public:
 
 	//--
 
-public:
+//public:
+private:
 
 	// mini preview rectangles positions and sizes
-	ofxInteractiveRect rectNdiIn = { "rectNdiIn" };
-	ofxInteractiveRect rectNdiOut = { "rectNdiOut" };
-	ofxInteractiveRect rectWebcam = { "rectWebcam" };
+	ofxInteractiveRect rect_NDI_IN = { "rect_NDI_IN" };
+	ofxInteractiveRect rect_NDI_OUT = { "rect_NDI_OUT" };
+	ofxInteractiveRect rect_Webcam = { "rect_Webcam" };
+	std::string path_rect_NDI_IN = "_NDI_In_Mini";
+	std::string path_rect_NDI_OUT = "_NDI_Out_Mini";
+	std::string path_rect_Webcam = "_Webcam_Mini";
 	ofParameter<bool> bLockRatio;
 	ofParameter<bool> bReset;
-	std::string path_rectNdiIn = "_NDI_In_Mini";
-	std::string path_rectNdiOut = "_NDI_Out_Mini";
-	std::string path_rectWebcam = "_Webcam_Mini";
+
+	void reset_Mini_Previews();
 
 	// default layout
-	int xPadPreview = 50;
-	int yPadPreview = 400;
-	float wPreview = 320;
-	void reset_Mini_Previews();
+	int xPadPreview = 300;
+	int yPadPreview = 50;
+	float wPreview = 320;//preview viewport size
+
+	// Text box
+	ofTrueTypeFont font;
+	ofTrueTypeFont fontBig;
+	float rounded = 2.0;
+	int pad = 20;
 
 	//-
 
@@ -278,53 +286,5 @@ private:
 	}
 
 	//--
-
-	// text box
-	ofTrueTypeFont font;
-	float rounded = 3.0;
-	int pad = 30;
-
-	//--------------------------------------------------------------
-	void drawTextBoxed(std::string text, int x, int y, float rounded = 0.f)
-	{
-		ofPushStyle();
-		int _alpha = 200;//bbox
-
-		if (!font.isLoaded()) {
-			ofDrawBitmapStringHighlight(text, x, y);
-		}
-		else {
-			//bbox
-			ofSetColor(0, _alpha);
-			ofFill();
-			ofRectangle _r(font.getStringBoundingBox(text, x, y));
-			_r.setWidth(_r.getWidth() + pad);
-			_r.setHeight(_r.getHeight() + pad);
-			_r.setX(_r.getPosition().x - pad / 2.);
-			_r.setY(_r.getPosition().y - pad / 2.);
-
-			if (rounded == 0.f) ofDrawRectangle(_r);
-			else ofDrawRectRounded(_r, rounded);
-
-			//text
-			ofSetColor(255, 255);
-			ofNoFill();
-			font.drawString(text, x, y);
-		}
-
-		ofPopStyle();
-	}
-	//--------------------------------------------------------------
-	float getBbTextBoxed(std::string text) {
-
-		if (!font.isLoaded()) {
-			//ofDrawBitmapStringHighlight(text, 0, 0);
-			//return bb//TODO:
-			return 200;
-		}
-		else {
-			return (font.getStringBoundingBox(text, 0, 0)).getWidth() + pad;
-		}
-	}
 
 };
