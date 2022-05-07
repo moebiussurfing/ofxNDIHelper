@@ -97,8 +97,8 @@ public:
 	void draw_WebcamOut();
 
 	ofParameter <std::string> _dName{ "WEBCAM_DEVICE_NAME", "" };
-	ofParameter<bool> mini_Webcam;
-	ofParameter<int> index_WebcamDevice;
+	ofParameter<bool> webcam_Mini;
+	ofParameter<int> webcam_Index_Device;
 	ofParameter<string> name_Webcam;
 	std::string path_WebcamSettings;
 #endif
