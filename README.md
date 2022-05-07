@@ -14,6 +14,9 @@ Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 
 
 ## Example
 ```.cpp
+#include "ofxNDIHelper.h"
+ofxNDIHelper NDIHelper;
+
 void ofApp::setup()
 {
     NDIHelper.setup();
