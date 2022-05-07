@@ -29,16 +29,13 @@ void ofApp::update()
 
     NDIHelper.begin_NDI_OUT();
     {
-        // Layers one upper others:
+        /* Draw your scene */
 
-        // 0. Draw a simple and animated scene:
-        drawScene();
-
-        // 1. Draw the connected Webcam
+        // Draw the connected Webcam
         NDIHelper.draw_Preview_Webcam();
         //NDIHelper.draw_WebcamOut(); //-> Another useful method
 
-        // 2. Draw the receiving from NDI Input
+        // Draw the video from the NDI Input
         NDIHelper.draw_Preview_NDI_IN();
     }
     NDIHelper.end_NDI_OUT();
@@ -48,21 +45,11 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-    // Draw monitor
+    // Draw Previews
     NDIHelper.draw();
 
     // Gui
     NDIHelper.draw_Gui();
-
-/*
-    // Other useful methods:
-
-    // Preview Webcam
-    NDIHelper.draw_Preview_Webcam();
-
-    // Preview NDI Out
-    NDIHelper.draw_Preview_NDI_OUT();
-*/
 }
 ```
 
