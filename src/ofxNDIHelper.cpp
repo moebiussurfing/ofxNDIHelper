@@ -16,6 +16,8 @@ ofxNDIHelper::ofxNDIHelper()
 #endif
 
 	setActive(true);// add key and mouse listeners
+
+	ofAddListener(ofEvents().update, this, &ofxNDIHelper::update);
 }
 
 //--------------------------------------------------------------
@@ -25,6 +27,8 @@ ofxNDIHelper::~ofxNDIHelper()
 
 	// remove params callbacks listeners
 	ofRemoveListener(params_AppsSettings.parameterChangedE(), this, &ofxNDIHelper::Changed_Params_AppSettings);
+
+	ofRemoveListener(ofEvents().update, this, &ofxNDIHelper::update);
 
 	exit();
 }
@@ -304,11 +308,16 @@ void ofxNDIHelper::startup()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::update()
+void ofxNDIHelper::update(ofEventArgs & args)
 {
 	if (ofGetFrameNum() == 1)
 	{
 		fixStartup();
+	}
+
+	if (!bActive)
+	{
+		return;
 	}
 
 	//-

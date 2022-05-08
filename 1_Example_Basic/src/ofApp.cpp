@@ -66,10 +66,6 @@ void ofApp::update()
 	}
 	NDIHelper.end_NDI_OUT();
 
-	//----
-
-	NDIHelper.update();
-
 #endif
 
 }
@@ -95,15 +91,17 @@ void ofApp::draw()
 
 	//----
 
-/*
-	// Other useful methods:
+	/* 
 
-	// Preview Webcam
-	NDIHelper.draw_Webcam_MiniPreview();
-
-	// Preview NDI Out
-	NDIHelper.draw_NDI_OUT();
-*/
+	Notice that obviously we can draw the above methods here too.
+	The above draw are being feeded into the NDI OUTPUT signal!
+	
+	*/
+	
+	//if (bDraw_NDI_Input_Full) NDIHelper.draw_NDI_IN_Full();
+	//if (bDraw_NDI_Input_Mini) NDIHelper.draw_NDI_IN_MiniPreview();
+	//if (bDraw_Webcam_Full) NDIHelper.draw_Webcam_Full();
+	//if (bDraw_Webcam_Mini) NDIHelper.draw_Webcam_MiniPreview();
 
 #endif
 

@@ -52,7 +52,7 @@ public:
 	void setup();
 	void setup_Params();
 	void startup();
-	void update();
+	void update(ofEventArgs & args);
 	void draw();
 	void exit();
 	void draw_Gui();
