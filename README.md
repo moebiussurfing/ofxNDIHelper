@@ -74,7 +74,6 @@ void ofApp::draw()
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / Optional
 
 ## HowTo
-To Test and understand how it works:  
 1. You should install the [NDI Tools](https://www.ndi.tv/tools/).
 2. Run an NDI Monitor to preview what is being sent through the output.
 3. You can run an NDI Test Patterns to feed a signal into the NDI Addon.
