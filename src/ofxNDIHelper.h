@@ -8,6 +8,7 @@
 	+ Fix directives to allow use i.e. only the camera or only the Output.
 	+ Split Webcam part as a new helper addon. ?
 	+ NDI input/output devices port settings as names instead of index port.
+
 */
 
 //---
@@ -25,6 +26,8 @@
 
 // fix workaround startup
 //#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
+// NOTE: if weebcam hangs during runtime, you should Disable and Enable again to restart/fix!
+
 
 //--
 
@@ -98,6 +101,7 @@ private:
 	void exit_Webcam();//store camera device name to xml
 
 public:
+	void draw_Webcam();
 
 	void draw_Webcam_MiniPreview(bool bInfo = false);
 	void draw_Webcam_Full();
@@ -106,7 +110,7 @@ private:
 	
 	ofParameter <std::string> _webcam_Name{ "WEBCAM_DEVICE_NAME", "" };
 	ofParameter<std::string> webcam_Name;//can be merged both vars?
-	ofParameter<bool> webcam_Mini;
+	ofParameter<bool> bWebcam_Mini;
 	ofParameter<int> webcam_Index_Device;
 	std::string path_WebcamSettings;
 #endif
@@ -217,7 +221,8 @@ private:
 
 	// default layout
 	int xPadPreview = 300;
-	int yPadPreview = 50;
+	int yPadPreview = 100;
+	//int yPadPreview = 50;
 	float wPreview = 320;
 	//preview viewport size
 
@@ -276,12 +281,12 @@ private:
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	// mouse
-	void mouseDragged(ofMouseEventArgs &eventArgs);
-	void mousePressed(ofMouseEventArgs &eventArgs);
-	void mouseReleased(ofMouseEventArgs &eventArgs);
-	void addMouseListeners();
-	void removeMouseListeners();
+	//// mouse
+	//void mouseDragged(ofMouseEventArgs &eventArgs);
+	//void mousePressed(ofMouseEventArgs &eventArgs);
+	//void mouseReleased(ofMouseEventArgs &eventArgs);
+	//void addMouseListeners();
+	//void removeMouseListeners();
 
 	// settings
 	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other addons data

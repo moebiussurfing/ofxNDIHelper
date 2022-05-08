@@ -91,13 +91,13 @@ void ofxNDIHelper::setup_Params()
 #ifdef USE_WEBCAM
 	bWebcam.set("CAM ENABLE", false);
 	bWebcam_Draw.set("CAM DRAW", true);
-	webcam_Mini.set("CAM MINI", true);
+	bWebcam_Mini.set("CAM MINI", true);
 	webcam_Index_Device.set("CAM DEVICE", 0, 0, 1);
 	webcam_Name.set("", "");
 
 	params_Webcam.add(bWebcam);
 	params_Webcam.add(bWebcam_Draw);
-	params_Webcam.add(webcam_Mini);
+	params_Webcam.add(bWebcam_Mini);
 	params_Webcam.add(webcam_Index_Device);
 	params_Webcam.add(webcam_Name);
 
@@ -140,9 +140,9 @@ void ofxNDIHelper::setup_Params()
 	params_User.add(bEdit);
 	params_User.add(bLockRatio);
 	params_User.add(bKeys);
+	params_User.add(bActive);
 	params_User.add(bDebug);
 	params_User.add(bReset);
-	//params_User.add(bActive);
 	//params_User.add(bHelp);
 
 	// Webcam
@@ -174,7 +174,7 @@ void ofxNDIHelper::setup_Params()
 	// params internal
 
 	params_Internal.setName("INTERNAL");
-	params_Internal.add(bActive);
+	//params_Internal.add(bActive);
 	params_Internal.add(bKeys);
 	params_Internal.add(bHelp);
 	params_Internal.add(bDebug);
@@ -312,7 +312,7 @@ void ofxNDIHelper::startup()
 
 #endif
 
-	// mini preview rectangles positions and sizes
+	// Reset preview rectangles positions and sizes
 	reset_Mini_Previews();
 
 #ifdef USE_ofxNDI_IN
@@ -417,7 +417,6 @@ void ofxNDIHelper::draw() {
 
 	//-
 
-
 #ifdef USE_ofxNDI_IN
 	// NDI IN
 	if (bNDI_Input.get() && bNDI_Input_Draw.get())
@@ -432,7 +431,7 @@ void ofxNDIHelper::draw() {
 	// Webcam
 	if (bWebcam.get() && bWebcam_Draw.get())
 	{
-		draw_Webcam_MiniPreview(true);
+		draw_Webcam();
 	}
 #endif
 
@@ -501,6 +500,7 @@ void ofxNDIHelper::windowResized(int w, int h)
 	screenW = w;
 	screenH = h;
 
+	//TODO:
 	//ndiSender.UpdateSender(1920, 1080);//update size
 }
 
@@ -567,7 +567,6 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 	if (key == ' ')
 	{
 		bNDI_Input_Scan = true;
-		//refresh_NDI_IN();
 	}
 #endif
 
@@ -578,19 +577,15 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs &eventArgs)
 		bEdit = !bEdit;
 	}
 
+	else if (key == 'D')
+	{
+		bDebug = !bDebug;
+	}
+
 	//else if (key == 'H')
 	//{
 	//	bHelp = !bHelp;
 	//}
-
-	//else if (key == 'D')
-	//{
-	//	bDebug = !bDebug;
-	//}
-
-	// edit mode
-	//if (bEdit)
-	//{
 
 	//--
 
@@ -638,47 +633,47 @@ void ofxNDIHelper::removeKeysListeners()
 	ofRemoveListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
 }
 
-// mouse
-//--------------------------------------------------------------
-void ofxNDIHelper::mouseDragged(ofMouseEventArgs &eventArgs)
-{
-	const int &x = eventArgs.x;
-	const int &y = eventArgs.y;
-	const int &button = eventArgs.button;
-	//ofLogNotice(__FUNCTION__) << "mouseDragged " << x << ", " << y << ", " << button;
-}
+//// mouse
+////--------------------------------------------------------------
+//void ofxNDIHelper::mouseDragged(ofMouseEventArgs &eventArgs)
+//{
+//	const int &x = eventArgs.x;
+//	const int &y = eventArgs.y;
+//	const int &button = eventArgs.button;
+//	//ofLogNotice(__FUNCTION__) << "mouseDragged " << x << ", " << y << ", " << button;
+//}
+//
+////--------------------------------------------------------------
+//void ofxNDIHelper::mousePressed(ofMouseEventArgs &eventArgs)
+//{
+//	const int &x = eventArgs.x;
+//	const int &y = eventArgs.y;
+//	const int &button = eventArgs.button;
+//	//ofLogNotice(__FUNCTION__) << "mousePressed " << x << ", " << y << ", " << button;
+//}
+//
+////--------------------------------------------------------------
+//void ofxNDIHelper::mouseReleased(ofMouseEventArgs &eventArgs)
+//{
+//	const int &x = eventArgs.x;
+//	const int &y = eventArgs.y;
+//	const int &button = eventArgs.button;
+//	//ofLogNotice(__FUNCTION__) << "mouseReleased " << x << ", " << y << ", " << button;
+//}
 
-//--------------------------------------------------------------
-void ofxNDIHelper::mousePressed(ofMouseEventArgs &eventArgs)
-{
-	const int &x = eventArgs.x;
-	const int &y = eventArgs.y;
-	const int &button = eventArgs.button;
-	//ofLogNotice(__FUNCTION__) << "mousePressed " << x << ", " << y << ", " << button;
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::mouseReleased(ofMouseEventArgs &eventArgs)
-{
-	const int &x = eventArgs.x;
-	const int &y = eventArgs.y;
-	const int &button = eventArgs.button;
-	//ofLogNotice(__FUNCTION__) << "mouseReleased " << x << ", " << y << ", " << button;
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::addMouseListeners()
-{
-	ofAddListener(ofEvents().mouseDragged, this, &ofxNDIHelper::mouseDragged);
-	ofAddListener(ofEvents().mousePressed, this, &ofxNDIHelper::mousePressed);
-	ofAddListener(ofEvents().mouseReleased, this, &ofxNDIHelper::mouseReleased);
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::removeMouseListeners()
-{
-	ofRemoveListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
-}
+////--------------------------------------------------------------
+//void ofxNDIHelper::addMouseListeners()
+//{
+//	ofAddListener(ofEvents().mouseDragged, this, &ofxNDIHelper::mouseDragged);
+//	ofAddListener(ofEvents().mousePressed, this, &ofxNDIHelper::mousePressed);
+//	ofAddListener(ofEvents().mouseReleased, this, &ofxNDIHelper::mouseReleased);
+//}
+//
+////--------------------------------------------------------------
+//void ofxNDIHelper::removeMouseListeners()
+//{
+//	ofRemoveListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
+//}
 
 
 //--------------------------------------------------------------
@@ -692,12 +687,12 @@ void ofxNDIHelper::setActive(bool b)
 	if (!b)
 	{
 		removeKeysListeners();
-		removeMouseListeners();
+		//removeMouseListeners();
 	}
 	else
 	{
 		addKeysListeners();
-		addMouseListeners();
+		//addMouseListeners();
 	}
 }
 
@@ -745,15 +740,6 @@ void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter &e)
 				rect_NDI_IN.enableEdit();
 				rect_NDI_OUT.enableEdit();
 				rect_Webcam.enableEdit();
-
-				//--
-
-#ifdef USE_WEBCAM
-				//if (bWebcam.get()) {
-				//	setup_Webcam();
-				//}
-#endif
-				//--
 			}
 			else
 			{
@@ -800,44 +786,11 @@ void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter &e)
 		else if (name == bNDI_Input.getName() && bNDI_Input.get())
 		{
 			setup_NDI_IN();
-
-			//refresh_NDI_IN();
 		}
 		else if (name == NDI_Input_Index.getName() && bNDI_Input.get())
 		{
 			setup_NDI_IN();
-
-			//refresh_NDI_IN();
-
-			//int _nsendersRemote = ndiReceiver.GetSenderCount();
-			//NDI_Input_Index.setMax(_nsendersRemote - 1);
-			//int index = NDI_Input_Index.get();
-			//char name[256];
-
-			//if (_nsendersRemote > 0 && index >= 0 && index < _nsendersRemote) {
-			//	//Update the receiver with the returned index
-			//	//Returns false if the current sender is selected
-			//	if (ndiReceiver.SetSenderIndex(index)) {
-			//		ofLogNotice(__FUNCTION__) << "Selected [" << ndiReceiver.GetSenderName(index) << "]";
-			//		ndiReceiver.GetSenderName(name, 256, index);
-			//		ofLogNotice(__FUNCTION__) << "    Sender " << index << " [" << name << "]";
-			//		//std::string my_string(name);
-			//		//NDI_Input_Name = my_string;
-			//		NDI_Input_Name = ndiReceiver.GetSenderName(index);
-			//		ofLogNotice(__FUNCTION__) << "NDI_Input_Name: " << NDI_Input_Name.get();
-			//	}
-			//	else
-			//		ofLogNotice(__FUNCTION__) << "Stay in same sender";
-			//}
-			//else
-			//{
-			//	ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
-			//}
 		}
-
-		//else if (name == "NDI_IN" && bNDI_Input.get())
-		//{
-		//}
 
 		//----
 
@@ -872,14 +825,8 @@ void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter &e)
 	}
 }
 
-////--------------------------------------------------------------
-//void ofxNDIHelper::setKey_MODE_App(int k)
-//{
-//	key_MODE_App = k;
-//}
-
 //--------------------------------------------------------------
-void ofxNDIHelper::setPathGlobal(string s)// must call before setup. disabled by default
+void ofxNDIHelper::setPathGlobal(string s) // must call before setup.
 {
 	path_GLOBAL = s;
 
@@ -911,12 +858,12 @@ void ofxNDIHelper::saveParams(ofParameterGroup &g, string path)
 
 // TODO:
 //--------------------------------------------------------------
-void ofxNDIHelper::restart_Webcam() {
+void ofxNDIHelper::restart_Webcam() 
+{
 	// must close before reopen
 	vidGrabber.close();
 
 	// start device
-	//if (bWebcam.get()) 
 	{
 		vidGrabber.setDeviceID(webcam_Index_Device.get());
 		//vidGrabber.setDesiredFrameRate(60);
@@ -1093,36 +1040,25 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 
 		ofRectangle r(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
 
-		//if (!webcam_Mini.get())// full size 
-		//{
-		//	r.scaleTo(ofGetWindowRect());
-		//	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
-		//	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_STRETCH_TO_FILL);
-		//	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
-		//	vidGrabber.draw(r.x, r.y, r.width, r.height);
-		//}
-		//else// mini
+		if (bLockRatio.get()) {
+			float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
+			rect_Webcam.height = rect_Webcam.width * _ratio;
+		}
+		vidGrabber.draw(rect_Webcam.x, rect_Webcam.y, rect_Webcam.width, rect_Webcam.height);
+		rect_Webcam.draw();
+
+		// bb border
+		ofNoFill();
+		ofSetColor(0);
+		ofSetLineWidth(2.0);
+		ofDrawRectangle(rect_Webcam);
+
+		// Top info
+		if (bDebug && bInfo)
 		{
-			if (bLockRatio.get()) {
-				float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
-				rect_Webcam.height = rect_Webcam.width * _ratio;
-			}
-			vidGrabber.draw(rect_Webcam.x, rect_Webcam.y, rect_Webcam.width, rect_Webcam.height);
-			rect_Webcam.draw();
-
-			// bb border
-			ofNoFill();
-			ofSetColor(0);
-			ofSetLineWidth(2.0);
-			ofDrawRectangle(rect_Webcam);
-
-			// Top info
-			if (bDebug && bInfo)
-			{
-				auto p = rect_Webcam.getTopLeft() + glm::vec2(_padx, _pady);
-				//int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, "WEBCAM  " + _webcam_Name.get());
-				ofxSurfingHelpers::drawTextBoxed(font, "WEBCAM  " + _webcam_Name.get(), p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
-			}
+			auto p = rect_Webcam.getTopLeft() + glm::vec2(_padx, _pady);
+			//int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, "WEBCAM  " + _webcam_Name.get());
+			ofxSurfingHelpers::drawTextBoxed(font, "WEBCAM  " + _webcam_Name.get(), p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
 		}
 
 		ofPopStyle();
@@ -1133,8 +1069,6 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 
 //--------------------------------------------------------------
 void ofxNDIHelper::reset_Mini_Previews() {
-
-	// reset mini previews layout
 
 	float _pad = 200;
 	float _xx = xPadPreview;
@@ -1171,6 +1105,13 @@ void ofxNDIHelper::reset_Mini_Previews() {
 }
 
 #ifdef USE_WEBCAM
+//--------------------------------------------------------------
+void ofxNDIHelper::draw_Webcam()
+{
+	if (bWebcam_Mini) draw_Webcam_MiniPreview(true);
+	else draw_Webcam_Full();
+}
+
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam_Full()
 {
@@ -1265,7 +1206,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 	// Webcam
 
 #ifdef USE_WEBCAM
-	if (bWebcam.get() && bWebcam_Draw.get() && webcam_Mini.get())
+	if (bWebcam.get() && bWebcam_Draw.get() && bWebcam_Mini.get())
 	{
 		// display devices
 
