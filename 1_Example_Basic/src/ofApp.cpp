@@ -14,6 +14,7 @@ void ofApp::setup()
 
 	gui.setup("ofApp");
 	gui.add(bDrawImage);
+	gui.add(bDrawAddonSources);
 	gui.add(NDIHelper.bGui);
 	gui.add(NDIHelper.bGui_Controls);
 }
@@ -34,12 +35,15 @@ void ofApp::update()
 		// 0. Draw a simple and animated scene:
 		drawScene();
 
-		// 1. Draw the connected Webcam
-		NDIHelper.draw_Preview_Webcam();
-		//NDIHelper.draw_WebcamOut(); //-> Another useful method
+		if (bDrawAddonSources) //-> Feed sources from the add-on too.
+		{
+			// 1. Draw the connected Webcam
+			NDIHelper.draw_Preview_Webcam(); //-> The mini preview of the camera.
+			//NDIHelper.draw_WebcamOut(); //-> Another useful method. The full screen camera.
 
-		// 2. Draw the receiving from NDI Input
-		NDIHelper.draw_Preview_NDI_IN();
+			// 2. Draw the receiving from NDI Input.
+			NDIHelper.draw_Preview_NDI_IN();
+		}
 	}
 	NDIHelper.end_NDI_OUT();
 
@@ -54,7 +58,7 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	//drawScene();
+	drawScene();
 
 	//--
 
@@ -62,7 +66,7 @@ void ofApp::draw()
 
 	//----
 
-	// Draw monitor
+	// Draw Preview Monitors
 	NDIHelper.draw();
 
 	//----

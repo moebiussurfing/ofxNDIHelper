@@ -35,6 +35,7 @@ public:
 	// bg image
 	ofImage image;
 	ofParameter<bool>bDrawImage{ "Image", true };
+	ofParameter<bool>bDrawAddonSources{ "Sources", false };
 
 	ofxPanel gui;
 

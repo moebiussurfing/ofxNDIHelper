@@ -4,14 +4,14 @@
 /*
 	TODO:
 
-	+	remove mini preview from webcam from output
-	+	improved selector/patching webcam or ndi input to output
-	+	layout
-			fix previews resize when app window changes
+	+	remove mini preview from webcam from output.
+	+	improved selector/patching webcam or ndi input to output.
+	+	layouting:
+			fix previews resize when app window changes.
 			dynamic draggable/resizable previews?
-	+	looks like sometimes more that expected ndi sources are appearing
-	+	split webCam as a new helper addon
-	+	ndi input port settings as names not index port
+	+	looks like sometimes more that expected ndi sources are appearing.
+	+	split webcam part as a new helper addon.
+	+	ndi input port settings as names not index port.
 
 	!	startup requires disable/enable ndi input to refresh index input...?
 */
@@ -28,6 +28,9 @@
 #define USE_WEBCAM // aux camera
 #define USE_ofxNDI_IN // NDI input
 #define USE_ofxNDI_OUT // NDI out
+
+// fix workaround startup
+//#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
 
 //----
 
@@ -83,6 +86,13 @@ private:
 	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
 	ofParameterGroup params_NDI_Output{ "NDI OUTPUT" };
 
+	void fixStartup()
+	{
+		bEdit = bEdit_PRE;
+
+		NDI_Input_Index = NDI_Input_Index;
+	}
+
 public:
 
 	// webcam
@@ -132,6 +142,7 @@ public:
 	unsigned int receiverWidth;			//sender width and height needed to receive char pixels
 	unsigned int receiverHeight;
 	void draw_InfoDevices();
+
 #endif
 
 	//--
@@ -146,6 +157,7 @@ public:
 	ofParameter<bool> bDraw_Webcam;
 
 	ofParameter<bool> bNDI_Input;
+	ofParameter<bool> bNDI_Input_Scan;
 	ofParameter<bool> bDraw_NDI_Input;
 	ofParameter<bool> bNDI_Input_Mini;
 	ofParameter<int> NDI_Input_Index;
@@ -166,7 +178,6 @@ public:
 
 	//--
 
-//public:
 private:
 
 	// mini preview rectangles positions and sizes
@@ -191,6 +202,9 @@ private:
 	ofTrueTypeFont fontBig;
 	float rounded = 2.0;
 	int pad = 20;
+	
+	float _padx = 9;
+	float _pady = 9 - pad;
 
 	//-
 
