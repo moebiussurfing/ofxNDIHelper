@@ -46,10 +46,10 @@ void ofApp::update()
 
         // 2. Draw the connected Webcam from the add-on:
 
-        //-> The full preview of the camera.
+        //-> The full preview of the camera
         NDIHelper.draw_Webcam_Full();
 
-        //-> The mini preview of the camera.
+        //-> The mini preview of the camera
         NDIHelper.draw_Webcam_MiniPreview(); 
     }
     NDIHelper.end_NDI_OUT();
