@@ -107,6 +107,7 @@ void ofxNDIHelper::setup_Params()
 
 	//--
 
+#ifdef USE_ofxNDI_IN
 	// NDI IN
 
 	params_NDI_Input.add(bNDI_Input);
@@ -115,7 +116,9 @@ void ofxNDIHelper::setup_Params()
 	params_NDI_Input.add(NDI_Input_Index);
 	params_NDI_Input.add(NDI_Input_Name);
 	params_NDI_Input.add(bNDI_Input_Scan);
+#endif
 
+#ifdef USE_ofxNDI_OUT
 	// NDI OUT
 
 	params_NDI_Output.add(bNDI_Output);
@@ -125,6 +128,7 @@ void ofxNDIHelper::setup_Params()
 
 	rect_NDI_OUT.enableEdit();
 	rect_NDI_OUT.setRect(200, 200, 200, 400);
+#endif
 
 	//-
 
@@ -146,8 +150,18 @@ void ofxNDIHelper::setup_Params()
 #ifdef USE_WEBCAM
 	params_User.add(params_Webcam);
 #endif
+
+	// Input
+
+#ifdef USE_ofxNDI_IN
 	params_User.add(params_NDI_Input);
+#endif
+
+	// Output
+
+#ifdef USE_ofxNDI_OUT
 	params_User.add(params_NDI_Output);
+#endif
 
 	//-
 
@@ -237,6 +251,8 @@ void ofxNDIHelper::setup()
 
 	//--
 
+	// Inputs
+
 	// sources / modules
 	// must be called before the loading of settings bc how callbacks are running..
 #ifdef USE_WEBCAM
@@ -248,6 +264,8 @@ void ofxNDIHelper::setup()
 #endif
 
 	//--
+
+	// Outputs
 
 #ifdef USE_ofxNDI_OUT
 	setup_NDI_OUT();
@@ -263,25 +281,22 @@ void ofxNDIHelper::startup()
 {
 	ofLogNotice(__FUNCTION__);
 
-	//----
+	//---
 
 	// startup
 
 	bDISABLECALLBACKS = false;
-
-	//bActive = true;
-
-	// set gui position after window setup/resizing
-	//windowResized(screenW, screenH);
 
 	position_Gui.set(glm::vec2(ofGetWidth() - 210, 10));
 
 	// load file settings
 	loadParams(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
 
-	//-----
+	//---
 
+#ifdef USE_ofxNDI_IN
 	refresh_NDI_IN();
+#endif
 
 	//--
 
@@ -299,9 +314,16 @@ void ofxNDIHelper::startup()
 
 	// mini preview rectangles positions and sizes
 	reset_Mini_Previews();
+
+#ifdef USE_ofxNDI_IN
 	rect_NDI_IN.loadSettings(path_rect_NDI_IN, path_GLOBAL, false);
+#endif
+#ifdef USE_ofxNDI_OUT
 	rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
+#endif
+#ifdef USE_WEBCAM
 	rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
+#endif
 
 	// fix workaround startup
 	bEdit_PRE = bEdit;
@@ -395,16 +417,19 @@ void ofxNDIHelper::draw() {
 
 	//-
 
+
+#ifdef USE_ofxNDI_IN
 	// NDI IN
 	if (bNDI_Input.get() && bNDI_Input_Draw.get())
 	{
 		draw_NDI_IN();
 	}
+#endif
 
 	//-
 
-	// Webcam
 #ifdef USE_WEBCAM
+	// Webcam
 	if (bWebcam.get() && bWebcam_Draw.get())
 	{
 		draw_Webcam_MiniPreview(true);
@@ -413,11 +438,13 @@ void ofxNDIHelper::draw() {
 
 	//-
 
+#ifdef USE_ofxNDI_OUT
 	// NDI OUT
 	if (bNDI_Output.get() && bNDI_Output_Draw.get())
 	{
 		draw_NDI_OUT();
 	}
+#endif
 
 }
 
@@ -428,7 +455,7 @@ void ofxNDIHelper::draw_Gui()
 
 	//-
 
-	// gui panel
+	// Gui panel
 	if (bGui_Controls) gui_User.draw();
 }
 
@@ -456,7 +483,7 @@ void ofxNDIHelper::exit()
 
 	saveParams(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
 
-	// viewports
+	// Viewports
 	rect_NDI_IN.saveSettings(path_rect_NDI_IN, path_GLOBAL, false);
 	rect_NDI_OUT.saveSettings(path_rect_NDI_OUT, path_GLOBAL, false);
 	rect_Webcam.saveSettings(path_rect_Webcam, path_GLOBAL, false);
@@ -1102,6 +1129,8 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 	}
 }
 
+#endif
+
 //--------------------------------------------------------------
 void ofxNDIHelper::reset_Mini_Previews() {
 
@@ -1112,19 +1141,24 @@ void ofxNDIHelper::reset_Mini_Previews() {
 	float _yy = yPadPreview;
 	float _ratio;
 
+#ifdef USE_ofxNDI_IN
 	_ratio = ndiReceiveTexture.getHeight() / ndiReceiveTexture.getWidth();
 	rect_NDI_IN.width = wPreview;
 	rect_NDI_IN.height = rect_NDI_IN.width * _ratio;
 	rect_NDI_IN.x = _xx;
 	rect_NDI_IN.y = _yy;
+#endif
 
+#ifdef USE_WEBCAM
 	_yy += _pad + rect_NDI_OUT.height;
 	_ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
 	rect_Webcam.width = wPreview;
 	rect_Webcam.height = rect_Webcam.width * _ratio;
 	rect_Webcam.x = _xx;
 	rect_Webcam.y = _yy;
+#endif
 
+#ifdef USE_ofxNDI_OUT
 	_xx += xPadPreview + rect_NDI_IN.width;
 	_yy = yPadPreview;
 	//_yy += _pad + rect_NDI_IN.height;
@@ -1133,8 +1167,10 @@ void ofxNDIHelper::reset_Mini_Previews() {
 	rect_NDI_OUT.height = rect_NDI_OUT.width * _ratio;
 	rect_NDI_OUT.x = _xx;
 	rect_NDI_OUT.y = _yy;
+#endif
 }
 
+#ifdef USE_WEBCAM
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam_Full()
 {
@@ -1215,8 +1251,7 @@ void ofxNDIHelper::setup_NDI_OUT() {
 }
 #endif
 
-
-#ifdef USE_ofxNDI_IN
+#ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN || USE_WEBCAM
 
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_InfoDevices() {
@@ -1254,6 +1289,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 
 	// NDI IN
 
+#ifdef USE_ofxNDI_IN
 	if (bNDI_Input.get() && bNDI_Input_Draw.get() && bNDI_Input_Mini.get()) {
 		string str = "";
 		//str += "DEVICE\n";
@@ -1303,9 +1339,13 @@ void ofxNDIHelper::draw_InfoDevices() {
 		auto p = rect_NDI_IN.getBottomLeft() + glm::vec2(_padx, _pady);
 		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
 	}
+#endif
 
-	//-
+	//--
 
+	// NDI OUTPUT
+
+#ifdef USE_ofxNDI_OUT
 	// NDI OUT
 
 	if (bNDI_Output.get() && bNDI_Output_Draw.get() && bNDI_Output_Mini.get())
@@ -1325,14 +1365,17 @@ void ofxNDIHelper::draw_InfoDevices() {
 			ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
 		}
 	}
+#endif
 }
 
+//--
+
+// NDI IN
+
+#ifdef USE_ofxNDI_IN
 //--------------------------------------------------------------
 void ofxNDIHelper::refresh_NDI_IN() {
 	ofLogNotice(__FUNCTION__);
-
-	//// deep setup
-	//setup_NDI_IN();
 
 	char name[256];
 	int nsenders = ndiReceiver.GetSenderCount();
@@ -1359,6 +1402,7 @@ void ofxNDIHelper::refresh_NDI_IN() {
 	else
 		ofLogNotice(__FUNCTION__) << "No NDI senders found";
 }
+#endif
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_NDI_IN() {
@@ -1372,6 +1416,8 @@ void ofxNDIHelper::setup_NDI_IN() {
 	ofLogNotice(__FUNCTION__) << "Press 'SPACE' to list NDI senders";
 
 	//--
+
+#ifdef USE_ofxNDI_IN
 
 	// TODO:
 
@@ -1427,12 +1473,14 @@ void ofxNDIHelper::setup_NDI_IN() {
 	{
 		ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
 	}
+#endif
 }
 
 //--
 
 // NDI IN
 
+#ifdef USE_ofxNDI_IN
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_MiniPreview(bool bInfo)
 {
@@ -1496,11 +1544,13 @@ void ofxNDIHelper::draw_NDI_IN()
 	if (bNDI_Input_Mini.get()) draw_NDI_IN_MiniPreview(true);
 	else draw_NDI_IN_Full();
 }
+#endif
 
 //--
 
-// API feed
+// NDI OUT
 
+#ifdef USE_ofxNDI_OUT
 //--------------------------------------------------------------
 void ofxNDIHelper::begin_NDI_OUT()
 {
@@ -1598,41 +1648,4 @@ void ofxNDIHelper::draw_NDI_OUT_Full()
 
 #endif
 
-
-
-
-////--
-
-//// NDI input
-//
-//#ifdef USE_ofxNDI_IN
-//			//char name[256];
-//			//int index = key - 48;// select by key numbers
-//
-//			//int _nsendersRemote = ndiReceiver.GetSenderCount();
-//			//NDI_Input_Index.setMax(_nsendersRemote - 1);
-//
-//			if (key == ' ') 
-//			{
-//				bNDI_Input_Scan = true;
-//				//refresh_NDI_IN();
-//			}
-//
-//			//// numbers
-//			//else if (_nsendersRemote > 0 && index >= 0 && index < _nsendersRemote)
-//			//{
-//			//	// Update the receiver with the returned index
-//			//	// Returns false if the current sender is selected
-//			//	if (ndiReceiver.SetSenderIndex(index)) {
-//			//		NDI_Input_Index = index;
-//			//		ofLogNotice(__FUNCTION__) << "Selected [" << ndiReceiver.GetSenderName(index) << "]";
-//			//		ndiReceiver.GetSenderName(name, 256, index);
-//			//		ofLogNotice(__FUNCTION__) << "    Sender " << index << " [" << name << "]";
-//			//		std::string my_string(name);
-//			//		NDI_Input_Name = my_string;
-//			//		ofLogNotice(__FUNCTION__) << "NDI_Input_Name: " << NDI_Input_Name.get();
-//			//	}
-//			//	else
-//			//		ofLogNotice(__FUNCTION__) << "Stay in same sender";
-//			//}
-//#endif
+#endif

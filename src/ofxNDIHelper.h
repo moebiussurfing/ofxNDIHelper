@@ -2,13 +2,12 @@
 //---
 
 /*
-
 	TODO:
 
-	+ 
-	+ split webcam part as a new helper addon.
-	+ ndi input port settings as names not index port.
-
+	+ Fix resizing windows to NDI Out or weird margins, real full screen.
+	+ Fix directives to allow use i.e. only the camera or only the Output.
+	+ Split Webcam part as a new helper addon. ?
+	+ NDI input/output devices port settings as names instead of index port.
 */
 
 //---
@@ -29,11 +28,12 @@
 
 //--
 
+// Dependencies
+
 #ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN
 #include "ofxNDI.h"
 #endif
 
-// dependencies
 #include "ofxGui.h"
 #include "ofxInteractiveRect.h"
 #include "ofxSurfingHelpers.h"
@@ -63,6 +63,7 @@ public:
 	void setGuiToggleVisible();
 	void setPathGlobal(std::string s);
 	void setLogLevel(ofLogLevel level);
+
 	//--------------------------------------------------------------
 	void setAutoSave(bool b)
 	{
@@ -87,7 +88,7 @@ private:
 
 private:
 
-	// webcam
+	// Webcam
 
 #ifdef USE_WEBCAM
 	ofVideoGrabber vidGrabber;
@@ -233,12 +234,11 @@ private:
 
 private:
 
-	// updating some params before save will trigs also the group callbacks
+	// Updating some params before save will trigs also the group callbacks
 	// so we disable this callbacks just in case params updating's are required
 	// in this case we will need to update gui position param
 	bool bDISABLECALLBACKS;
 
-	//int key_MODE_App = OF_KEY_TAB;//default key to switch MODE_App
 	int screenW, screenH;
 
 	// autosave
@@ -267,9 +267,6 @@ private:
 	ofParameter<bool> bDebug;
 	ofParameter<glm::vec2> position_Gui;
 	ofParameter<bool> bHelp;
-
-	//ofParameter<int> MODE_App;
-	//ofParameter<std::string> MODE_App_Name;
 
 	ofxPanel gui_User;
 

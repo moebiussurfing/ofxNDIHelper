@@ -51,14 +51,14 @@ public:
 
 	// bg image
 	ofImage image;
-	ofParameter<bool>bDrawImage{ "Image", true };
+	ofParameter<bool>bDrawImage{ "Image to feed NDI OUT", true };
 
-	ofParameterGroup params{ "Sources To Feed NDI Out" };
+	ofParameterGroup params{ "Sources to feed NDI OUT" };
 	ofParameter<bool>bByPassDrawAddonSources{ "ByPass", false };
-	ofParameter<bool>bDraw_Webcam_Mini{ "Cam Mini", true };
-	ofParameter<bool>bDraw_Webcam_Full{ "Cam Full", false };
-	ofParameter<bool>bDraw_NDI_Input_Mini{ "NDI Mini", true };
-	ofParameter<bool>bDraw_NDI_Input_Full{ "NDI Full", false };
+	ofParameter<bool>bDraw_Webcam_Mini{ "Webcam Mini", true };
+	ofParameter<bool>bDraw_Webcam_Full{ "Webcam Full", false };
+	ofParameter<bool>bDraw_NDI_Input_Mini{ "NDI INPUT Mini", true };
+	ofParameter<bool>bDraw_NDI_Input_Full{ "NDI INPUT Full", false };
 
 	// A simple and animated scene using an image:
 	//--------------------------------------------------------------

@@ -8,10 +8,10 @@ Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 
 
 ## Features
 - Add an **NDI Manager** to your apps **fast**.
-- 1 Webcam Input + 1 NDI Input + 1 NDI Output.
-- List, select and feed **NDI Devices** and route a **Webcam** device.
-- Auto **store and recall** all the settings and layout.
-- Draggable **Mini Previews**.
+- 1 Webcam INPUT + 1 NDI INPUT + 1 NDI OUTPUT.
+- List, select and draw **NDI INPUT Devices** from, feed to an OUTPUT, and draw or route a **Webcam** device too.
+- Draggable and scalable **Mini Previews Layout**.
+- Auto **store and recall** all the **settings**.
 
 ## Example
 ```.cpp
@@ -25,8 +25,8 @@ void ofApp::setup()
 
 void ofApp::update()
 {
-    // Draw inside to feed the NDI Video Output.
-    // that's the signal we will send!
+    // Draw and feed the signals from the NDI Manager inside the NDI OUTPUT.
+    // That's the video signal we will send to the network!
 
     NDIHelper.begin_NDI_OUT();
     {
@@ -53,14 +53,14 @@ void ofApp::update()
         NDIHelper.draw_Webcam_MiniPreview(); 
     }
     NDIHelper.end_NDI_OUT();
-
-    NDIHelper.update();
 }
 
 void ofApp::draw()
 {
     // Draw Preview Monitors
     NDIHelper.draw();
+
+    /* You can draw from the add-on here too with the above methods. */
 
     // Gui
     NDIHelper.draw_Gui();
@@ -74,11 +74,13 @@ void ofApp::draw()
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / Optional
 
 ## HowTo
+If you are new to **NDI**:  
 1. You should install the [NDI Tools](https://www.ndi.tv/tools/).
 2. Run an NDI Monitor to preview what is being sent through the output.
-3. You can run an NDI Test Patterns to feed a signal into the NDI Addon.
-4. Have fun with Sources toggles and the addon GUI to explore combinations,
+3. You can run an NDI Test Pattern to feed a signal into the NDI add-on.
+4. Have fun with Sources toggles and the add-on GUI to explore combinations,
 while looking to the NDI Out Preview GUI or the NDI Monitor video.
+5. NDI works locally or on a local or remote network.
 
 ## Tested Systems
 - **Windows 10** / **VS 2017** / **OF 0.11**
