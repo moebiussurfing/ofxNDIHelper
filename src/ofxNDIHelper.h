@@ -6,8 +6,9 @@
 
 	+ Make a class with the NDI INPUT to add multiple channels. Start with 2 INPUT channels.
 	+ Fix resizing windows to NDI Out or weird margins, real full screen.
-	+ Fix directives to allow use i.e. only the camera or only the Output.
-	+ Split Webcam part as a new helper addon. ?
+	+ Real preview size or custom/fullsize.
+	+ Fix directives to allow use i.e. only the camera or only the Output. 
+		+ Split Webcam part as a new helper addon. ?
 	+ NDI input/output devices port settings as names instead of index port.
 
 */
@@ -197,8 +198,8 @@ private:
 	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other add-ons data
 	std::string path_Params_AppSettings;
 
-	void loadParams(ofParameterGroup &g, std::string path);
-	void saveParams(ofParameterGroup &g, std::string path);
+	void loadSettings();
+	void saveSettings();
 
 	//----
 
@@ -206,6 +207,8 @@ private:
 	// 1. Webcam
 	// 2. NDI INPUT
 	// 3. NDI OUTPUT
+
+	//----
 
 private:
 
@@ -216,7 +219,24 @@ private:
 	ofVideoGrabber vidGrabber;
 	void setup_Webcam(); // setup webcam from name device nor index
 	void setup_Webcam(int index); // setup webcam from device index
-	void exit_Webcam(); // store camera device name to xml
+	//void exit_Webcam(); // store camera device name to xml
+
+	//--
+
+//#ifdef USE_WEBCAM
+//	//--------------------------------------------------------------
+//	void webcam_SaveSettings()
+//	{
+//		ofXml _xml;
+//		ofSerialize(_xml, webcam_Name_);
+//		_xml.save(path_GLOBAL + path_WebcamSettings);
+//	}
+//	//--------------------------------------------------------------
+//	void webcam_LoadSettings() {
+//		//TODO: use this file for settings.
+//		//TODO: camera is loading from index on app settings...
+//	}
+//#endif
 
 public:
 
@@ -320,4 +340,5 @@ private:
 	ofParameterGroup params_NDI_Output{ "NDI OUTPUT" };
 
 #endif//USE_ofxNDI_OUT
+
 };

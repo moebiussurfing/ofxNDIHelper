@@ -73,14 +73,15 @@ void ofApp::draw()
 * ofxGui / From oF Core
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For the example
 
-## HowTo
-If you are new to **NDI**:  
+## HowTo. New to NDI?  
 1. You should install the [NDI Tools](https://www.ndi.tv/tools/).
-2. Run an NDI Monitor to preview what is being sent through the output.
-3. You can run an NDI Test Pattern to feed a signal into the NDI add-on.
-4. Have fun with Sources toggles and the add-on GUI to explore combinations,
-while looking to the NDI Out Preview GUI or the NDI Monitor video.
+2. Run an **NDI Studio Monitor** app to preview what is being sent through the output.
+3. You can run an **NDI Test Pattern** to feed a signal into the add-on.
+4. Have fun with **sources** toggles on the add-on GUI to explore combinations,
+while looking to the **NDI Out Preview** GUI or the **NDI Studio Monitor** video.
 5. NDI works locally or on a local or remote network.
+6. **NDI Screen Capture** app does live desktop capture to NDI.
+7. **NDI Webcam Input** converts NDI ports to virtual camera to use on Zoom/Skype.
 
 ## Tested Systems
 - **Windows 10** / **VS 2017** / **OF 0.11**

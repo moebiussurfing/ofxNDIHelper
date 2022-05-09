@@ -23,14 +23,16 @@ ofxNDIHelper::ofxNDIHelper()
 
 	// text
 	std::string helpInfo = "";
-	helpInfo += "HELP NDI MANAGER \n\n";
-	helpInfo += "KEY COMMANDS \n";
-	helpInfo += "H          HELP \n";
-	helpInfo += "E          EDIT \n";
-	helpInfo += "SPACE      LIST NDI INPUT DEVICES \n";
-	helpInfo += "I          NEXT WEBCAM \n";
-	helpInfo += "D          DEBUG \n";
-	helpInfo += "K          KEYS \n";
+	helpInfo += "HELP \n";
+	helpInfo += "NDI MANAGER \n";
+	helpInfo += "\n";
+	helpInfo += "KEYS \n";
+	helpInfo += "H              HELP \n";
+	helpInfo += "E              EDIT \n";
+	helpInfo += "SPACE          LIST NDI INPUT DEVICES \n";
+	helpInfo += "I              NEXT WEBCAM \n";
+	helpInfo += "D              DEBUG \n";
+	helpInfo += "K              KEYS \n";
 
 	textBoxWidget.setText(helpInfo);
 
@@ -109,6 +111,7 @@ void ofxNDIHelper::setup()
 	gui_User.add(params_Internal);
 
 	// collapse groups
+
 	auto &g0 = gui_User.getGroup(params_User.getName());// 1st level
 	auto &g1 = g0.getGroup(params_Webcam.getName());
 	auto &g2 = g0.getGroup(params_NDI_Input.getName());
@@ -118,7 +121,9 @@ void ofxNDIHelper::setup()
 	g3.minimize();
 
 	auto &gi = gui_User.getGroup(params_Internal.getName());
+	auto &gp = gi.getGroup(position_Gui.getName());
 	gi.minimize();
+	gp.minimize();
 
 	//--
 
@@ -340,47 +345,10 @@ void ofxNDIHelper::startup()
 
 	position_Gui.set(glm::vec2(ofGetWidth() - 210, 10));
 
-	// load file settings
-	loadParams(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
-
-	//---
-
-#ifdef USE_ofxNDI_IN
-	doRefresh_NDI_IN();
-#endif
-
 	//--
 
-#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
-
-	// fix workaround startup
-	if (bWebcam.get())
-	{
-		bDoRestartup = true;
-		bWebcam = false;
-		vidGrabber.close();
-	}
-
-#endif
-
-	// Reset preview rectangles positions and sizes
-	doReset_Mini_Previews();
-
-	// Load Settings
-
-#ifdef USE_ofxNDI_IN
-	rect_NDI_IN.loadSettings(path_rect_NDI_IN, path_GLOBAL, false);
-#endif
-#ifdef USE_ofxNDI_OUT
-	rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
-#endif
-#ifdef USE_WEBCAM
-	rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
-#endif
-
-	// fix workaround startup
-	bEdit_PRE = bEdit;
-	}
+	loadSettings();
+}
 
 //--------------------------------------------------------------
 void ofxNDIHelper::update(ofEventArgs & args)
@@ -432,30 +400,20 @@ void ofxNDIHelper::update(ofEventArgs & args)
 		//	////load the inverted pixels
 		//	//videoTexture.loadData(videoInverted);
 		//}
-}
+	}
 
 #endif
 
 	//--
 
 	// autosave
+
 	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
-		ofLogLevel _logPre = ofGetLogLevel();
-		ofSetLogLevel(OF_LOG_SILENT);// bypass this logs
+		ofLogNotice(__FUNCTION__) << "AutoSave";
 
-		bDISABLECALLBACKS = true;
-
-		// get gui position before save
-		position_Gui = glm::vec2(gui_User.getPosition());
-		saveParams(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
-
-		bDISABLECALLBACKS = false;
-
+		saveSettings();
 		timerLast_Autosave = ofGetElapsedTimeMillis();
-		ofLogNotice(__FUNCTION__) << "Autosaved DONE";
-
-		ofSetLogLevel(_logPre);
 	}
 }
 
@@ -519,58 +477,6 @@ void ofxNDIHelper::draw_Gui()
 
 	// HelpBox
 	if (bHelp) textBoxWidget.draw();
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::exit()
-{
-	// Webcam
-
-#ifdef USE_WEBCAM
-
-	exit_Webcam();
-
-#endif
-
-	//-
-
-#ifdef USE_ofxNDI_OUT
-
-	// The sender must be released 
-	// or NDI sender discovery will still find it
-	ndiSender.ReleaseSender();
-
-#endif
-
-	//--
-
-	// get gui position before save
-
-	position_Gui = glm::vec2(gui_User.getPosition());
-
-	saveParams(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
-
-	// Viewports
-
-	rect_NDI_IN.saveSettings(path_rect_NDI_IN, path_GLOBAL, false);
-	rect_NDI_OUT.saveSettings(path_rect_NDI_OUT, path_GLOBAL, false);
-	rect_Webcam.saveSettings(path_rect_Webcam, path_GLOBAL, false);
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::setLogLevel(ofLogLevel level)
-{
-	ofSetLogLevel("ofxNDIHelper", level);
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::windowResized(int w, int h)
-{
-	screenW = w;
-	screenH = h;
-
-	//TODO:
-	//ndiSender.UpdateSender(1920, 1080);//update size
 }
 
 // keys
@@ -876,24 +782,6 @@ void ofxNDIHelper::setPathGlobal(string s) // must call before setup.
 	ofxSurfingHelpers::CheckFolder(path_GLOBAL);
 }
 
-//--------------------------------------------------------------
-void ofxNDIHelper::loadParams(ofParameterGroup &g, string path)
-{
-	ofLogNotice(__FUNCTION__) << "loadParams: " << path;
-	ofXml settings;
-	settings.load(path);
-	ofDeserialize(settings, g);
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::saveParams(ofParameterGroup &g, string path)
-{
-	ofLogNotice(__FUNCTION__) << "saveParams: " << path;
-	ofXml settings;
-	ofSerialize(settings, g);
-	settings.save(path);
-}
-
 //--
 
 // Webcam
@@ -1172,12 +1060,6 @@ void ofxNDIHelper::draw_Webcam_Full()
 	ofPopStyle();
 }
 
-//--------------------------------------------------------------
-void ofxNDIHelper::exit_Webcam() {
-	ofXml _xml;
-	ofSerialize(_xml, webcam_Name_);
-	_xml.save(path_GLOBAL + path_WebcamSettings);
-}
 #endif
 
 //--
@@ -1634,3 +1516,129 @@ void ofxNDIHelper::draw_NDI_OUT_Full()
 #endif
 
 #endif
+
+//--------------------------------------------------------------
+void ofxNDIHelper::loadSettings()
+{
+	ofLogNotice(__FUNCTION__);
+
+	// load file settings
+	ofxSurfingHelpers::loadGroup(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
+
+	//---
+
+#ifdef USE_ofxNDI_IN
+	doRefresh_NDI_IN();
+#endif
+
+	//--
+
+#ifdef USE_WEBCAM
+
+	//webcamLoadSettings();
+
+	//--
+
+#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
+
+	// fix workaround startup
+	if (bWebcam.get())
+	{
+		bDoRestartup = true;
+		bWebcam = false;
+		vidGrabber.close();
+	}
+
+#endif	
+
+	//--
+
+#endif
+
+	//--
+
+	// Reset preview rectangles positions and sizes
+	doReset_Mini_Previews();
+
+	// Load Settings
+
+#ifdef USE_ofxNDI_IN
+	rect_NDI_IN.loadSettings(path_rect_NDI_IN, path_GLOBAL, false);
+#endif
+#ifdef USE_ofxNDI_OUT
+	rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
+#endif
+#ifdef USE_WEBCAM
+	rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
+#endif
+
+	// fix workaround startup
+	bEdit_PRE = bEdit;
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::saveSettings()
+{
+	ofLogNotice(__FUNCTION__);
+
+	// get gui position before save
+
+	position_Gui = glm::vec2(gui_User.getPosition());
+
+	ofxSurfingHelpers::CheckFolder(path_GLOBAL);
+	ofxSurfingHelpers::saveGroup(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
+
+	//--
+
+//#ifdef USE_WEBCAM
+//	webcam_SaveSettings();
+//#endif
+
+	//--
+
+	// Viewports
+
+#ifdef USE_WEBCAM
+	rect_NDI_OUT.saveSettings(path_rect_NDI_OUT, path_GLOBAL, false);
+#endif
+#ifdef USE_ofxNDI_IN
+	rect_NDI_IN.saveSettings(path_rect_NDI_IN, path_GLOBAL, false);
+#endif
+#ifdef USE_ofxNDI_OUT
+	rect_Webcam.saveSettings(path_rect_Webcam, path_GLOBAL, false);
+#endif
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::exit()
+{
+	ofLogNotice(__FUNCTION__);
+
+	saveSettings();
+
+	//--
+
+#ifdef USE_ofxNDI_OUT
+
+	// The sender must be released 
+	// or NDI sender discovery will still find it
+	ndiSender.ReleaseSender();
+
+#endif
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::setLogLevel(ofLogLevel level)
+{
+	ofSetLogLevel("ofxNDIHelper", level);
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::windowResized(int w, int h)
+{
+	screenW = w;
+	screenH = h;
+
+	//TODO:
+	//ndiSender.UpdateSender(1920, 1080);//update size
+}
