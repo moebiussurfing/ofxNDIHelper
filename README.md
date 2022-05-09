@@ -70,8 +70,8 @@ void ofApp::draw()
 ## Dependencies
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
-* ofxGui / oF Core
-* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / Optional
+* ofxGui / From oF Core
+* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For the example
 
 ## HowTo
 If you are new to **NDI**:  
