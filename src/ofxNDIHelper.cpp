@@ -29,8 +29,8 @@ ofxNDIHelper::ofxNDIHelper()
 	helpInfo += "KEYS \n";
 	helpInfo += "H              HELP \n";
 	helpInfo += "E              EDIT \n";
-	helpInfo += "SPACE          LIST NDI INPUT DEVICES \n";
-	helpInfo += "I              NEXT WEBCAM \n";
+	helpInfo += "I              WEBCAM NEXT \n";
+	helpInfo += "SPACE          NDI INPUT LIST DEVICES \n";
 	helpInfo += "D              DEBUG \n";
 	helpInfo += "K              KEYS \n";
 
@@ -410,10 +410,13 @@ void ofxNDIHelper::update(ofEventArgs & args)
 
 	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
-		ofLogNotice(__FUNCTION__) << "AutoSave";
+		ofLogNotice(__FUNCTION__) << "AutoSaved Settings";
 
+		ofLogLevel _logPre = ofGetLogLevel();
+		ofSetLogLevel(OF_LOG_SILENT);
 		saveSettings();
 		timerLast_Autosave = ofGetElapsedTimeMillis();
+		ofSetLogLevel(_logPre);
 	}
 }
 
