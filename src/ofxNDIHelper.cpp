@@ -29,7 +29,7 @@ ofxNDIHelper::ofxNDIHelper()
 	helpInfo += "KEYS \n";
 	helpInfo += "H              HELP \n";
 	helpInfo += "E              EDIT \n";
-	helpInfo += "I              WEBCAM NEXT \n";
+	helpInfo += "I              WEBCAM NEXT DEVICE \n";
 	helpInfo += "SPACE          NDI INPUT LIST DEVICES \n";
 	helpInfo += "D              DEBUG \n";
 	helpInfo += "K              KEYS \n";
@@ -1143,8 +1143,8 @@ void ofxNDIHelper::draw_InfoDevices() {
 		str += "\n\n";
 		str += "DEVICES \n\n";
 		str += webcam_Names_InputDevices;
-		str += "\n\n";
-		str += "I key > Next device";
+		//str += "\n\n";
+		//str += "I key > Next device";
 		//str += " " + ofToString(vidGrabber.isInitialized() ? "ON" : "OFF") + "\n";
 
 		auto p = rect_Webcam.getBottomLeft() + glm::vec2(_padx2, _pady2);
@@ -1182,14 +1182,14 @@ void ofxNDIHelper::draw_InfoDevices() {
 				}
 			}
 
-			str += "\n\n";
-			if (nsenders == 1) {
-				str += "1 SOURCE";
-			}
-			else {
-				str += ofToString(nsenders) + " SOURCES \n";
-				str += "Space key > List sources";
-			}
+			//str += "\n\n";
+			//if (nsenders == 1) {
+			//	str += "1 SOURCE";
+			//}
+			//else {
+			//	str += ofToString(nsenders) + " SOURCES \n";
+			//	//str += "Space key > List sources";
+			//}
 		}
 		else {
 			str += "\n";
@@ -1199,7 +1199,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 
 		// NDI input devices list
 		if (NDI_INPUT_Names_Devices.size() > 0) {
-			str += "DEVICES\n";
+			str += "DEVICES \n\n";
 			str += NDI_INPUT_Names_Devices;
 		}
 
@@ -1260,7 +1260,7 @@ void ofxNDIHelper::doRefresh_NDI_IN() {
 		for (int i = 0; i < nsenders; i++) {
 			string name = ndiReceiver.GetSenderName(i);
 			string str;
-			str = "[" + ofToString(i) + "] " + name;
+			str = "#" + ofToString(i) + " " + name;
 			ofLogNotice(__FUNCTION__) << str;
 			NDI_INPUT_Names_Devices += str;
 
