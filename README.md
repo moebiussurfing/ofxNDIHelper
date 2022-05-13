@@ -77,7 +77,7 @@ void ofApp::draw()
   <summary>HowTo. New to NDI?</summary>
   <p>
 
-1. You should install the [NDI Tools](https://www.ndi.tv/tools/). It's an apps bundle.
+1. You should install the [NDI Tools](https://www.ndi.tv/tools/). It's a bundle of apps.
 2. Run an **NDI Studio Monitor** app to preview what is being sent through the **NDI OUTPUT**.
 3. You can run an **NDI Test Pattern** to feed a signal into the **NDI INPUT** of the add-on.
 4. Have fun with **sources** toggles on the add-on GUI to explore combinations,
