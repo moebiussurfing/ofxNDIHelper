@@ -1,12 +1,17 @@
 #pragma once
 
+#define USE_ofxNDI_IN
+
+//--
+
+#ifdef USE_ofxNDI_IN
+
 #include "ofMain.h"
 #include "ofxNDI.h"
 #include "ofxGui.h"
 #include "ofxInteractiveRect.h"
 #include "ofxSurfingHelpers.h"
 
-#define USE_ofxNDI_IN
 
 #define DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 
@@ -25,10 +30,11 @@ public:
 	void windowResized(int w, int h);
 	void exit();
 	void startup();
-	
-private:
 
 	ofParameterGroup params;
+
+private:
+
 	ofParameterGroup params_Control;
 
 	void Changed(ofAbstractParameter& e);
@@ -38,6 +44,8 @@ public:
 
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
+
+	void setEdit(bool b) { bEdit = b; }
 
 private:
 
@@ -109,8 +117,11 @@ public:
 	void draw_NDI_IN_Full();
 
 	void doRefresh_NDI_IN();
+	
+	void doScan(); // scan network NDI devices!
 
 private:
+
 
 	void setup_NDI_IN_ByIndex(int deviceIndex);
 	void setup_NDI_IN_ByName(string deviceName);
@@ -131,3 +142,4 @@ private:
 
 };
 
+#endif

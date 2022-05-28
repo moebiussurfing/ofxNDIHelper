@@ -4,12 +4,14 @@
 /*
 	TODO:
 
-	+ Make a class with the NDI INPUT to add multiple channels. Start with 2 INPUT channels.
-	+ Fix resizing windows to NDI Out or weird margins, real full screen.
+	+ fix handle settings file for webcam and ndi out.
+
+	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
+	+ NDI output devices port settings as names instead of index port.
+	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
 	+ Real preview size or custom/fullsize.
 	+ Fix directives to allow use i.e. only the camera or only the Output. 
 		+ Split Webcam part as a new helper addon. ?
-	+ NDI input/output devices port settings as names instead of index port.
 
 */
 
@@ -23,8 +25,8 @@
 //--
 
 #define USE_WEBCAM // Aux camera
-#define USE_ofxNDI_IN // NDI input
 #define USE_ofxNDI_OUT // NDI out
+//#define USE_ofxNDI_IN // NDI input //-> moved to NDI_Input.h!
 
 // fix workaround startup
 //#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
@@ -37,6 +39,7 @@
 
 #ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN
 #include "ofxNDI.h"
+#include "NDI_input.h"
 #endif
 
 #include "ofxGui.h"
@@ -63,6 +66,20 @@ public:
 	void exit();
 	void draw_Gui();
 	void windowResized(int w, int h);
+	
+	void draw_InfoDevices();
+
+#ifdef USE_ofxNDI_IN
+
+	void draw_NDI_IN_1();
+	void draw_NDI_IN_1_MiniPreview();
+	void draw_NDI_IN_1_Full();
+
+	void draw_NDI_IN_2();
+	void draw_NDI_IN_2_MiniPreview();
+	void draw_NDI_IN_2_Full();
+
+#endif
 
 	//--
 
@@ -78,7 +95,7 @@ public:
 
 	// API
 
-	// feed the sender
+	// Feed the sender
 	void begin_NDI_OUT();
 	void end_NDI_OUT();
 
@@ -97,11 +114,9 @@ public:
 private:
 
 	//--------------------------------------------------------------
-	void fixStartup()
+	void startupFix()
 	{
-		bEdit = bEdit_PRE;
-
-		NDI_Input_Index = NDI_Input_Index;//retrig
+		//bEdit = bEdit_PRE;
 	}
 
 	//--
@@ -132,10 +147,10 @@ public:
 	
 private:
 
-	// default layout
-	// preview viewport sizes
+	// Default layout
+	// Preview viewport sizes
 	int xPadPreview = 300;
-	int yPadPreview = 100;
+	int yPadPreview = 200;
 	int pad = 20;
 	float wPreview = 320;
 	float _padx = 9;
@@ -160,7 +175,7 @@ private:
 
 	int screenW, screenH;
 
-	// autosave
+	// auto save
 	ofParameter<bool> bAutoSave;
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 10000;//10 secs
@@ -187,16 +202,16 @@ private:
 	ofParameter<bool> bHelp;
 	ofParameter<glm::vec2> position_Gui;
 
-	// gui advanced/add-on
+	// Gui
 	ofxPanel gui_User;
 
-	// keys
+	// Keys
 	void keyPressed(ofKeyEventArgs &eventArgs);
 	void keyReleased(ofKeyEventArgs &eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
-	// settings
+	// Settings
 	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other add-ons data
 	std::string path_Params_AppSettings;
 
@@ -207,7 +222,7 @@ private:
 
 	// DEVICES
 	// 1. Webcam
-	// 2. NDI INPUT
+	// 2. 2 x NDI INPUTS
 	// 3. NDI OUTPUT
 
 	//----
@@ -269,39 +284,8 @@ private:
 
 #ifdef USE_ofxNDI_IN
 
-	ofParameter<bool> bNDI_Input;
-	ofParameter<bool> bNDI_Input_Scan;
-	ofParameter<bool> bNDI_Input_Draw;
-	ofParameter<bool> bNDI_Input_Mini;
-	ofParameter<int> NDI_Input_Index;
-	ofParameter<std::string> NDI_Input_Name;
-	std::string NDI_INPUT_Names_Devices;
-
-public:
-
-	void draw_NDI_IN();
-	void draw_NDI_IN_MiniPreview(bool bInfo = false);
-	void draw_NDI_IN_Full();
-
-	void doRefresh_NDI_IN();
-
-private:
-
-	void setup_NDI_IN();
-	void draw_InfoDevices();
-	ofxNDIreceiver ndiReceiver; // NDI receiver
-	ofFbo fbo_NDI_Receiver; // Fbo to receive
-	ofTexture ndiReceiveTexture; // Texture to receive
-	ofImage ndiReceiveImage; // Image to receive
-	ofPixels ndiReceivePixels; // Pixels to receive
-	unsigned char *ndiReceiveChars; // unsigned char image array to receive
-	unsigned int receiverWidth; // sender width and height needed to receive char pixels
-	unsigned int receiverHeight;
-
-	ofxInteractiveRect rect_NDI_IN = { "rect_NDI_IN" };
-	std::string path_rect_NDI_IN = "_NDI_In_Mini";
-
-	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
+	NDI_input NDI_Input1;
+	NDI_input NDI_Input2;
 
 #endif//USE_ofxNDI_IN
 

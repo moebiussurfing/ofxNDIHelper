@@ -1,5 +1,7 @@
 #include "NDI_input.h"
 
+#ifdef USE_ofxNDI_IN
+
 //--------------------------------------------------------------
 NDI_input::NDI_input()
 {
@@ -53,6 +55,12 @@ void NDI_input::setup(string _name)
 //--
 
 //--------------------------------------------------------------
+void NDI_input::doScan()
+{
+	bScan = true;
+}
+
+//--------------------------------------------------------------
 void NDI_input::startup()
 {
 
@@ -78,8 +86,8 @@ void NDI_input::setup_Params()
 		glm::vec2(screenW, screenH)
 	);
 
-	bEdit.set("EDIT LAYOUT", true);
-	bReset.set("RESET LAYOUT", false);
+	bEdit.set("LAYOUT EDIT", true);
+	bReset.set("LAYOUT RESET", false);
 
 	bReset.setSerializable(false);
 
@@ -115,9 +123,9 @@ void NDI_input::setup_Params()
 
 	params_Control.setName("CONTROL");
 	params_Control.add(bEdit);
+	params_Control.add(bReset);
 	params_Control.add(bLockRatio);
 	params_Control.add(bDebug);
-	params_Control.add(bReset);
 	params_Control.add(position_Gui);
 
 	params.setName("NDI INPUT");
@@ -489,7 +497,7 @@ void NDI_input::draw_NDI_IN_Full()
 	if (bDebug)
 	{
 		auto p = glm::vec2(20 + _padx, 40 + _pady);
-		ofxSurfingHelpers::drawTextBoxed(font, "NDI IN : " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+		ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
 	}
 }
 
@@ -585,12 +593,16 @@ void NDI_input::saveSettings()
 //--------------------------------------------------------------
 void NDI_input::doReset_Mini_Previews() {
 
-	float _pad = 200;
-	float _xx = xPadPreview;
-	float _yy = yPadPreview;
-	float _ratio;
+	//float _pad = 200;
+	//float _xx = xPadPreview;
+	//float _yy = yPadPreview;
 
-	_ratio = ndiReceiveTexture.getHeight() / ndiReceiveTexture.getWidth();
+	float _pad = 10;
+	float _xx = gui_Control.getShape().getTopRight().x + _pad;
+	float _yy = gui_Control.getShape().getTopRight().y + 28;
+
+	float _ratio = ndiReceiveTexture.getHeight() / ndiReceiveTexture.getWidth();
+	
 	rect_NDI_IN.width = wPreview;
 	rect_NDI_IN.height = rect_NDI_IN.width * _ratio;
 	rect_NDI_IN.x = _xx;
@@ -692,3 +704,5 @@ void NDI_input::windowResized(int w, int h)
 	//TODO:
 	//ndiSender.UpdateSender(1920, 1080);//update size
 }
+
+#endif

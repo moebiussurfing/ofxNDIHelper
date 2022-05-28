@@ -20,8 +20,6 @@
 #include "ofxNDIHelper.h"
 #endif
 
-#include "NDI_input.h"
-
 #include "ofxSurfingHelpers.h"
 #include "ofxGui.h"
 #include "ofxWindowApp.h"
@@ -43,9 +41,6 @@ public:
 	ofxNDIHelper NDIHelper;
 #endif
 
-
-	NDI_input myNDI_Input2;
-
 	//--
 
 	// window
@@ -59,12 +54,14 @@ public:
 	ofImage image;
 	ofParameter<bool>bDrawImage{ "Image to feed NDI OUT", true };
 
-	ofParameterGroup params{ "Sources to feed NDI OUT" };
-	ofParameter<bool>bByPassDrawAddonSources{ "ByPass", false };
+	ofParameterGroup params{ "EXAMPLE ofxNDIHelper" };
+	ofParameter<bool>bDontDraw{ "HIDE ALL", false };
 	ofParameter<bool>bDraw_Webcam_Mini{ "Webcam Mini", true };
 	ofParameter<bool>bDraw_Webcam_Full{ "Webcam Full", false };
-	ofParameter<bool>bDraw_NDI_Input_Mini{ "NDI INPUT Mini", true };
-	ofParameter<bool>bDraw_NDI_Input_Full{ "NDI INPUT Full", false };
+	ofParameter<bool>bDraw_NDI_Input_1_Mini{ "NDI INPUT 1 Mini", true };
+	ofParameter<bool>bDraw_NDI_Input_1_Full{ "NDI INPUT 1 Full", false };
+	ofParameter<bool>bDraw_NDI_Input_2_Mini{ "NDI INPUT 2 Mini", true };
+	ofParameter<bool>bDraw_NDI_Input_2_Full{ "NDI INPUT 2 Full", false };
 
 	//--
 	 
