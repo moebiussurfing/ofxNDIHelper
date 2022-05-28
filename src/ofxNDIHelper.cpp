@@ -167,7 +167,7 @@ void ofxNDIHelper::setup()
 void ofxNDIHelper::setup_Params()
 {
 	bGui.set("NDI HELPER", true);
-	bGui_Controls.set("NDI ADVANCED", true);
+	bGui_Controls.set("NDI CONTROLS", true);
 	bEdit.set("EDIT LAYOUT", true);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
 	bKeys.set("KEYS", true);
@@ -325,6 +325,8 @@ void ofxNDIHelper::setup_Params()
 	// Group all
 	// this group will be saved as settings to a file on /data
 
+	params_AppsSettings.add(bGui);
+	params_AppsSettings.add(bGui_Controls);
 	params_AppsSettings.add(params_Internal);
 
 	//-
@@ -348,6 +350,8 @@ void ofxNDIHelper::startup()
 	//--
 
 	loadSettings();
+
+	bEdit = bEdit;
 }
 
 //--------------------------------------------------------------
@@ -480,6 +484,7 @@ void ofxNDIHelper::draw_Gui()
 
 	// HelpBox
 	if (bHelp) textBoxWidget.draw();
+
 }
 
 // keys
@@ -705,12 +710,14 @@ void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter &e)
 			doReset_Mini_Previews();
 		}
 
+#ifdef USE_ofxNDI_IN
 		else if (name == bNDI_Input_Scan.getName() && bNDI_Input_Scan.get())
 		{
 			bNDI_Input_Scan = false;
 
 			doRefresh_NDI_IN();
 		}
+#endif
 
 		//----
 

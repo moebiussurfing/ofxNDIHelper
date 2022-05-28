@@ -20,6 +20,8 @@
 #include "ofxNDIHelper.h"
 #endif
 
+#include "NDI_input.h"
+
 #include "ofxSurfingHelpers.h"
 #include "ofxGui.h"
 #include "ofxWindowApp.h"
@@ -32,6 +34,7 @@ public:
 	void setup();
 	void update();
 	void draw();
+	void exit();
 	void windowResized(int w, int h);
 
 public:
@@ -39,6 +42,9 @@ public:
 #ifdef USE_ofxNDI
 	ofxNDIHelper NDIHelper;
 #endif
+
+
+	NDI_input myNDI_Input2;
 
 	//--
 
@@ -60,6 +66,8 @@ public:
 	ofParameter<bool>bDraw_NDI_Input_Mini{ "NDI INPUT Mini", true };
 	ofParameter<bool>bDraw_NDI_Input_Full{ "NDI INPUT Full", false };
 
+	//--
+	 
 	// A simple and animated BG Image scene using an image file:
 	//--------------------------------------------------------------
 	void drawScene()

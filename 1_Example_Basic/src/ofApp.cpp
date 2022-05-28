@@ -8,22 +8,31 @@ void ofApp::setup()
 	NDIHelper.setup();
 #endif
 
+	myNDI_Input2.setPathGlobal("NDI_Input2/");
+	myNDI_Input2.setup("macOS");
+
 	//--
 
 	image.loadImage("assets/image.jpg");
 
-	gui.setup("ofApp");
-	gui.add(bDrawImage);
-	
+	params.add(bDrawImage);
 	params.add(bByPassDrawAddonSources);
 	params.add(bDraw_Webcam_Mini);
 	params.add(bDraw_Webcam_Full);
 	params.add(bDraw_NDI_Input_Mini);
 	params.add(bDraw_NDI_Input_Full);
+	
+	gui.setup("ofApp");
 	gui.add(params);
 
 	gui.add(NDIHelper.bGui);
 	gui.add(NDIHelper.bGui_Controls);
+
+	gui.add(myNDI_Input2.bGui_Internal);
+	gui.add(myNDI_Input2.bGui_Preview);
+
+	// handle session settings
+	ofxSurfingHelpers::loadGroup(params, "ofApp.json");
 }
 
 //--------------------------------------------------------------
@@ -62,6 +71,10 @@ void ofApp::update()
 			//-> The mini preview of the camera.
 			if (bDraw_Webcam_Mini) NDIHelper.draw_Webcam_MiniPreview(); 
 
+			//--
+
+			myNDI_Input2.draw();
+
 		}
 	}
 	NDIHelper.end_NDI_OUT();
@@ -83,11 +96,13 @@ void ofApp::draw()
 
 	// Draw Preview Monitors
 	NDIHelper.draw();
+	myNDI_Input2.draw();
 
 	//----
 
 	// Gui
 	NDIHelper.draw_Gui();
+	myNDI_Input2.drawGui();
 
 	//----
 
@@ -118,4 +133,13 @@ void ofApp::windowResized(int w, int h) {
 	NDIHelper.windowResized(w, h);
 #endif
 
+	myNDI_Input2.windowResized(w, h);
+
+}
+
+//--------------------------------------------------------------
+void ofApp::exit()
+{
+	// handle session settings
+	ofxSurfingHelpers::saveGroup(params, "ofApp.json");
 }

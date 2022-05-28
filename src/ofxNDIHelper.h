@@ -103,6 +103,7 @@ private:
 
 		NDI_Input_Index = NDI_Input_Index;//retrig
 	}
+
 	//--
 
 private:
@@ -111,6 +112,7 @@ private:
 	ofParameter<bool> bEdit;
 	ofParameter<bool> bLockRatio;
 	ofParameter<bool> bReset;
+
 	bool bEdit_PRE;
 	bool bDoRestartup = false;
 
