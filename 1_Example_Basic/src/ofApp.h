@@ -60,7 +60,7 @@ public:
 	ofParameter<bool>bDraw_NDI_Input_Mini{ "NDI INPUT Mini", true };
 	ofParameter<bool>bDraw_NDI_Input_Full{ "NDI INPUT Full", false };
 
-	// A simple and animated scene using an image:
+	// A simple and animated BG Image scene using an image file:
 	//--------------------------------------------------------------
 	void drawScene()
 	{
