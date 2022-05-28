@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ofMain.h"
 #include "ofxNDI.h"
 #include "ofxGui.h"
@@ -6,6 +7,8 @@
 #include "ofxSurfingHelpers.h"
 
 #define USE_ofxNDI_IN
+
+#define DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 
 class NDI_input
 {
@@ -21,11 +24,12 @@ public:
 	void drawGui();
 	void windowResized(int w, int h);
 	void exit();
+	void startup();
 	
 private:
 
 	ofParameterGroup params;
-	ofParameterGroup params_Internal;
+	ofParameterGroup params_Control;
 
 	void Changed(ofAbstractParameter& e);
 	void doReset_Mini_Previews();
@@ -50,7 +54,7 @@ private:
 
 	bool bDISABLECALLBACKS = true;
 
-	ofxPanel gui_User;
+	ofxPanel gui_Control;
 
 	std::string name;
 
@@ -90,12 +94,12 @@ private:
 
 	// 2. NDI INPUT
 
-	ofParameter<bool> bNDI_Input;
-	ofParameter<bool> bNDI_Input_Scan;
-	ofParameter<bool> bNDI_Input_Draw;
-	ofParameter<bool> bNDI_Input_Mini;
-	ofParameter<int> NDI_Input_Index;
-	ofParameter<std::string> NDI_Input_Name;
+	ofParameter<bool> bEnable;
+	ofParameter<bool> bScan;
+	ofParameter<bool> bDraw;
+	ofParameter<bool> bDrawMini;
+	ofParameter<int> indexDevice;
+	ofParameter<std::string> nameDevice;
 	std::string NDI_INPUT_Names_Devices;
 
 public:
@@ -108,6 +112,8 @@ public:
 
 private:
 
+	void setup_NDI_IN_ByIndex(int deviceIndex);
+	void setup_NDI_IN_ByName(string deviceName);
 	void setup_NDI_IN();
 	void draw_InfoDevices();
 	ofxNDIreceiver ndiReceiver; // NDI receiver
