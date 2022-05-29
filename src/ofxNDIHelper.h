@@ -4,8 +4,9 @@
 /*
 	TODO:
 
-	+ fix handle settings file for webcam and ndi out.
+	+ improve drawing webcam and ndi workflow
 	+ switch to ofxSurfingBox for previews rects
+		+ add rect container to center the webcam, zoom, rotate, translate inside!
 	+ add full screen, fit, scale fit, half screen etc enum list
 
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
@@ -45,6 +46,7 @@
 
 //----
 
+
 //--
 
 // Dependencies
@@ -62,7 +64,7 @@
 
 //--
 
-class ofxNDIHelper : public ofBaseApp
+class ofxNDIHelper /*: public ofBaseApp*/
 {
 
 public:
@@ -107,7 +109,8 @@ public:
 
 	// API
 
-	// Feed the sender
+	// Feed the sender aka NDI Out
+
 	void begin_NDI_OUT();
 	void end_NDI_OUT();
 
@@ -203,7 +206,7 @@ private:
 
 public:
 
-	//ofParameter<bool> bGui_Controls;
+	ofParameter<bool> bGui_Controls;
 	ofParameter<bool> bGui;
 
 private:

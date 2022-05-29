@@ -17,6 +17,7 @@
 
 
 #define USE_ofxNDI //-> ifdef directives stuff to help copy paste to other app projects.
+
 #ifdef USE_ofxNDI
 #include "ofxNDIHelper.h"
 #endif

@@ -13,6 +13,7 @@ void ofApp::setup()
 
 	params.add(scene.bGui);
 	params.add(NDIHelper.bGui);
+	params.add(NDIHelper.bGui_Controls);
 
 	gui.setup("ofApp");
 	gui.add(params);
@@ -31,15 +32,27 @@ void ofApp::update()
 
 	NDIHelper.begin_NDI_OUT();
 	{
-		// Draw independent channels 
-		// to use as layers to mix/blend with your own code
-		//scene.drawBackground();
-		//scene.drawChannel1();
-		//scene.drawChannel2();
+		// Test Scene
+		{
+			// Draw independent channels 
+			// to use as layers to mix/blend with your own code
+			//scene.drawBackground();
+			//scene.drawChannel1();
+			//scene.drawChannel2();
 
-		// Draw all channels 
-		// one upon other without any blending
-		scene.drawAll();
+			// Draw all channels 
+			// one upon other without any blending
+			scene.drawAll();
+		}
+
+		//-
+
+		// Feed the NDI Helper Previews too:
+		{
+			NDIHelper.draw_NDI_IN_1_MiniPreview();
+			NDIHelper.draw_NDI_IN_2_MiniPreview();
+			NDIHelper.draw_Webcam_MiniPreview();
+		}
 	}
 	NDIHelper.end_NDI_OUT();
 

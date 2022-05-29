@@ -47,7 +47,7 @@ public:
 
 	void setEdit(bool b) { bEdit = b; }
 
-private:
+public:
 
 	ofParameter<glm::vec2> position_Gui;
 
@@ -55,6 +55,8 @@ private:
 	ofParameter<bool> bDebug;
 	ofParameter<bool> bEdit;
 	ofParameter<bool> bReset;
+
+private:
 
 	// Text Box
 	ofTrueTypeFont font;
