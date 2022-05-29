@@ -5,12 +5,14 @@
 	TODO:
 
 	+ fix handle settings file for webcam and ndi out.
+	+ switch to ofxSurfingBox for previews rects
+	+ add full screen, fit, scale fit, half screen etc enum list
 
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
 	+ NDI output devices port settings as names instead of index port.
 	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
 	+ Real preview size or custom/fullsize.
-	+ Fix directives to allow use i.e. only the camera or only the Output. 
+	+ Fix directives to allow use i.e. only the camera or only the Output.
 		+ Split Webcam part as a new helper addon. ?
 
 */
@@ -32,6 +34,16 @@
 //#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
 // NOTE: if webcam hangs during runtime, you should Disable and Enable again to restart/fix!
 
+
+//----
+
+// DEVICES
+// 
+// 1. Webcam
+// 2. 2 x NDI INPUTS
+// 3. NDI OUTPUT
+
+//----
 
 //--
 
@@ -61,12 +73,12 @@ public:
 	void setup();
 	void setup_Params();
 	void startup();
-	void update(ofEventArgs & args);
+	void update(ofEventArgs& args);
 	void draw();
 	void exit();
 	void draw_Gui();
 	void windowResized(int w, int h);
-	
+
 	void draw_InfoDevices();
 
 #ifdef USE_ofxNDI_IN
@@ -116,6 +128,7 @@ private:
 	//--------------------------------------------------------------
 	void startupFix()
 	{
+		ofLogNotice(__FUNCTION__);
 		//bEdit = bEdit_PRE;
 	}
 
@@ -144,7 +157,7 @@ public:
 public:
 
 	void doReset_Mini_Previews();
-	
+
 private:
 
 	// Default layout
@@ -182,7 +195,7 @@ private:
 
 	//-
 
-	void Changed_Params_AppSettings(ofAbstractParameter &e);
+	void Changed(ofAbstractParameter& e);
 
 	//-
 
@@ -190,7 +203,7 @@ private:
 
 public:
 
-	ofParameter<bool> bGui_Controls;
+	//ofParameter<bool> bGui_Controls;
 	ofParameter<bool> bGui;
 
 private:
@@ -203,11 +216,11 @@ private:
 	ofParameter<glm::vec2> position_Gui;
 
 	// Gui
-	ofxPanel gui_User;
+	ofxPanel gui_Controls;
 
 	// Keys
-	void keyPressed(ofKeyEventArgs &eventArgs);
-	void keyReleased(ofKeyEventArgs &eventArgs);
+	void keyPressed(ofKeyEventArgs& eventArgs);
+	void keyReleased(ofKeyEventArgs& eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
@@ -217,15 +230,6 @@ private:
 
 	void loadSettings();
 	void saveSettings();
-
-	//----
-
-	// DEVICES
-	// 1. Webcam
-	// 2. 2 x NDI INPUTS
-	// 3. NDI OUTPUT
-
-	//----
 
 private:
 
@@ -237,23 +241,92 @@ private:
 	void setup_Webcam(); // setup webcam from name device nor index
 	void setup_Webcam(int index); // setup webcam from device index
 	//void exit_Webcam(); // store camera device name to xml
+	vector<ofVideoDevice> _devs;
 
 	//--
 
-//#ifdef USE_WEBCAM
-//	//--------------------------------------------------------------
-//	void webcam_SaveSettings()
-//	{
-//		ofXml _xml;
-//		ofSerialize(_xml, webcam_Name_);
-//		_xml.save(path_GLOBAL + path_WebcamSettings);
-//	}
-//	//--------------------------------------------------------------
-//	void webcam_LoadSettings() {
-//		//TODO: use this file for settings.
-//		//TODO: camera is loading from index on app settings...
-//	}
-//#endif
+	//--------------------------------------------------------------
+	void webcam_SaveSettings()
+	{
+		ofLogNotice(__FUNCTION__);
+
+		ofXml _xml;
+		ofSerialize(_xml, webcam_Name_);
+		_xml.save(path_GLOBAL + path_WebcamSettings);
+	}
+	//--------------------------------------------------------------
+	void webcam_LoadSettings()
+	{
+		ofLogNotice(__FUNCTION__);
+
+		//TODO: use this file for settings.
+		//TODO: camera is loading from index on app settings...
+
+		ofXml _xml;
+		bool _isLoaded;
+		_isLoaded = _xml.load(path_GLOBAL + path_WebcamSettings);
+		ofDeserialize(_xml, webcam_Name_);
+		ofLogNotice(__FUNCTION__) << _xml.toString();
+		ofLogNotice(__FUNCTION__) << "xml device name:\t" << webcam_Name_.get();
+
+
+		//--
+
+		// start device
+		//bDISABLECALLBACKS = true;
+
+		webcam_Index_Device = -1;
+		if (_isLoaded) {
+			for (int i = 0; i < _devs.size(); i++) {
+				if (_devs[i].deviceName == webcam_Name_.get()) {
+					webcam_Index_Device = i;
+					ofLogNotice(__FUNCTION__) << "device name: \t" << webcam_Name_.get();
+					ofLogNotice(__FUNCTION__) << "device index: \t" << webcam_Index_Device;
+				}
+			}
+		}
+		if (webcam_Index_Device == -1) {// error. try to load first device...
+			webcam_Index_Device = 0;// force select first cam device
+
+			if (webcam_Index_Device < _devs.size()) {
+				webcam_Name_ = _devs[webcam_Index_Device].deviceName;
+				webcam_Name = _devs[webcam_Index_Device].deviceName;
+			}
+			else
+			{
+				ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
+				webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
+				vidGrabber.close();
+				return;//cancel and exit!
+			}
+		}
+
+		webcam_Name = webcam_Name_;
+
+		//--
+
+		// 1. Must close before reopen
+		vidGrabber.close();
+
+		// 2. Start device
+		//if (bWebcam.get()) 
+		{
+			vidGrabber.setDeviceID(webcam_Index_Device.get());
+			//vidGrabber.setDesiredFrameRate(60);
+			vidGrabber.setup(1920, 1080);
+		}
+
+		//--
+
+		//// debug connected
+		//bool _isConnected = vidGrabber.isInitialized();
+		//ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
+		//if (!_isConnected) {
+		//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE vidGrabber!";
+		//	ofLogError(__FUNCTION__) << "CAMERA DISABLED";
+		//	bWebcam = false;
+		//}
+	}
 
 public:
 
@@ -276,6 +349,7 @@ private:
 
 	ofxInteractiveRect rect_Webcam = { "rect_Webcam" };
 	std::string path_rect_Webcam = "_Webcam_Mini";
+
 #endif//USE_WEBCAM
 
 	//--
@@ -319,11 +393,11 @@ public:
 
 private:
 
-	ofParameterGroup params_Webcam{ "WEBCAM" };
+	ofParameterGroup params_Webcam;
 	ofxInteractiveRect rect_NDI_OUT = { "rect_NDI_OUT" };
 	std::string path_rect_NDI_OUT = "_NDI_Out_Mini";
 
-	ofParameterGroup params_NDI_Output{ "NDI OUTPUT" };
+	ofParameterGroup params_NDI_Output;
 
 #endif//USE_ofxNDI_OUT
 

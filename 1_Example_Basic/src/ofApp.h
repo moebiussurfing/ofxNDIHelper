@@ -3,8 +3,12 @@
 #include "ofMain.h"
 
 /*
+	This example is an NDI Sender
+	Draws an animated background image into an NDI Out to be broad casted into your network.
+	Then can be received into any NDI receiver like an NDI Monitor app.
+ 
 
-	To Test and understand how it works:
+	To Test and understand how the addoon works:
 
 	1. You should install the NDI Tools.
 	2. Run an NDI Monitor to preview what is being sent through the output.
@@ -15,14 +19,9 @@
 */
 
 
-#define USE_ofxNDI //-> ifdef directives stuff to help copy paste to other app projects.
-#ifdef USE_ofxNDI
 #include "ofxNDIHelper.h"
-#endif
 
-#include "ofxSurfingHelpers.h"
 #include "ofxGui.h"
-#include "ofxWindowApp.h"
 
 class ofApp : public ofBaseApp
 {
@@ -32,36 +31,19 @@ public:
 	void setup();
 	void update();
 	void draw();
-	void exit();
 	void windowResized(int w, int h);
 
 public:
 
-#ifdef USE_ofxNDI
 	ofxNDIHelper NDIHelper;
-#endif
-
-	//--
-
-	// window
-	ofxWindowApp windowApp;
 
 	//--
 
 	ofxPanel gui;
 
-	// bg image
+	// Bg image
 	ofImage image;
 	ofParameter<bool>bDrawImage{ "Image to feed NDI OUT", true };
-
-	ofParameterGroup params{ "EXAMPLE ofxNDIHelper" };
-	ofParameter<bool>bDontDraw{ "HIDE ALL", false };
-	ofParameter<bool>bDraw_Webcam_Mini{ "Webcam Mini", true };
-	ofParameter<bool>bDraw_Webcam_Full{ "Webcam Full", false };
-	ofParameter<bool>bDraw_NDI_Input_1_Mini{ "NDI INPUT 1 Mini", true };
-	ofParameter<bool>bDraw_NDI_Input_1_Full{ "NDI INPUT 1 Full", false };
-	ofParameter<bool>bDraw_NDI_Input_2_Mini{ "NDI INPUT 2 Mini", true };
-	ofParameter<bool>bDraw_NDI_Input_2_Full{ "NDI INPUT 2 Full", false };
 
 	//--
 	 

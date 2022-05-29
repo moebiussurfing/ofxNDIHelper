@@ -5,11 +5,11 @@ ofxNDIHelper::ofxNDIHelper()
 {
 	bDISABLECALLBACKS = true;
 
-	// path for settings
-	// this is to folder all files to avoid mixing with other add-ons data
+	// Path for settings
+	// This is to folder all files to avoid mixing with other add-ons data
 	setPathGlobal("ofxNDIHelper/");
 
-	path_Params_AppSettings = "Settings_App.xml";
+	path_Params_AppSettings = "Settings_App";
 
 #ifdef USE_WEBCAM
 	path_WebcamSettings = "Settings_Webcam.xml";
@@ -49,7 +49,7 @@ ofxNDIHelper::~ofxNDIHelper()
 	setActive(false); // remove keys and mouse listeners
 
 	// remove params callbacks listeners
-	ofRemoveListener(params_AppsSettings.parameterChangedE(), this, &ofxNDIHelper::Changed_Params_AppSettings);
+	ofRemoveListener(params_AppsSettings.parameterChangedE(), this, &ofxNDIHelper::Changed);
 
 	ofRemoveListener(ofEvents().update, this, &ofxNDIHelper::update);
 
@@ -64,11 +64,8 @@ void ofxNDIHelper::setup()
 	// log mode
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
 
-	// gui help display font
-
+	// gui display font
 	string _str = "telegrama_render.otf";
-	//string _str = "overpass-mono-bold.otf";
-
 	string _pathFont = "assets/fonts/" + _str;
 
 	float _size = 7;
@@ -87,50 +84,25 @@ void ofxNDIHelper::setup()
 
 	//--
 
-	setup_Params();
-
-	//--
-
 	// Gui
 
 	// ofxGui Theme
 
-	string strG = "telegrama_render.otf";
-	//string strG = "overpass-mono-bold.otf";
+	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
-	string pathFontG = "assets/fonts/" + _str;
-
-	ofxSurfingHelpers::setThemeSurfing_ofxGui(pathFontG, 7);
-
-	//--
-
-	// Setup gui
-
-	gui_User.setup("ofxNDIHelper");
-	gui_User.add(params_User);
-	gui_User.add(params_Internal);
+	//string strG = "telegrama_render.otf";
+	//string pathFontG = "assets/fonts/" + _str;
+	//ofxSurfingHelpers::setThemeDark_ofxGui(pathFontG, 7);
 
 	//--
-	
-	// collapse groups
 
-	auto& g0 = gui_User.getGroup(params_User.getName());// 1st level
-	auto& g1 = g0.getGroup(params_Webcam.getName());
-	auto& g3 = g0.getGroup(params_NDI_Output.getName());
-	g1.minimize();
-	g3.minimize();
-
-	auto& gi = gui_User.getGroup(params_Internal.getName());
-	auto& gp = gi.getGroup(position_Gui.getName());
-	gi.minimize();
-	gp.minimize();
+	setup_Params();
 
 	//--
 
 	// Inputs
-
 	// sources / modules
-	// must be called before the loading of settings bc how callbacks are running..
+	// must be called before the loading of settings bc how callbacks are listening...
 
 #ifdef USE_WEBCAM
 
@@ -168,11 +140,38 @@ void ofxNDIHelper::setup()
 	//--
 
 	// Settings file
-	params_AppsSettings.setName("ofxNDIHelper");
-	params_AppsSettings.add(params_User);
+	params_AppsSettings.setName("NDI Helper");
 	params_AppsSettings.add(bGui);
-	params_AppsSettings.add(bGui_Controls);
 	params_AppsSettings.add(params_Internal);
+	params_AppsSettings.add(params_User);
+	//params_AppsSettings.add(bGui_Controls);
+
+//#ifdef USE_WEBCAM
+//	params_User.add(params_Webcam);
+//#endif
+
+	//--
+
+	// Setup Gui
+
+	gui_Controls.setup("ofxNDIHelper");
+	gui_Controls.add(params_User);
+	gui_Controls.add(params_Internal);
+
+	//--
+
+	// collapse groups
+
+	auto& g0 = gui_Controls.getGroup(params_User.getName());// 1st level
+	auto& g1 = g0.getGroup(params_Webcam.getName());
+	auto& g3 = g0.getGroup(params_NDI_Output.getName());
+	g1.minimize();
+	g3.minimize();
+
+	auto& gi = gui_Controls.getGroup(params_Internal.getName());
+	auto& gp = gi.getGroup(position_Gui.getName());
+	gi.minimize();
+	gp.minimize();
 
 	//--
 
@@ -187,7 +186,7 @@ void ofxNDIHelper::setup()
 void ofxNDIHelper::setup_Params()
 {
 	bGui.set("NDI HELPER", true);
-	bGui_Controls.set("NDI CONTROLS", true);
+	//bGui_Controls.set("NDI CONTROLS", true);
 	bEdit.set("LAYOUT EDIT", true);
 	bReset.set("LAYOUT RESET", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
@@ -221,6 +220,7 @@ void ofxNDIHelper::setup_Params()
 	webcam_Index_Device.setSerializable(false);
 	webcam_Name.setSerializable(false);
 
+	params_Webcam.setName("WEBCAM" );
 	params_Webcam.add(bWebcam);
 	params_Webcam.add(bWebcam_Draw);
 	params_Webcam.add(bWebcam_Mini);
@@ -245,6 +245,7 @@ void ofxNDIHelper::setup_Params()
 	//NDI_Input_Name.setSerializable(false);
 	//NDI_Output_Name.setSerializable(false);
 
+	params_NDI_Output.setName("NDI OUTPUT" );
 	params_NDI_Output.add(bNDI_Output);
 	params_NDI_Output.add(bNDI_Output_Draw);
 	params_NDI_Output.add(bNDI_Output_Mini);
@@ -292,7 +293,7 @@ void ofxNDIHelper::setup_Params()
 	params_User.add(params_NDI_Output);
 #endif
 
-	//-
+	//--
 
 	// Queue more into params_AppsSettings
 
@@ -304,11 +305,11 @@ void ofxNDIHelper::setup_Params()
 	params_Internal.add(bAutoSave);
 	params_Internal.add(position_Gui);
 
-	//-
+	//--
 
 	// Callback
 
-	ofAddListener(params_AppsSettings.parameterChangedE(), this, &ofxNDIHelper::Changed_Params_AppSettings);
+	ofAddListener(params_AppsSettings.parameterChangedE(), this, &ofxNDIHelper::Changed);
 }
 
 //--------------------------------------------------------------
@@ -481,19 +482,22 @@ void ofxNDIHelper::draw() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Gui()
 {
+	ofDisableDepthTest();
+
 	if (!bGui) return;
 
 	//-
 
 	// Gui panel
-	if (bGui_Controls)
+	//if (bGui_Controls)
 	{
 		NDI_Input1.drawGui();
 		NDI_Input2.drawGui();
 	}
 
 	// Gui panel
-	if (bGui_Controls) gui_User.draw();
+	//if (bGui_Controls) gui_Controls.draw();
+	gui_Controls.draw();
 
 	// HelpBox
 	if (bHelp) textBoxWidget.draw();
@@ -653,18 +657,20 @@ void ofxNDIHelper::setActive(bool b)
 //--------------------------------------------------------------
 void ofxNDIHelper::setGuiVisible(bool b)
 {
-	bGui_Controls = b;
+	//bGui_Controls = b;
+	bGui= b;
 }
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setGuiToggleVisible()
 {
-	bGui_Controls = !bGui_Controls;
+	bGui= !bGui;
+	//bGui_Controls = !bGui_Controls;
 }
 
 // addon engine params
 //--------------------------------------------------------------
-void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter& e)
+void ofxNDIHelper::Changed(ofAbstractParameter& e)
 {
 	if (bDISABLECALLBACKS) return;
 
@@ -773,7 +779,7 @@ void ofxNDIHelper::Changed_Params_AppSettings(ofAbstractParameter& e)
 
 		else if (name == position_Gui.getName())
 		{
-			gui_User.setPosition(position_Gui.get().x, position_Gui.get().y);
+			gui_Controls.setPosition(position_Gui.get().x, position_Gui.get().y);
 		}
 		else if (name == bActive.getName())
 		{
@@ -875,12 +881,15 @@ void ofxNDIHelper::setup_Webcam(int index) {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_Webcam() {
+	ofLogNotice(__FUNCTION__);
+
 	// will initialized the device from the loaded name from the xml settings, not from the index number!
 	// that's because the index of a device could be changed if a new device is connected.
 
 	// get back a list of devices.
 	vidGrabber.setVerbose(true);
-	vector<ofVideoDevice> _devs = vidGrabber.listDevices();
+	//vector<ofVideoDevice> _devs = vidGrabber.listDevices();
+	_devs = vidGrabber.listDevices();
 
 	// get all dev names
 	webcam_Names_InputDevices = "";
@@ -906,68 +915,12 @@ void ofxNDIHelper::setup_Webcam() {
 
 	//--
 
+#ifdef USE_WEBCAM
+	
 	// load settings file
-
-	ofXml _xml;
-	bool _isLoaded;
-	_isLoaded = _xml.load(path_GLOBAL + path_WebcamSettings);
-	ofDeserialize(_xml, webcam_Name_);
-	ofLogNotice(__FUNCTION__) << _xml.toString();
-	ofLogNotice(__FUNCTION__) << "xml device name:\t" << webcam_Name_.get();
-
-	//--
-
-	// start device
-	//bDISABLECALLBACKS = true;
-
-	webcam_Index_Device = -1;
-	if (_isLoaded) {
-		for (int i = 0; i < _devs.size(); i++) {
-			if (_devs[i].deviceName == webcam_Name_.get()) {
-				webcam_Index_Device = i;
-				ofLogNotice(__FUNCTION__) << "device name:\t" << webcam_Name_.get();
-				ofLogNotice(__FUNCTION__) << "device index:\t" << webcam_Index_Device;
-			}
-		}
-	}
-	if (webcam_Index_Device == -1) {// error. try to load first device...
-		webcam_Index_Device = 0;// select cam device
-
-		if (webcam_Index_Device < _devs.size()) {
-			webcam_Name_ = _devs[webcam_Index_Device].deviceName;
-			webcam_Name = _devs[webcam_Index_Device].deviceName;
-		}
-		else {
-			ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
-			webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
-		}
-	}
-
-	webcam_Name = webcam_Name_;
-
-	//--
-
-	// must close before reopen
-	vidGrabber.close();
-
-	// start device
-	//if (bWebcam.get()) 
-	{
-		vidGrabber.setDeviceID(webcam_Index_Device.get());
-		//vidGrabber.setDesiredFrameRate(60);
-		vidGrabber.setup(1920, 1080);
-	}
-
-	//--
-
-	//// debug connected
-	//bool _isConnected = vidGrabber.isInitialized();
-	//ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
-	//if (!_isConnected) {
-	//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE vidGrabber!";
-	//	ofLogError(__FUNCTION__) << "CAMERA DISABLED";
-	//	bWebcam = false;
-	//}
+	webcam_LoadSettings();
+	
+#endif//USE_WEBCAM
 }
 
 //--------------------------------------------------------------
@@ -1012,8 +965,8 @@ void ofxNDIHelper::doReset_Mini_Previews()
 {
 #ifdef USE_WEBCAM
 	float _pad = 20;
-	float _xx = gui_User.getShape().getTopRight().x + _pad;
-	float _yy = gui_User.getShape().getTopRight().y + 28;
+	float _xx = gui_Controls.getShape().getTopRight().x + _pad;
+	float _yy = gui_Controls.getShape().getTopRight().y + 28;
 	float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
 	rect_Webcam.width = wPreview;
 	rect_Webcam.height = rect_Webcam.width * _ratio;
@@ -1361,19 +1314,23 @@ void ofxNDIHelper::saveSettings()
 {
 	ofLogNotice(__FUNCTION__);
 
-	// get gui position before save
-
-	position_Gui = glm::vec2(gui_User.getPosition());
+	// Get gui position before save
+	position_Gui = glm::vec2(gui_Controls.getPosition());
 
 	ofxSurfingHelpers::CheckFolder(path_GLOBAL);
-	ofxSurfingHelpers::saveGroup(params_AppsSettings, path_GLOBAL + path_Params_AppSettings);
+
+	string p = path_GLOBAL + path_Params_AppSettings;
+	ofxSurfingHelpers::saveGroup(params_AppsSettings, p);
 
 	//--
 
-//#ifdef USE_WEBCAM
-//	webcam_SaveSettings();
-//#endif
+#ifdef USE_WEBCAM
 
+	// Save settings file
+	webcam_SaveSettings();
+
+#endif // USE_WEBCAM
+	
 	//--
 
 	// Viewports
