@@ -8,7 +8,7 @@ Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 
 
 ## Features
 - Add an **NDI Manager** to your apps **fast**.
-- 1 Webcam INPUT + 1 NDI INPUT + 1 NDI OUTPUT.
+- 1 Webcam INPUT + 2 NDI INPUTS + 1 NDI OUTPUT.
 - List, select and draw **NDI INPUT Devices** from, feed to an OUTPUT, and draw or route a **Webcam** device too.
 - Draggable and scalable **Mini Previews Layout**.
 - Auto **store and recall** all the **settings**.
