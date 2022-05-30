@@ -26,13 +26,14 @@ ofxNDIHelper::ofxNDIHelper()
 	helpInfo += "HELP \n";
 	helpInfo += "NDI MANAGER \n";
 	helpInfo += "\n";
+	helpInfo += "DoubleClick Previews Edit/Lock \n";
+	helpInfo += "\n";
 	helpInfo += "KEYS \n";
 	helpInfo += "H              HELP \n";
-	helpInfo += "E              EDIT \n";
 	helpInfo += "I              WEBCAM NEXT \n";
-	helpInfo += "SPACE          NDI INPUT SCAN! \n";
+	helpInfo += "SPACE          NDI INPUTS SCAN! \n";
+	helpInfo += "R              LAYOUT RESET \n";
 	helpInfo += "D              DEBUG \n";
-	//helpInfo += "K              KEYS \n";
 
 	textBoxWidget.setText(helpInfo);
 
@@ -85,11 +86,6 @@ void ofxNDIHelper::reset_Gui()
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_Gui()
 {
-	//--
-
-	// ofxGui Theme
-
-	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
 	//--
 
@@ -140,6 +136,14 @@ void ofxNDIHelper::setup()
 {
 	// log mode
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
+
+	//--
+
+	// ofxGui Theme
+
+	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
+
+	//--
 
 	// Gui display font
 
@@ -338,8 +342,8 @@ void ofxNDIHelper::setup_Params()
 	params_User.add(bHelp);
 	params_User.add(bLockRatio);
 	params_User.add(bKeys);
-	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 	params_User.add(bReset);
+	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 
 	//--
 
@@ -645,6 +649,11 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	else if (key == 'H')
 	{
 		bHelp = !bHelp;
+	}
+
+	else if (key == 'R')
+	{
+		doReset_Mini_Previews();
 	}
 
 	//--
@@ -1076,67 +1085,86 @@ void ofxNDIHelper::webcam_LoadSettings()
 //--------------------------------------------------------------
 void ofxNDIHelper::doReset_Mini_Previews()
 {
+	// Align all the previews using Webcam as anchor!
+	 
+	//float _xx0 = 100;
+	//float _yy0 = 250;
+	float _xx0 = rect_Webcam.getX();
+	float _yy0 = rect_Webcam.getY();
+
+	float _ratio;
+	float _xx;
+	float _yy;
+	float _ww;
+	float _hh;
+
+	//--
+
 #ifdef USE_WEBCAM
 
-	//float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
-	//float _pad = 20;
-	//float _xx = gui_Controls.getShape().getTopRight().x + _pad;
-	//float _yy = gui_Controls.getShape().getTopRight().y + 28;
+	//rect_Webcam.reset();
 
-	////rect_Webcam.width = wPreview;
-	////rect_Webcam.height = rect_Webcam.width * _ratio;
-	////rect_Webcam.x = _xx;
-	////rect_Webcam.y = _yy;
+	_ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
 
-	////glm::vec2 p = glm::vec2(gui_Control.getShape().getTopRight());
-	////float _xx = p.x + _pad;
-	////float _yy = p.y + 28;
+	_xx = _xx0;
+	_yy = _yy0;
+	_ww = rect_Webcam.getWidth();
+	//_ww = wPreview;
+	_hh = _ww * _ratio;
 
-	//rect_Webcam.setShape(ofRectangle(_xx, _yy, wPreview, wPreview * _ratio));
-	rect_Webcam.reset();
-
-#endif
-
-#ifdef USE_ofxNDI_OUT
-
-	//_ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
-	//_yy += rect_Webcam.getRectangle().getBottomLeft().y + yPadPreview;
-	////rect_NDI_OUT.width = wPreview;
-	////rect_NDI_OUT.height = rect_NDI_OUT.width * _ratio;
-	////rect_NDI_OUT.x = _xx;
-	////rect_NDI_OUT.y = _yy;
-
-	//rect_NDI_OUT.setShape(ofRectangle(_xx, _yy, wPreview, wPreview * _ratio));
-	rect_NDI_OUT.reset();
+	rect_Webcam.setShape(ofRectangle(_xx, _yy, _ww, _hh));
 
 #endif
 
 	//--
 
-//	float _pad = 200;
-//	float _xx = xPadPreview;
-//	float _yy = yPadPreview;
-//	float _ratio;
-//
-//#ifdef USE_WEBCAM
-//	_yy += _pad + rect_NDI_OUT.height;
-//	_ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
-//	rect_Webcam.width = wPreview;
-//	rect_Webcam.height = rect_Webcam.width * _ratio;
-//	rect_Webcam.x = _xx;
-//	rect_Webcam.y = _yy;
-//#endif
-//
-//#ifdef USE_ofxNDI_OUT
-//	_xx += xPadPreview + rect_Webcam.width;
-//	_yy = yPadPreview;
-//	//_yy += _pad + rect_NDI_IN.height;
-//	_ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
-//	rect_NDI_OUT.width = wPreview;
-//	rect_NDI_OUT.height = rect_NDI_OUT.width * _ratio;
-//	rect_NDI_OUT.x = _xx;
-//	rect_NDI_OUT.y = _yy;
-//#endif
+#ifdef USE_ofxNDI_OUT
+
+	//rect_NDI_OUT.reset();
+
+	_ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
+
+	_xx = _xx0;
+	_yy += _hh + yPadPreview;
+	_ww = rect_NDI_OUT.getWidth();
+	//_ww = wPreview;
+	_hh = _ww * _ratio;
+
+	rect_NDI_OUT.setShape(ofRectangle(_xx, _yy, _ww, _hh));
+
+#endif
+
+	//--
+
+#ifdef USE_ofxNDI_IN
+
+	//NDI_Input1.doReset_Mini_Previews();
+
+	_xx = _xx0 + MAX(rect_Webcam.getWidth(), rect_NDI_OUT.getWidth()) + pad;
+	_yy = _yy0 ;
+	//_ww = wPreview;
+	_hh = _ww * _ratio;
+
+	auto r = NDI_Input1.getPreviewRect();
+	_ratio = r.getHeight() / r.getWidth();
+	_ww = r.getWidth();
+	
+	NDI_Input1.setPositionPreview(glm::vec2(_xx, _yy));
+
+	//--
+
+	//NDI_Input2.doReset_Mini_Previews();
+
+	_xx = _xx + _ww + pad;
+
+	auto r2 = NDI_Input2.getPreviewRect();
+	_ratio = r2.getHeight() / r2.getWidth();
+	_ww = r2.getWidth();
+
+	NDI_Input2.setPositionPreview(glm::vec2(_xx, _yy));
+
+#endif
+
 }
 
 #ifdef USE_WEBCAM

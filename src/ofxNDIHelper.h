@@ -178,7 +178,7 @@ private:
 	int pad = 20;
 	float wPreview = 320;
 	int xPadPreview = 300;
-	int yPadPreview = 200;
+	int yPadPreview = 100;
 	float _padx = 9;
 	float _pady =  - 11;
 	float _padx2 = 9;

@@ -38,9 +38,10 @@ private:
 	ofParameterGroup params_Control;
 
 	void Changed(ofAbstractParameter& e);
-	void doReset_Mini_Previews();
 
 public:
+
+	void doReset_Mini_Previews();
 
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
@@ -109,6 +110,16 @@ public:
 	void setPositionGui(glm::vec2 pos)
 	{
 		gui_Control.setPosition(pos.x, pos.y);
+	}
+	//--------------------------------------------------------------
+	void setPositionPreview(glm::vec2 pos)
+	{
+		rect_NDI_IN.setPosition(pos.x, pos.y);
+	}
+
+	//--------------------------------------------------------------
+	ofRectangle getPreviewRect() {
+		return rect_NDI_IN.getRectangle();
 	}
 
 	//--

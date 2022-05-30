@@ -10,12 +10,11 @@ void ofApp::setup()
 
 	image.loadImage("assets/image.jpg");
 
-
 	gui.setup("ofApp");
 	gui.add(bDrawImage);
 	gui.add(NDIHelper.bGui);
 	gui.add(NDIHelper.bGui_Controls);
-
+	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 40);
 }
 
 //--------------------------------------------------------------
