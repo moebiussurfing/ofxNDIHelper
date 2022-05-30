@@ -71,7 +71,8 @@ void ofApp::draw()
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 * ofxGui / From oF Core
-* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For the example
+* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For example
+* [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST) / For example
 
 <details>
   <summary>HowTo. New to NDI?</summary>
@@ -89,7 +90,8 @@ while looking to the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 </details>
 
 ## Tested Systems
-- **Windows 10** / **VS 2017** / **OF 0.11**
+- **Windows 10** / **VS 2017** / **oF 0.11**
+- **Windows 10** / **VS 2022** / **oF 0.12**
 
 ## Author
 moebiusSurfing, 2020-2022.  
