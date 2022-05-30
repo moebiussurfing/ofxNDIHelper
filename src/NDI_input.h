@@ -9,7 +9,7 @@
 #include "ofMain.h"
 #include "ofxNDI.h"
 #include "ofxGui.h"
-#include "ofxInteractiveRect.h"
+#include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingHelpers.h"
 
 
@@ -45,7 +45,7 @@ public:
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
 
-	void setEdit(bool b) { bEdit = b; }
+	//void setEdit(bool b) { bEdit = b; }
 
 public:
 
@@ -53,7 +53,7 @@ public:
 
 	ofParameter<bool> bLockRatio;
 	ofParameter<bool> bDebug;
-	ofParameter<bool> bEdit;
+	//ofParameter<bool> bEdit;
 	ofParameter<bool> bReset;
 
 private:
@@ -80,7 +80,7 @@ private:
 	int pad = 20;
 	float wPreview = 320;
 	float _padx = 9;
-	float _pady = 9 - pad;
+	float _pady = -11;
 	float _padx2 = 9;
 	float _pady2 = 18;
 	int x2, y2;
@@ -89,6 +89,11 @@ private:
 	void saveSettings();
 
 public:
+	
+	void setName(string s)
+	{
+		name = s;
+	}
 
 	//--------------------------------------------------------------
 	void setPathGlobal(string s) // Path for settings file. Must call before setup.
@@ -96,6 +101,14 @@ public:
 		path_GLOBAL = s;
 
 		ofxSurfingHelpers::CheckFolder(path_GLOBAL);
+
+		//path_rect_NDI_IN = "NDI_IN_" + name + "_Mini";
+		//rect_NDI_IN.setPathGlobal(path_GLOBAL + path_rect_NDI_IN);
+	}
+	//--------------------------------------------------------------
+	void setPositionGui(glm::vec2 pos)
+	{
+		gui_Control.setPosition(pos.x, pos.y);
 	}
 
 	//--
@@ -138,7 +151,7 @@ private:
 	unsigned int receiverWidth; // sender width and height needed to receive char pixels
 	unsigned int receiverHeight;
 
-	ofxInteractiveRect rect_NDI_IN = { "rect_NDI_IN" };
+	ofxSurfingBoxInteractive rect_NDI_IN;
 
 	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
 

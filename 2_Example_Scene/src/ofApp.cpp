@@ -17,6 +17,7 @@ void ofApp::setup()
 
 	gui.setup("ofApp");
 	gui.add(params);
+	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 40);
 
 	ofxSurfingHelpers::loadGroup(params);
 }
@@ -34,13 +35,13 @@ void ofApp::update()
 	{
 		// Test Scene
 		{
-			// Draw independent channels 
-			// to use as layers to mix/blend with your own code
+			// A. Draw independent channels 
+			// to use as layers to mix/blend with your scene
 			//scene.drawBackground();
 			//scene.drawChannel1();
 			//scene.drawChannel2();
 
-			// Draw all channels 
+			// B. Draw all channels 
 			// one upon other without any blending
 			scene.drawAll();
 		}
@@ -49,9 +50,9 @@ void ofApp::update()
 
 		// Feed the NDI Helper Previews too:
 		{
-			NDIHelper.draw_NDI_IN_1_MiniPreview();
-			NDIHelper.draw_NDI_IN_2_MiniPreview();
-			NDIHelper.draw_Webcam_MiniPreview();
+			NDIHelper.draw_NDI_IN_1();
+			NDIHelper.draw_NDI_IN_2();
+			NDIHelper.draw_Webcam();
 		}
 	}
 	NDIHelper.end_NDI_OUT();
@@ -63,7 +64,9 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	scene.drawAll();
+	// Draw the scene on the "main screen" too
+	scene.drawChannel1();
+	//scene.drawAll();
 
 	//--
 

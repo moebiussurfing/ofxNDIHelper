@@ -2,5 +2,6 @@ ofxGui
 ofxNDI
 ofxNDIHelper
 ofxSceneTEST
+ofxSurfingBox
 ofxSurfingHelpers
 ofxWindowApp

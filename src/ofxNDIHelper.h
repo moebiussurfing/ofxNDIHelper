@@ -57,7 +57,7 @@
 #endif
 
 #include "ofxGui.h"
-#include "ofxInteractiveRect.h"
+#include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfing_ofxGui.h"
 #include "TextBoxWidget.h"
@@ -73,23 +73,30 @@ public:
 	~ofxNDIHelper();
 
 	void setup();
+	void draw();
+	void draw_Gui();
+	void windowResized(int w, int h);
+
+private:
+
+	void setup_Gui();
+	void reset_Gui();
 	void setup_Params();
 	void startup();
 	void update(ofEventArgs& args);
-	void draw();
 	void exit();
-	void draw_Gui();
-	void windowResized(int w, int h);
 
 	void draw_InfoDevices();
 
 #ifdef USE_ofxNDI_IN
 
+public:
 	void draw_NDI_IN_1();
+	void draw_NDI_IN_2();
+
+private:
 	void draw_NDI_IN_1_MiniPreview();
 	void draw_NDI_IN_1_Full();
-
-	void draw_NDI_IN_2();
 	void draw_NDI_IN_2_MiniPreview();
 	void draw_NDI_IN_2_Full();
 
@@ -97,6 +104,8 @@ public:
 
 	//--
 
+public:
+	
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setGuiToggleVisible();
@@ -132,6 +141,7 @@ private:
 	void startupFix()
 	{
 		ofLogNotice(__FUNCTION__);
+
 		//bEdit = bEdit_PRE;
 	}
 
@@ -140,11 +150,9 @@ private:
 private:
 
 	ofParameterGroup params_AppsSettings;
-	ofParameter<bool> bEdit;
 	ofParameter<bool> bLockRatio;
 	ofParameter<bool> bReset;
 
-	bool bEdit_PRE;
 	bool bDoRestartup = false;
 
 	//--
@@ -165,16 +173,18 @@ private:
 
 	// Default layout
 	// Preview viewport sizes
-	int xPadPreview = 300;
-	int yPadPreview = 200;
+
+	int padg = 5;
 	int pad = 20;
 	float wPreview = 320;
+	int xPadPreview = 300;
+	int yPadPreview = 200;
 	float _padx = 9;
-	float _pady = 9 - pad;
-	float rounded = 2.0;
+	float _pady =  - 11;
 	float _padx2 = 9;
 	float _pady2 = 18;
 	int x2, y2;
+	float rounded = 2.0;
 
 	// Text Box
 	ofTrueTypeFont font;
@@ -208,10 +218,14 @@ public:
 
 	ofParameter<bool> bGui_Controls;
 	ofParameter<bool> bGui;
+	ofParameter<bool> bGui_Webcam;
+	ofParameter<bool> bGui_NDI_OUT;
 
 private:
 
 	ofParameterGroup params_Internal;
+	ofParameterGroup params_Callbacks;
+	ofParameterGroup params_Panels;
 	ofParameter<bool> bActive;
 	ofParameter<bool> bKeys;
 	ofParameter<bool> bDebug;
@@ -220,6 +234,8 @@ private:
 
 	// Gui
 	ofxPanel gui_Controls;
+	ofxPanel gui_Webcam;
+	ofxPanel gui_NDI_Out;
 
 	// Keys
 	void keyPressed(ofKeyEventArgs& eventArgs);
@@ -234,11 +250,13 @@ private:
 	void loadSettings();
 	void saveSettings();
 
-private:
-
+	//--
+	// 
 	// 1. Webcam
 
 #ifdef USE_WEBCAM
+
+private:
 
 	ofVideoGrabber vidGrabber;
 	void setup_Webcam(); // setup webcam from name device nor index
@@ -248,88 +266,8 @@ private:
 
 	//--
 
-	//--------------------------------------------------------------
-	void webcam_SaveSettings()
-	{
-		ofLogNotice(__FUNCTION__);
-
-		ofXml _xml;
-		ofSerialize(_xml, webcam_Name_);
-		_xml.save(path_GLOBAL + path_WebcamSettings);
-	}
-	//--------------------------------------------------------------
-	void webcam_LoadSettings()
-	{
-		ofLogNotice(__FUNCTION__);
-
-		//TODO: use this file for settings.
-		//TODO: camera is loading from index on app settings...
-
-		ofXml _xml;
-		bool _isLoaded;
-		_isLoaded = _xml.load(path_GLOBAL + path_WebcamSettings);
-		ofDeserialize(_xml, webcam_Name_);
-		ofLogNotice(__FUNCTION__) << _xml.toString();
-		ofLogNotice(__FUNCTION__) << "xml device name:\t" << webcam_Name_.get();
-
-
-		//--
-
-		// start device
-		//bDISABLECALLBACKS = true;
-
-		webcam_Index_Device = -1;
-		if (_isLoaded) {
-			for (int i = 0; i < _devs.size(); i++) {
-				if (_devs[i].deviceName == webcam_Name_.get()) {
-					webcam_Index_Device = i;
-					ofLogNotice(__FUNCTION__) << "device name: \t" << webcam_Name_.get();
-					ofLogNotice(__FUNCTION__) << "device index: \t" << webcam_Index_Device;
-				}
-			}
-		}
-		if (webcam_Index_Device == -1) {// error. try to load first device...
-			webcam_Index_Device = 0;// force select first cam device
-
-			if (webcam_Index_Device < _devs.size()) {
-				webcam_Name_ = _devs[webcam_Index_Device].deviceName;
-				webcam_Name = _devs[webcam_Index_Device].deviceName;
-			}
-			else
-			{
-				ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
-				webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
-				vidGrabber.close();
-				return;//cancel and exit!
-			}
-		}
-
-		webcam_Name = webcam_Name_;
-
-		//--
-
-		// 1. Must close before reopen
-		vidGrabber.close();
-
-		// 2. Start device
-		//if (bWebcam.get()) 
-		{
-			vidGrabber.setDeviceID(webcam_Index_Device.get());
-			//vidGrabber.setDesiredFrameRate(60);
-			vidGrabber.setup(1920, 1080);
-		}
-
-		//--
-
-		//// debug connected
-		//bool _isConnected = vidGrabber.isInitialized();
-		//ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
-		//if (!_isConnected) {
-		//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE vidGrabber!";
-		//	ofLogError(__FUNCTION__) << "CAMERA DISABLED";
-		//	bWebcam = false;
-		//}
-	}
+	void webcam_SaveSettings();
+	void webcam_LoadSettings();
 
 public:
 
@@ -341,7 +279,7 @@ public:
 
 private:
 
-	ofParameter<bool> bWebcam;
+	ofParameter<bool> bWebcam_Enable;
 	ofParameter<bool> bWebcam_Draw;
 	std::string webcam_Names_InputDevices;
 	ofParameter<std::string> webcam_Name_{ "WEBCAM_DEVICE_NAME", "" };
@@ -350,10 +288,10 @@ private:
 	ofParameter<int> webcam_Index_Device;
 	std::string path_WebcamSettings;
 
-	ofxInteractiveRect rect_Webcam = { "rect_Webcam" };
-	std::string path_rect_Webcam = "_Webcam_Mini";
+	ofxSurfingBoxInteractive rect_Webcam;
+	std::string path_rect_Webcam = "Webcam_Mini";
 
-#endif//USE_WEBCAM
+#endif
 
 	//--
 
@@ -364,7 +302,7 @@ private:
 	NDI_input NDI_Input1;
 	NDI_input NDI_Input2;
 
-#endif//USE_ofxNDI_IN
+#endif
 
 	//--
 
@@ -372,7 +310,7 @@ private:
 
 #ifdef USE_ofxNDI_OUT
 
-	ofParameter<bool> bNDI_Output;
+	ofParameter<bool> bNDI_Output_Enable;
 	ofParameter<bool> bNDI_Output_Draw;
 	ofParameter<bool> bNDI_Output_Mini;
 	ofParameter<std::string> NDI_Output_Name;
@@ -397,8 +335,8 @@ public:
 private:
 
 	ofParameterGroup params_Webcam;
-	ofxInteractiveRect rect_NDI_OUT = { "rect_NDI_OUT" };
-	std::string path_rect_NDI_OUT = "_NDI_Out_Mini";
+	ofxSurfingBoxInteractive rect_NDI_OUT;
+	std::string path_rect_NDI_OUT = "NDI_Out_Mini";
 
 	ofParameterGroup params_NDI_Output;
 
