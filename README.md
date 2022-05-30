@@ -71,8 +71,12 @@ void ofApp::draw()
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 * ofxGui / From oF Core
-* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For example
-* [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST) / For example
+* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For examples only
+* [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST) / For examples only
+
+Notice that must be present into ```/bin/data/```:  
+Processing.NDI.Lib.x64.dll  
+Processing.NDI.Lib.x864.dll  
 
 <details>
   <summary>HowTo. New to NDI?</summary>
