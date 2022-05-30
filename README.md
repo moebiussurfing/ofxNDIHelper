@@ -74,9 +74,9 @@ void ofApp::draw()
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For examples only
 * [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST) / For examples only
 
-Notice that must be present into ```/bin/data/```:  
-Processing.NDI.Lib.x64.dll  
-Processing.NDI.Lib.x864.dll  
+Notice that must be present into ```/bin/data/``` :  
+_Processing.NDI.Lib.x64.dll_  
+_Processing.NDI.Lib.x864.dll_  
 
 <details>
   <summary>HowTo. New to NDI?</summary>
