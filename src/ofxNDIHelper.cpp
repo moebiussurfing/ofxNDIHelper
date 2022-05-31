@@ -62,7 +62,7 @@ ofxNDIHelper::~ofxNDIHelper()
 //--
 
 //--------------------------------------------------------------
-void ofxNDIHelper::reset_Gui()
+void ofxNDIHelper::doReset_Gui()
 {
 	// Positions
 	position_Gui = glm::vec2(padg, padg);
@@ -117,7 +117,7 @@ void ofxNDIHelper::setup_Gui()
 
 	//--
 
-	reset_Gui();
+	doReset_Gui();
 
 	//--
 
@@ -243,6 +243,7 @@ void ofxNDIHelper::setup()
 	// Settings File
 
 	params_AppsSettings.setName("NDI Helper");
+	//params_AppsSettings.add(bLockRatio);
 	params_AppsSettings.add(params_Internal);
 
 	//params_AppsSettings.add(params_User); //-> crashes. why??
@@ -252,6 +253,8 @@ void ofxNDIHelper::setup()
 #ifdef USE_ofxNDI_OUT
 	params_AppsSettings.add(params_NDI_Output);
 #endif
+
+	params_AppsSettings.add(params_Panels);
 
 	//--
 
@@ -276,7 +279,7 @@ void ofxNDIHelper::setup_Params()
 
 	//bEdit.set("LAYOUT EDIT", true);
 	bReset.set("RESET LAYOUT", false);
-	bLockRatio.set("LOCK ASPECT RATIO", true);
+	//bLockRatio.set("LOCK ASPECT RATIO", true);
 	bKeys.set("KEYS", true);
 	bDebug.set("DEBUG", true);
 	bReset.setSerializable(false);
@@ -299,19 +302,26 @@ void ofxNDIHelper::setup_Params()
 #ifdef USE_WEBCAM
 
 	bWebcam_Enable.set("CAM ENABLE", false);
+	bWebcam_LockRatio.set("LOCK ASPECT RATIO", true);
 	bWebcam_Draw.set("CAM DRAW", true);
 	bWebcam_Mini.set("CAM MINI", true);
 	webcam_Index_Device.set("CAM DEVICE", 0, 0, 1);
+	scaleMode_Index.set("SCALE MODE", 0, 0, 3);
+	scaleMode_Name.set("NAME", "");
 	webcam_Name.set("", "");
 
 	webcam_Index_Device.setSerializable(false);
 	webcam_Name.setSerializable(false);
+	scaleMode_Name.setSerializable(false);
 
 	params_Webcam.setName("WEBCAM");
 	params_Webcam.add(bWebcam_Enable);
 	params_Webcam.add(bWebcam_Draw);
 	params_Webcam.add(bWebcam_Mini);
 	params_Webcam.add(webcam_Index_Device);
+	params_Webcam.add(bWebcam_LockRatio);
+	params_Webcam.add(scaleMode_Index);
+	params_Webcam.add(scaleMode_Name);
 	params_Webcam.add(webcam_Name);
 
 #endif
@@ -341,7 +351,7 @@ void ofxNDIHelper::setup_Params()
 
 	params_User.setName("NDI HELPER");
 	params_User.add(bHelp);
-	params_User.add(bLockRatio);
+	//params_User.add(bLockRatio);
 	params_User.add(bKeys);
 	params_User.add(bReset);
 	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
@@ -364,7 +374,6 @@ void ofxNDIHelper::setup_Params()
 	//--
 
 	params_Internal.setName("INTERNAL");
-
 
 	params_Internal.add(bActive);
 	params_Internal.add(bAutoSave);
@@ -445,7 +454,7 @@ void ofxNDIHelper::update(ofEventArgs& args)
 
 	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60)))
 	{
-		//vidGrabber.close();
+		//webcam_Grabber.close();
 		doRestart_Webcam();
 		bWebcam_Enable = true;
 	}
@@ -458,10 +467,10 @@ void ofxNDIHelper::update(ofEventArgs& args)
 	{
 		//ofBackground(100, 100, 100);
 
-		vidGrabber.update();
+		webcam_Grabber.update();
 
-		//if (vidGrabber.isFrameNew()) {
-		//	//ofPixels & pixels = vidGrabber.getPixels();
+		//if (webcam_Grabber.isFrameNew()) {
+		//	//ofPixels & pixels = webcam_Grabber.getPixels();
 		//	//for (size_t i = 0; i < pixels.size(); i++) {
 		//	//	//invert the color of the pixel
 		//	//	videoInverted[i] = 255 - pixels[i];
@@ -595,6 +604,9 @@ void ofxNDIHelper::draw_Gui()
 //--------------------------------------------------------------
 void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 {
+	// disabler for all keys. (independent from bActive)
+	if (!bKeys) return;
+
 	const int& key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << "keyPressed: " << (char)key << " [" << key << "]";
 
@@ -620,9 +632,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	//if (key == 'K' /*&& mod_CONTROL*/)
 	//{
 	//	bKeys = !bKeys;
-
 	//	ofLogNotice(__FUNCTION__) << "KEYS: " << (bKeys ? "ON" : "OFF");
-
 	//	if (!bKeys)
 	//	{
 	//		ofLogNotice(__FUNCTION__) << "ALL KEYS DISABLED. PRESS '/*CTRL + */K' TO ENABLE GAIN!";
@@ -632,9 +642,6 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	//		ofLogNotice(__FUNCTION__) << "KEYS ENABLED BACK";
 	//	}
 	//}
-
-	// disabler for all keys. (independent from bActive)
-	if (!bKeys) return;
 
 	//-
 
@@ -679,17 +686,16 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 
 	else if (key == 'I')
 	{
-		// WEBCAM
-		auto _devs = vidGrabber.listDevices();
+		auto _devs = webcam_Grabber.listDevices();
 		webcam_Index_Device++;
 		if (webcam_Index_Device.get() > _devs.size() - 1) webcam_Index_Device = 0;
 		webcam_Name_ = _devs[webcam_Index_Device].deviceName;
 		webcam_Name = webcam_Name_;
 
 		// select cam device
-		vidGrabber.close();
-		vidGrabber.setDeviceID(webcam_Index_Device.get());
-		vidGrabber.setup(1920, 1080);
+		webcam_Grabber.close();
+		webcam_Grabber.setDeviceID(webcam_Index_Device.get());
+		webcam_Grabber.setup(1920, 1080);
 	}
 
 #endif
@@ -761,7 +767,6 @@ void ofxNDIHelper::setGuiToggleVisible()
 	bGui = !bGui;
 }
 
-// addon engine params
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed(ofAbstractParameter& e)
 {
@@ -796,7 +801,14 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 	else if (name == bWebcam_Enable.getName())
 	{
 		if (bWebcam_Enable.get()) doRestart_Webcam();
-		else vidGrabber.close();
+		else webcam_Grabber.close();
+	}
+
+	else if (name == webcam_Name.getName())
+	{
+		//TODO:
+		// get index for a name
+		// setup cam for index
 	}
 
 	else if (name == webcam_Index_Device.getName() && bWebcam_Enable.get())
@@ -821,7 +833,7 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 		}
 		else
 		{
-			//ndiSender.ReleaseSender();//?
+			//NDI_OUT_Sender.ReleaseSender();//?
 		}
 	}
 	else if (name == NDI_Output_Name.getName())
@@ -862,23 +874,24 @@ void ofxNDIHelper::setPathGlobal(string s) // must call before setup.
 void ofxNDIHelper::doRestart_Webcam()
 {
 	// must close before reopen
-	vidGrabber.close();
+	webcam_Grabber.close();
 
 	// start device
 	{
-		vidGrabber.setDeviceID(webcam_Index_Device.get());
-		//vidGrabber.setDesiredFrameRate(60);
-		vidGrabber.setup(1920, 1080);
+		webcam_Grabber.setDeviceID(webcam_Index_Device.get());
+		//webcam_Grabber.setDesiredFrameRate(60);
+		webcam_Grabber.setup(1920, 1080);
 	}
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Webcam(int index) {
+void ofxNDIHelper::setup_Webcam(int index)
+{
 	// will load from index (webcam_Index_Device) not from name 
 
 	// get back a list of devices.
-	vidGrabber.setVerbose(true);
-	vector<ofVideoDevice> _devs = vidGrabber.listDevices();
+	webcam_Grabber.setVerbose(true);
+	vector<ofVideoDevice> _devs = webcam_Grabber.listDevices();
 	webcam_Index_Device.setMax(_devs.size() - 1);
 
 	// get all dev names
@@ -894,44 +907,84 @@ void ofxNDIHelper::setup_Webcam(int index) {
 
 	// check valid index and clamp
 	bool bError = false;
-	if (webcam_Index_Device > _devs.size() - 1) {
+	if (webcam_Index_Device > _devs.size() - 1)
+	{
 		ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
 		webcam_Index_Device = -1;
 		webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
+
 		bError = true;
 	}
 
-	if (!bError) {// valid index
-
+	// valid index
+	if (!bError)
+	{
 		// must close before reopen
-		vidGrabber.close();
+		webcam_Grabber.close();
 
 		// start device
-		//if (bWebcam_Enable.get()) 
 		{
-			vidGrabber.setDeviceID(webcam_Index_Device.get());
-			//vidGrabber.setDesiredFrameRate(60);
-			vidGrabber.setup(1920, 1080);
+			webcam_Grabber.setDeviceID(webcam_Index_Device.get());
+
+			//TODO:
+			// now size is hardcoded
+			// 
+			//webcam_Grabber.setDesiredFrameRate(60);
+			webcam_Grabber.setup(1920, 1080);
 		}
 
 		//--
 
 		// debug connected
-		bool _isConnected = vidGrabber.isInitialized();
-		ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
-		if (!_isConnected) {
-			ofLogError(__FUNCTION__) << "CAN'T INITIALIZE vidGrabber!";
+		bool _isConnected = webcam_Grabber.isInitialized();
+		ofLogNotice(__FUNCTION__) << "webcam_Grabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
+
+		if (!_isConnected)
+		{
+			ofLogError(__FUNCTION__) << "CAN'T INITIALIZE webcam_Grabber!";
 			ofLogError(__FUNCTION__) << "CAMERA DISABLED";
+
 			bWebcam_Enable = false;
+
+			//return;
 		}
 
 		//--
 
-		if (webcam_Index_Device < _devs.size()) {
+		if (webcam_Index_Device < _devs.size())
+		{
 			webcam_Name_ = _devs[webcam_Index_Device].deviceName;
 			webcam_Name = webcam_Name_;
 		}
+
+		//--
+
+		////TODO: child frame
+		//float w = webcam_Grabber.getWidth();
+		//float h = webcam_Grabber.getHeight();
+		//float wc = w / 2.f;
+		//float hc = h / 2.f;
+		//frame_.setSize(w, h);
+		//frame_.getInnerTransformNode().setAnchorPoint(wc, hc, 0);
+		//frame_.getInnerTransformNode().setTranslation(wc, hc, 0);
 	}
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::mouseDragged(int x, int y, int button) {
+#ifdef USE_OFX_CHILD_FRAME
+	switch (button) {
+	case OF_MOUSE_BUTTON_LEFT: {
+		TransformNode& node = frame_.getInnerTransformNode();
+		node.addTranslationX(x - ofGetPreviousMouseX());
+		node.addTranslationY(y - ofGetPreviousMouseY());
+	}	break;
+	case OF_MOUSE_BUTTON_RIGHT: {
+		TransformNode& node = frame_.getInnerTransformNode();
+		node.mulScale(ofVec3f(100 + x - ofGetPreviousMouseX(), 100 + y - ofGetPreviousMouseY(), 100) / 100.f);
+	}	break;
+	}
+#endif
 }
 
 //--------------------------------------------------------------
@@ -942,9 +995,9 @@ void ofxNDIHelper::setup_Webcam() {
 	// that's because the index of a device could be changed if a new device is connected.
 
 	// get back a list of devices.
-	vidGrabber.setVerbose(true);
-	//vector<ofVideoDevice> _devs = vidGrabber.listDevices();
-	_devs = vidGrabber.listDevices();
+	webcam_Grabber.setVerbose(true);
+	//vector<ofVideoDevice> _devs = webcam_Grabber.listDevices();
+	_devs = webcam_Grabber.listDevices();
 
 	// get all dev names
 	webcam_Names_InputDevices = "";
@@ -956,7 +1009,9 @@ void ofxNDIHelper::setup_Webcam() {
 	{
 		// queue devices names
 		webcam_Names_InputDevices += ofToString(i) + " " + _devs[i].deviceName;
-		if (i != _devs.size() - 1) webcam_Names_InputDevices += "\n";
+
+		webcam_Names_InputDevices += "\n";
+		//if (i != _devs.size() - 1) webcam_Names_InputDevices += "\n";
 
 		if (_devs[i].bAvailable) {
 			// log the device
@@ -983,16 +1038,63 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 {
 	if (bWebcam_Enable.get())
 	{
+		//----
+
 		ofPushStyle();
 		ofSetColor(255, 255);
 
-		ofRectangle r(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
 
-		if (bLockRatio.get()) {
-			float _ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
+#ifdef USE_OFX_CHILD_FRAME
+		//TODO: child frame
+		//float w = webcam_Grabber.getWidth();
+		//float h = webcam_Grabber.getHeight();
+		float w = rect_Webcam.getWidth();
+		float h = rect_Webcam.getHeight();
+		float wc = w / 2.f;
+		float hc = h / 2.f;
+		frame_.setSize(w, h);
+		frame_.getInnerTransformNode().setAnchorPoint(wc, hc, 0);
+		frame_.getInnerTransformNode().setTranslation(wc, hc, 0);
+
+		frame_.begin();
+		webcam_Grabber.draw(0, 0, rect_Webcam.getWidth(), rect_Webcam.getHeight());
+		ofDrawCircle(64, 64, 64);
+		frame_.end();
+		frame_.draw(rect_Webcam.getX(), rect_Webcam.getY());
+#endif
+
+		//TODO:
+		// 
+		// Viewport
+
+		ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
+		ofRectangle rOut(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+
+		if (bWebcam_LockRatio.get()) 
+		{
+			float _ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
 			rect_Webcam.setHeight(rect_Webcam.getWidth() * _ratio);
 		}
-		vidGrabber.draw(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+
+		ofScaleMode scaleMode;
+		switch (scaleMode_Index)
+		{
+		case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
+		case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
+		case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
+		case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+		}
+
+		//rOut.scaleTo(rSrc, scaleMode);
+		rSrc.scaleTo(rOut, scaleMode);
+
+		// image
+		//webcam_Grabber.draw(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+		
+		//webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
+		webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
+
+		// interactive box
 		rect_Webcam.draw();
 
 		// bb border
@@ -1001,17 +1103,10 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 		ofSetLineWidth(2.0);
 		ofDrawRectangle(rect_Webcam.getRectangle());
 
-		//// Top info
-		//if (bDebug && bInfo)
-		//{
-		//	glm::vec2 p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-		//	//int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, "WEBCAM  " + webcam_Name_.get());
-		//	ofxSurfingHelpers::drawTextBoxed(font, "WEBCAM | " + webcam_Name_.get(), p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
-		//}
-
 		ofPopStyle();
 	}
 }
+
 //--------------------------------------------------------------
 void ofxNDIHelper::webcam_SaveSettings()
 {
@@ -1021,6 +1116,7 @@ void ofxNDIHelper::webcam_SaveSettings()
 	ofSerialize(_xml, webcam_Name_);
 	_xml.save(path_GLOBAL + path_WebcamSettings);
 }
+
 //--------------------------------------------------------------
 void ofxNDIHelper::webcam_LoadSettings()
 {
@@ -1063,7 +1159,7 @@ void ofxNDIHelper::webcam_LoadSettings()
 		{
 			ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
 			webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
-			vidGrabber.close();
+			webcam_Grabber.close();
 			return;//cancel and exit!
 		}
 	}
@@ -1073,23 +1169,23 @@ void ofxNDIHelper::webcam_LoadSettings()
 	//--
 
 	// 1. Must close before reopen
-	vidGrabber.close();
+	webcam_Grabber.close();
 
 	// 2. Start device
 	//if (bWebcam_Enable.get()) 
 	{
-		vidGrabber.setDeviceID(webcam_Index_Device.get());
-		//vidGrabber.setDesiredFrameRate(60);
-		vidGrabber.setup(1920, 1080);
+		webcam_Grabber.setDeviceID(webcam_Index_Device.get());
+		//webcam_Grabber.setDesiredFrameRate(60);
+		webcam_Grabber.setup(1920, 1080);
 	}
 
 	//--
 
 	//// debug connected
-	//bool _isConnected = vidGrabber.isInitialized();
-	//ofLogNotice(__FUNCTION__) << "vidGrabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
+	//bool _isConnected = webcam_Grabber.isInitialized();
+	//ofLogNotice(__FUNCTION__) << "webcam_Grabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
 	//if (!_isConnected) {
-	//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE vidGrabber!";
+	//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE webcam_Grabber!";
 	//	ofLogError(__FUNCTION__) << "CAMERA DISABLED";
 	//	bWebcam_Enable = false;
 	//}
@@ -1119,7 +1215,7 @@ void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 
 	//rect_Webcam.reset();
 
-	_ratio = vidGrabber.getHeight() / vidGrabber.getWidth();
+	_ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
 
 	_xx = _xx0;
 	_yy = _yy0;
@@ -1194,16 +1290,31 @@ void ofxNDIHelper::draw_Webcam()
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam_Full()
 {
+	//TODO:
+	// making fit viewports
+
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	ofRectangle r(0, 0, vidGrabber.getWidth(), vidGrabber.getHeight());
-	r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_STRETCH_TO_FILL);
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
+	ofScaleMode scaleMode;
+	switch (scaleMode_Index)
+	{
+	case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
+	case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
+	case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
+	case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+	}
 
-	vidGrabber.draw(r.x, r.y, r.width, r.height);
+	ofRectangle rOut(0, 0, NDI_OUT_Sender.GetWidth(), NDI_OUT_Sender.GetHeight());
+	//ofRectangle rOut = ofGetWindowRect();
+
+	ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
+
+	rOut.scaleTo(rSrc, scaleMode);
+	//rSrc.scaleTo(rOut, scaleMode);
+	
+	webcam_Grabber.draw(rOut.x, rOut.y, rOut.width, rOut.height);
+	//webcam_Grabber.draw(rSrc.x, rSrc.y, rSrc.width, rSrc.height);
 
 	ofPopStyle();
 }
@@ -1217,9 +1328,9 @@ void ofxNDIHelper::draw_Webcam_Full()
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_NDI_OUT() {
 
-	ndiSender.ReleaseSender();//?
+	NDI_OUT_Sender.ReleaseSender();//?
 
-	ofLogNotice(__FUNCTION__) << ndiSender.GetNDIversion() << " (http://ndi.tv/)";
+	ofLogNotice(__FUNCTION__) << NDI_OUT_Sender.GetNDIversion() << " (http://ndi.tv/)";
 	//strcpy_s(senderName, 256, "OF NDI Sender"); // Set the sender name
 
 	const std::string str = NDI_Output_Name.get();
@@ -1249,18 +1360,18 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	//fbo_NDI_Sender.allocate(senderWidth, senderHeight, GL_RGBA);
 
 	// Optionally set fbo readback using OpenGL pixel buffers
-	ndiSender.SetReadback(); // Change to false to compare
+	NDI_OUT_Sender.SetReadback(); // Change to false to compare
 
 	// Set NDI asynchronous sending for best performance
-	ndiSender.SetAsync();
+	NDI_OUT_Sender.SetAsync();
 
 	////Create a new sender - default RGBA for ofPixels
-	//ndiSender.CreateSender("Openframeworks NDI webcam", (unsigned int)vidGrabber.getWidth(), (unsigned int)vidGrabber.getHeight());
-	//ofLogNotice(__FUNCTION__) << "Created NDI sender [Openframeworks NDI webcam] (" << vidGrabber.getWidth() << "x" << vidGrabber.getHeight() << ")" ;
+	//NDI_OUT_Sender.CreateSender("Openframeworks NDI webcam", (unsigned int)webcam_Grabber.getWidth(), (unsigned int)webcam_Grabber.getHeight());
+	//ofLogNotice(__FUNCTION__) << "Created NDI sender [Openframeworks NDI webcam] (" << webcam_Grabber.getWidth() << "x" << webcam_Grabber.getHeight() << ")" ;
 
 	// Create a sender with default RGBA output format
-	ndiSender.CreateSender(senderName, senderWidth, senderHeight);
-	//ndiSender.CreateSender("OF TEST", senderWidth, senderHeight);
+	NDI_OUT_Sender.CreateSender(senderName, senderWidth, senderHeight);
+	//NDI_OUT_Sender.CreateSender("OF TEST", senderWidth, senderHeight);
 
 	ofLogNotice(__FUNCTION__) << "Created NDI sender [" << senderName << "] (" << senderWidth << "x" << senderHeight << ")";
 }
@@ -1301,7 +1412,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 		str += webcam_Names_InputDevices;
 		//str += "\n\n";
 		//str += "I key > Next device";
-		//str += " " + ofToString(vidGrabber.isInitialized() ? "ON" : "OFF") + "\n";
+		//str += " " + ofToString(webcam_Grabber.isInitialized() ? "ON" : "OFF") + "\n";
 
 		glm::vec2 p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
 		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
@@ -1318,7 +1429,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 	if (bNDI_Output_Enable.get() && bNDI_Output_Draw.get() && bNDI_Output_Mini.get())
 	{
 		// Show what it's sending
-		if (ndiSender.SenderCreated())
+		if (NDI_OUT_Sender.SenderCreated())
 		{
 			// Top info
 			if (bDebug)
@@ -1334,7 +1445,7 @@ void ofxNDIHelper::draw_InfoDevices() {
 			//str += "DEVICE\n";
 			str += ofToString(senderName) + "\n";
 			str += ofToString(senderWidth) + "x" + ofToString(senderHeight) + "px | ";
-			str += "FPS " + ofToString(ndiSender.GetFps()) + " / " + ofToString((int)ofGetFrameRate()) + "";
+			str += "FPS " + ofToString(NDI_OUT_Sender.GetFps()) + " / " + ofToString((int)ofGetFrameRate()) + "";
 
 			x2 = rect_NDI_OUT.getX() + _padx2;
 			y2 = rect_NDI_OUT.getY() + rect_NDI_OUT.getHeight() + _pady2;
@@ -1376,9 +1487,9 @@ void ofxNDIHelper::end_NDI_OUT()
 		// do the sending
 
 		ofColor(255);
-		ndiSender.SendImage(fbo_NDI_Sender);
-		//ndiSender.SendImage(fbo_NDI_Sender, false);// send processed
-		//ndiSender.SendImage(vidGrabber.getPixels());// send clean webcam
+		NDI_OUT_Sender.SendImage(fbo_NDI_Sender);
+		//NDI_OUT_Sender.SendImage(fbo_NDI_Sender, false);// send processed
+		//NDI_OUT_Sender.SendImage(webcam_Grabber.getPixels());// send clean webcam
 	}
 }
 
@@ -1402,11 +1513,12 @@ void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo)
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	if (bLockRatio.get())
+	//if (bLockRatio.get())
 	{
 		float _ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
 		rect_NDI_OUT.setHeight(rect_NDI_OUT.getWidth() * _ratio);
 	}
+
 	fbo_NDI_Sender.draw(rect_NDI_OUT.getX(), rect_NDI_OUT.getY(), rect_NDI_OUT.getWidth(), rect_NDI_OUT.getHeight());
 	rect_NDI_OUT.draw();
 
@@ -1475,7 +1587,7 @@ void ofxNDIHelper::loadSettings()
 	{
 		bDoRestartup = true;
 		bWebcam_Enable = false;
-		vidGrabber.close();
+		webcam_Grabber.close();
 	}
 
 #endif	
@@ -1553,7 +1665,7 @@ void ofxNDIHelper::exit()
 
 	// The sender must be released 
 	// or NDI sender discovery will still find it
-	ndiSender.ReleaseSender();
+	NDI_OUT_Sender.ReleaseSender();
 
 #endif
 }
@@ -1571,7 +1683,7 @@ void ofxNDIHelper::windowResized(int w, int h)
 	screenH = h;
 
 	//TODO:
-	//ndiSender.UpdateSender(1920, 1080);//update size
+	//NDI_OUT_Sender.UpdateSender(1920, 1080);//update size
 
 #ifdef USE_ofxNDI_IN
 

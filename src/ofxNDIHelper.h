@@ -37,6 +37,10 @@
 //#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
 // NOTE: if webcam hangs during runtime, you should Disable and Enable again to restart/fix!
 
+//--
+ 
+//#define USE_OFX_CHILD_FRAME //-> for translate webcam
+
 
 //----
 
@@ -64,12 +68,21 @@
 #include "ofxSurfing_ofxGui.h"
 #include "TextBoxWidget.h"
 
+#ifdef USE_OFX_CHILD_FRAME
+#include "ofxChildFrame.h"
+#endif
+
 //--
 
 class ofxNDIHelper /*: public ofBaseApp*/
 {
 
 public:
+	
+#ifdef USE_OFX_CHILD_FRAME
+	ofxChildFrame frame_;
+#endif
+	void mouseDragged(int x, int y, int button);
 
 	ofxNDIHelper();
 	~ofxNDIHelper();
@@ -79,10 +92,11 @@ public:
 	void draw_Gui();
 	void windowResized(int w, int h);
 
+	void doReset_Gui();
+
 private:
 
 	void setup_Gui();
-	void reset_Gui();
 	void setup_Params();
 	void startup();
 	void update(ofEventArgs& args);
@@ -152,7 +166,7 @@ private:
 private:
 
 	ofParameterGroup params_AppsSettings;
-	ofParameter<bool> bLockRatio;
+	//ofParameter<bool> bLockRatio;
 	ofParameter<bool> bReset;
 
 	bool bDoRestartup = false;
@@ -261,7 +275,7 @@ private:
 
 private:
 
-	ofVideoGrabber vidGrabber;
+	ofVideoGrabber webcam_Grabber;
 	void setup_Webcam(); // setup webcam from name device nor index
 	void setup_Webcam(int index); // setup webcam from device index
 	//void exit_Webcam(); // store camera device name to xml
@@ -282,6 +296,9 @@ public:
 
 private:
 
+	ofParameter<bool> bWebcam_LockRatio;
+	ofParameter<int> scaleMode_Index;
+	ofParameter<string> scaleMode_Name;
 	ofParameter<bool> bWebcam_Enable;
 	ofParameter<bool> bWebcam_Draw;
 	std::string webcam_Names_InputDevices;
@@ -321,7 +338,7 @@ private:
 private:
 
 	void setup_NDI_OUT();
-	ofxNDIsender ndiSender; // NDI sender object
+	ofxNDIsender NDI_OUT_Sender; // NDI sender object
 	ofFbo fbo_NDI_Sender; // Fbo used for graphics and sending
 	unsigned int senderWidth; // Width of the sender output
 	unsigned int senderHeight; // Height of the sender output

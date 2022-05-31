@@ -69,7 +69,6 @@ void NDI_input::setup(string _name)
 void NDI_input::doScan()
 {
 	ofLogNotice(__FUNCTION__);
-	//bScan = true;
 
 	doRefresh_NDI_IN();
 }
@@ -377,7 +376,7 @@ void NDI_input::drawGui()
 //--------------------------------------------------------------
 void NDI_input::update(ofEventArgs& args)
 {
-	cout << __FUNCTION__ << endl;
+	//cout << __FUNCTION__ << endl;
 
 	if (!bLoadedStartup)
 		if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME)
@@ -745,7 +744,7 @@ void NDI_input::windowResized(int w, int h)
 	screenH = h;
 
 	//TODO:
-	//ndiSender.UpdateSender(1920, 1080);//update size
+	//NDI_OUT_Sender.UpdateSender(1920, 1080);//update size
 }
 
 #endif
