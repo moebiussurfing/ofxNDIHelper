@@ -5,11 +5,14 @@
 //--------------------------------------------------------------
 NDI_input::NDI_input()
 {
+	ofAddListener(ofEvents().update, this, &NDI_input::update);
 }
 
 //--------------------------------------------------------------
 NDI_input::~NDI_input()
 {
+	ofRemoveListener(ofEvents().update, this, &NDI_input::update);
+
 	ofRemoveListener(params.parameterChangedE(), this, &NDI_input::Changed);
 
 	exit();
@@ -20,6 +23,7 @@ void NDI_input::setup(string _name)
 {
 	name = _name;
 	path_rect_NDI_IN = "NDI_IN_" + name + "_Mini";
+
 	rect_NDI_IN.setName(path_rect_NDI_IN);
 	rect_NDI_IN.setPathGlobal(path_GLOBAL);
 	rect_NDI_IN.setMode(ofxSurfingBoxInteractive::FREE_LAYOUT);
@@ -54,7 +58,7 @@ void NDI_input::setup(string _name)
 
 	//--
 
-	bDISABLECALLBACKS = false;
+	bDISABLE_CALLBACKS = false;
 
 	loadSettings();
 }
@@ -64,12 +68,16 @@ void NDI_input::setup(string _name)
 //--------------------------------------------------------------
 void NDI_input::doScan()
 {
-	bScan = true;
+	ofLogNotice(__FUNCTION__);
+	//bScan = true;
+
+	doRefresh_NDI_IN();
 }
 
 //--------------------------------------------------------------
 void NDI_input::startup()
 {
+	ofLogNotice(__FUNCTION__);
 
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 	nameDevice = nameDevice;
@@ -96,7 +104,7 @@ void NDI_input::setup_Params()
 
 	//bEdit.set("LAYOUT EDIT", true);
 
-	bReset.set("LAYOUT RESET", false);
+	bReset.set("RESET PREVIEW", false);
 	bReset.setSerializable(false);
 
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
@@ -119,22 +127,22 @@ void NDI_input::setup_Params()
 	bScan.setSerializable(false);
 
 	params_NDI_Input.add(bEnable);
-	params_NDI_Input.add(bScan);
 	params_NDI_Input.add(bDraw);
 	params_NDI_Input.add(bDrawMini);
 	params_NDI_Input.add(indexDevice);
 	params_NDI_Input.add(nameDevice);
+	params_NDI_Input.add(bScan);
 
 	//--
 
 	// Input
 
 	params_Control.setName("CONTROL");
-	//params_Control.add(bEdit);
 	params_Control.add(bReset);
 	params_Control.add(bLockRatio);
-	//params_Control.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 	params_Control.add(position_Gui);
+	//params_Control.add(bEdit);
+	//params_Control.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 
 	params.setName("NDI INPUT");
 	params.add(params_Control);
@@ -367,10 +375,24 @@ void NDI_input::drawGui()
 }
 
 //--------------------------------------------------------------
+void NDI_input::update(ofEventArgs& args)
+{
+	cout << __FUNCTION__ << endl;
+
+	if (!bLoadedStartup)
+		if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME)
+		{
+			bLoadedStartup = true;
+
+			startup(); // fix
+		}
+}
+
+//--------------------------------------------------------------
 void NDI_input::draw() {
-	if (ofGetFrameNum() == 120) startup();//fix
 
 	if (!bGui_Preview) return;
+	if (!bLoadedStartup) return;
 
 	if (bDebug)
 	{
@@ -413,7 +435,7 @@ void NDI_input::draw_InfoDevices() {
 					str += "FPS " + ofToString(ndiReceiver.GetSenderFps()) + " / ";
 					str += ofToString(ndiReceiver.GetFps()) + "";
 				}
-				else 
+				else
 				{
 					// Nothing received
 					str += "> " + ofToString(ndiReceiver.GetSenderName().c_str());
@@ -530,31 +552,27 @@ void NDI_input::draw_NDI_IN()
 void NDI_input::doRefresh_NDI_IN() {
 	ofLogNotice(__FUNCTION__);
 
-	//char name[256];
 	int nsenders = ndiReceiver.GetSenderCount();
 	indexDevice.setMax(nsenders - 1);
 
 	// List all the senders
+
 	if (nsenders > 0)
 	{
 		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
 
 		NDI_INPUT_Names_Devices = "";
-		for (int i = 0; i < nsenders; i++) 
+
+		for (int i = 0; i < nsenders; i++)
 		{
 			string name = ndiReceiver.GetSenderName(i);
 
 			string str = ofToString(i) + " " + name;
 			ofLogNotice(__FUNCTION__) << str;
-			
+
 			NDI_INPUT_Names_Devices += str;
 			NDI_INPUT_Names_Devices += "\n";
-
-			//if (i != nsenders - 1) NDI_INPUT_Names_Devices += "\n";
 		}
-
-		//if (nsenders > 1)
-		//	ofLogNotice(__FUNCTION__) << "Press key [0] to [" << nsenders - 1 << "] to select a sender";
 	}
 	else ofLogNotice(__FUNCTION__) << "No NDI senders found";
 }
@@ -574,7 +592,7 @@ void NDI_input::loadSettings()
 	//--
 
 	// Reset preview rectangles positions and sizes
-	//doReset_Mini_Previews();
+	//doReset_Mini_PreviewsSize();
 
 	// Load Settings
 	//rect_NDI_IN.loadSettings(path_rect_NDI_IN, path_GLOBAL, false);
@@ -613,7 +631,7 @@ void NDI_input::saveSettings()
 }
 
 //--------------------------------------------------------------
-void NDI_input::doReset_Mini_Previews() {
+void NDI_input::doReset_Mini_PreviewsSize() {
 
 	//float _pad = 200;
 	//float _xx = xPadPreview;
@@ -632,13 +650,13 @@ void NDI_input::doReset_Mini_Previews() {
 	////rect_NDI_IN.y = _yy;
 
 	//rect_NDI_IN.setShape(ofRectangle(_xx, _yy, wPreview, wPreview * _ratio));
-	rect_NDI_IN.reset();
+	rect_NDI_IN.reset(false, wPreview);
 }
 
 //--------------------------------------------------------------
 void NDI_input::Changed(ofAbstractParameter& e)
 {
-	if (bDISABLECALLBACKS) return;
+	if (bDISABLE_CALLBACKS) return;
 
 	{
 		string name = e.getName();
@@ -676,14 +694,15 @@ void NDI_input::Changed(ofAbstractParameter& e)
 		{
 			bReset = false;
 
-			doReset_Mini_Previews();
+			doReset_Mini_PreviewsSize();
 		}
 
 		else if (name == bScan.getName() && bScan.get())
 		{
 			bScan = false;
 
-			doRefresh_NDI_IN();
+			doScan();
+			//doRefresh_NDI_IN();
 		}
 
 		//----

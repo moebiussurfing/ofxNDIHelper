@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 ofxNDIHelper::ofxNDIHelper()
 {
-	bDISABLECALLBACKS = true;
+	bDISABLE_CALLBACKS = true;
 
 	// Path for settings
 	// This is to folder all files to avoid mixing with other add-ons data
@@ -23,6 +23,7 @@ ofxNDIHelper::ofxNDIHelper()
 
 	// text
 	std::string helpInfo = "";
+
 	helpInfo += "HELP \n";
 	helpInfo += "NDI MANAGER \n";
 	helpInfo += "\n";
@@ -274,7 +275,7 @@ void ofxNDIHelper::setup_Params()
 	bGui_NDI_OUT.set("NDI OUT", true);
 
 	//bEdit.set("LAYOUT EDIT", true);
-	bReset.set("LAYOUT RESET", false);
+	bReset.set("RESET LAYOUT", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
 	bKeys.set("KEYS", true);
 	bDebug.set("DEBUG", true);
@@ -393,7 +394,7 @@ void ofxNDIHelper::startup()
 
 	//---
 
-	bDISABLECALLBACKS = false;
+	bDISABLE_CALLBACKS = false;
 
 	//position_Gui.set(glm::vec2(ofGetWidth() - 210, 10));
 
@@ -407,9 +408,23 @@ void ofxNDIHelper::startup()
 //--------------------------------------------------------------
 void ofxNDIHelper::update(ofEventArgs& args)
 {
+
 	if (ofGetFrameNum() == 1)
 	{
 		startupFix();
+	}
+
+	// startup waiting
+	if (!bLoadedStartup)
+	{
+
+#ifdef USE_ofxNDI_IN
+
+		if (NDI_Input1.bLoadedStartup && NDI_Input2.bLoadedStartup) {
+			bLoadedStartup = true;
+		}
+#endif
+
 	}
 
 	if (!bActive)
@@ -509,7 +524,7 @@ void ofxNDIHelper::draw_NDI_IN_2_Full() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw() {
 	if (!bGui) return;
-
+	if (!bLoadedStartup) return;
 
 	//-
 
@@ -653,7 +668,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 
 	else if (key == 'R')
 	{
-		doReset_Mini_Previews();
+		doReset_Mini_PreviewsLayout();
 	}
 
 	//--
@@ -750,7 +765,7 @@ void ofxNDIHelper::setGuiToggleVisible()
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed(ofAbstractParameter& e)
 {
-	if (bDISABLECALLBACKS) return;
+	if (bDISABLE_CALLBACKS) return;
 
 	string name = e.getName();
 
@@ -769,7 +784,7 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 	{
 		bReset = false;
 
-		doReset_Mini_Previews();
+		doReset_Mini_PreviewsLayout();
 	}
 
 	//----
@@ -1025,7 +1040,7 @@ void ofxNDIHelper::webcam_LoadSettings()
 	//--
 
 	// start device
-	//bDISABLECALLBACKS = true;
+	//bDISABLE_CALLBACKS = true;
 
 	webcam_Index_Device = -1;
 	if (_isLoaded) {
@@ -1083,10 +1098,10 @@ void ofxNDIHelper::webcam_LoadSettings()
 #endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::doReset_Mini_Previews()
+void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 {
 	// Align all the previews using Webcam as anchor!
-	 
+
 	//float _xx0 = 100;
 	//float _yy0 = 250;
 	float _xx0 = rect_Webcam.getX();
@@ -1138,22 +1153,22 @@ void ofxNDIHelper::doReset_Mini_Previews()
 
 #ifdef USE_ofxNDI_IN
 
-	//NDI_Input1.doReset_Mini_Previews();
+	//NDI_Input1.doReset_Mini_PreviewsSize();
 
 	_xx = _xx0 + MAX(rect_Webcam.getWidth(), rect_NDI_OUT.getWidth()) + pad;
-	_yy = _yy0 ;
+	_yy = _yy0;
 	//_ww = wPreview;
 	_hh = _ww * _ratio;
 
 	auto r = NDI_Input1.getPreviewRect();
 	_ratio = r.getHeight() / r.getWidth();
 	_ww = r.getWidth();
-	
+
 	NDI_Input1.setPositionPreview(glm::vec2(_xx, _yy));
 
 	//--
 
-	//NDI_Input2.doReset_Mini_Previews();
+	//NDI_Input2.doReset_Mini_PreviewsSize();
 
 	_xx = _xx + _ww + pad;
 
@@ -1472,7 +1487,7 @@ void ofxNDIHelper::loadSettings()
 	//--
 
 	// Reset preview rectangles positions and sizes
-	//doReset_Mini_Previews();
+	//doReset_Mini_PreviewsLayout();
 
 	// Load Settings
 

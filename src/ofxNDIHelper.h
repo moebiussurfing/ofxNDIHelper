@@ -2,17 +2,19 @@
 //---
 
 /*
+* 
 	TODO:
 
-	+ improve drawing webcam and ndi workflow
-	+ switch to ofxSurfingBox for previews rects
-		+ add rect container to center the webcam, zoom, rotate, translate inside!
-	+ add full screen, fit, scale fit, half screen etc enum list
+	+ add inner rect container to center the webcam, zoom, rotate, translate inside!
 
-	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
-	+ NDI output devices port settings as names instead of index port.
-	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
+	+ add full screen, fit, scale fit, half screen etc with an kind of ofRectangle ENUM list.
+
 	+ Real preview size or custom/fullsize.
+	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
+		+ e.g. ndi out do not fits exactly the fullwidth frame.
+
+	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
+
 	+ Fix directives to allow use i.e. only the camera or only the Output.
 		+ Split Webcam part as a new helper addon. ?
 
@@ -154,6 +156,7 @@ private:
 	ofParameter<bool> bReset;
 
 	bool bDoRestartup = false;
+	bool bLoadedStartup = false; // to hide all and waiting startup done to star drawing.
 
 	//--
 
@@ -167,7 +170,7 @@ public:
 
 public:
 
-	void doReset_Mini_Previews();
+	void doReset_Mini_PreviewsLayout();
 
 private:
 
@@ -197,7 +200,7 @@ private:
 	// Updating some params before save will trigs also the group callbacks
 	// so we disable this callbacks just in case params updating's are required
 	// in this case we will need to update gui position param
-	bool bDISABLECALLBACKS;
+	bool bDISABLE_CALLBACKS;
 
 	int screenW, screenH;
 

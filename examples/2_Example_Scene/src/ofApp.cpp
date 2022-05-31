@@ -17,7 +17,7 @@ void ofApp::setup()
 
 	gui.setup("ofApp");
 	gui.add(params);
-	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 40);
+	gui.setPosition(40, ofGetHeight() - gui.getHeight() - 40);
 
 	ofxSurfingHelpers::loadGroup(params);
 }
@@ -64,9 +64,10 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	// Draw the scene on the "main screen" too
-	scene.drawChannel1();
-	//scene.drawAll();
+	//scene.drawBackground();
+	//scene.drawChannel1();
+	//scene.drawChannel2();
+	scene.drawAll();
 
 	//--
 

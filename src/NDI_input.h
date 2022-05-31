@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEFAULT_STARTUP_WAITING_TIME 60 // in frames
+
 #define USE_ofxNDI_IN
 
 //--
@@ -19,12 +21,15 @@ class NDI_input
 {
 
 public:
+	
+	bool bLoadedStartup = false; // to hide all and waiting startup done to star drawing.
 
 	NDI_input();
 	~NDI_input();
 
 	void setup(string name = "myInput");
 	void setup_Params();
+	void update(ofEventArgs& args); 
 	void draw();
 	void drawGui();
 	void windowResized(int w, int h);
@@ -41,12 +46,13 @@ private:
 
 public:
 
-	void doReset_Mini_Previews();
+	void doReset_Mini_PreviewsSize();
 
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
 
 	//void setEdit(bool b) { bEdit = b; }
+	//ofParameter<bool> bEdit;
 
 public:
 
@@ -54,7 +60,6 @@ public:
 
 	ofParameter<bool> bLockRatio;
 	ofParameter<bool> bDebug;
-	//ofParameter<bool> bEdit;
 	ofParameter<bool> bReset;
 
 private:
@@ -63,7 +68,7 @@ private:
 	ofTrueTypeFont font;
 	ofTrueTypeFont fontBig;
 
-	bool bDISABLECALLBACKS = true;
+	bool bDISABLE_CALLBACKS = true;
 
 	ofxPanel gui_Control;
 
@@ -147,7 +152,6 @@ public:
 	void doScan(); // scan network NDI devices!
 
 private:
-
 
 	void setup_NDI_IN_ByIndex(int deviceIndex);
 	void setup_NDI_IN_ByName(string deviceName);

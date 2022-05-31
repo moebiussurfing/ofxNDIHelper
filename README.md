@@ -1,7 +1,7 @@
 # ofxNDIHelper
 
 ## Overview
-Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) **Input**/**Output** ports and input **Webcam** devices with **customizable layout**.
+Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports and input **Webcam** devices with **customizable layout**.
 
 ## Screenshot
 ![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
@@ -16,6 +16,7 @@ Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 
 ## Example
 ```.cpp
 #include "ofxNDIHelper.h"
+
 ofxNDIHelper NDIHelper;
 
 void ofApp::setup()
@@ -25,7 +26,7 @@ void ofApp::setup()
 
 void ofApp::update()
 {
-    // Draw and feed the signals from the NDI Manager inside the NDI OUTPUT.
+    // Draw and feed the signals from the NDI Manager inside the NDI OUTPUT too.
     // That's the video signal we will send to the network!
 
     NDIHelper.begin_NDI_OUT();
@@ -34,21 +35,15 @@ void ofApp::update()
 
         //--
 
-        // 1. Draw the receiving signal from NDI Input from the add-on:
-        
-        //-> The Full screen of NDI Input
-        NDIHelper.draw_NDI_IN_Full();
+        /* Feed channels from the addon */
 
+        // 1. Draw the receiving signal from NDI Input from the add-on:
         //-> The Mini screen of NDI Input
         NDIHelper.draw_NDI_IN_MiniPreview();
 
-        //--
+        //-
 
         // 2. Draw the connected Webcam from the add-on:
-
-        //-> The full preview of the camera
-        NDIHelper.draw_Webcam_Full();
-
         //-> The mini preview of the camera
         NDIHelper.draw_Webcam_MiniPreview(); 
     }
@@ -60,7 +55,7 @@ void ofApp::draw()
     // Draw Preview Monitors
     NDIHelper.draw();
 
-    /* You can draw from the add-on here too with the above methods. */
+    /* You can draw from the add-on here to you "local" scene. */
 
     // Gui
     NDIHelper.draw_Gui();
@@ -73,12 +68,19 @@ void ofApp::draw()
 * [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
 * ofxGui / From oF Core  
 
-* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp) / For examples only
-* [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST) / For examples only
+<details>
+  <summary>For examples only</summary>
+  <p>
+
+* [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp)
+* [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST)
+  </p>
+</details>
 
 Notice that must be present into ```/bin/data/``` :  
-_Processing.NDI.Lib.x64.dll_  
-_Processing.NDI.Lib.x864.dll_  
+
+  _Processing.NDI.Lib.x64.dll_  
+  _Processing.NDI.Lib.x864.dll_  
 
 <details>
   <summary>HowTo. New to NDI?</summary>
