@@ -2,7 +2,7 @@
 //---
 
 /*
-* 
+*
 	TODO:
 
 	+ add inner rect container to center the webcam, zoom, rotate, translate inside!
@@ -38,8 +38,8 @@
 // NOTE: if webcam hangs during runtime, you should Disable and Enable again to restart/fix!
 
 //--
- 
-//#define USE_OFX_CHILD_FRAME //-> for translate webcam
+
+#define USE_OFX_CHILD_FRAME //-> for translate webcam
 
 
 //----
@@ -78,11 +78,18 @@ class ofxNDIHelper /*: public ofBaseApp*/
 {
 
 public:
-	
+	float x;
+	float y;
+	float w;
+	float h;
+	float wc;
+	float hc;
+
 #ifdef USE_OFX_CHILD_FRAME
 	ofxChildFrame frame_;
-#endif
 	void mouseDragged(int x, int y, int button);
+	void mouseScrolled(ofMouseEventArgs& mouse);
+#endif
 
 	ofxNDIHelper();
 	~ofxNDIHelper();
@@ -121,7 +128,7 @@ private:
 	//--
 
 public:
-	
+
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setGuiToggleVisible();
@@ -197,7 +204,7 @@ private:
 	int xPadPreview = 300;
 	int yPadPreview = 100;
 	float _padx = 9;
-	float _pady =  - 11;
+	float _pady = -11;
 	float _padx2 = 9;
 	float _pady2 = 18;
 	int x2, y2;
@@ -300,6 +307,7 @@ private:
 	ofParameter<int> scaleMode_Index;
 	ofParameter<string> scaleMode_Name;
 	ofParameter<bool> bWebcam_Enable;
+	ofParameter<bool> bWebcam_Restart;
 	ofParameter<bool> bWebcam_Draw;
 	std::string webcam_Names_InputDevices;
 	ofParameter<std::string> webcam_Name_{ "WEBCAM_DEVICE_NAME", "" };
@@ -307,6 +315,7 @@ private:
 	ofParameter<bool> bWebcam_Mini;
 	ofParameter<int> webcam_Index_Device;
 	std::string path_WebcamSettings;
+	std::string name_WebcamSettings;
 
 	ofxSurfingBoxInteractive rect_Webcam;
 	std::string path_rect_Webcam = "Webcam_Mini";
@@ -356,7 +365,8 @@ private:
 
 	ofParameterGroup params_Webcam;
 	ofxSurfingBoxInteractive rect_NDI_OUT;
-	std::string path_rect_NDI_OUT = "NDI_Out_Mini";
+	std::string path_rect_NDI_OUT = "NDI_Out";
+	std::string name_rect_NDI_OUT = "NDI_Out_Mini";
 
 	ofParameterGroup params_NDI_Output;
 

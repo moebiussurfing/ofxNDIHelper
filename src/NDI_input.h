@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEFAULT_STARTUP_WAITING_TIME 60 // in frames
+#define DEFAULT_STARTUP_WAITING_TIME 120 // in frames
 
 #define USE_ofxNDI_IN
 

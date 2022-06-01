@@ -84,7 +84,7 @@ void NDI_input::startup()
 	indexDevice = indexDevice;
 #endif
 
-	doScan();
+	//doScan();
 }
 
 //--------------------------------------------------------------
