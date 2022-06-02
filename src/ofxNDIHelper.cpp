@@ -12,8 +12,10 @@ ofxNDIHelper::ofxNDIHelper()
 	path_Params_AppSettings = "Settings_App.json";
 
 #ifdef USE_WEBCAM
+
 	name_WebcamSettings = "Settings_Webcam.xml";
 	path_WebcamSettings = "Webcam/";
+
 #endif
 
 	//--
@@ -65,78 +67,6 @@ ofxNDIHelper::~ofxNDIHelper()
 #endif
 
 	exit();
-}
-
-//--
-
-//--------------------------------------------------------------
-void ofxNDIHelper::doReset_Gui()
-{
-	// Positions
-	position_Gui = glm::vec2(padg, padg);
-	gui_Controls.setPosition(position_Gui.get().x, position_Gui.get().y);
-
-	float w = gui_Controls.getWidth();
-	glm::vec2 pg = glm::vec2(position_Gui.get());
-	glm::vec2 p = glm::vec2(pg.x + w + padg, pg.y);
-	gui_Webcam.setPosition(p.x, p.y);
-	gui_NDI_Out.setPosition(p.x + gui_Webcam.getWidth() + padg, p.y);
-
-#ifdef USE_ofxNDI_IN
-	glm::vec2 pTr = glm::vec2(gui_NDI_Out.getShape().getTopRight());
-	glm::vec2 p2 = glm::vec2(pTr.x + padg, pTr.y);
-	NDI_Input1.setPositionGui(p2);
-
-	glm::vec2 p3 = glm::vec2(p2.x + padg + w, p2.y);
-	NDI_Input2.setPositionGui(p3);
-#endif
-}
-
-//--------------------------------------------------------------
-void ofxNDIHelper::setup_Gui()
-{
-	//--
-
-	// Setup Gui
-
-	gui_Controls.setup("ofxNDIHelper");
-	gui_Controls.add(params_Panels);
-	gui_Controls.add(params_User);
-	gui_Controls.add(params_Internal);
-
-#ifdef USE_WEBCAM
-
-	gui_Webcam.setup("WEBCAM");
-	//gui_Webcam.setup("WEBCAM | " + webcam_Name.get());
-
-	gui_Webcam.add(params_Webcam);
-	//gui_Webcam.minimizeAll();
-
-#endif
-
-#ifdef USE_ofxNDI_OUT
-
-	gui_NDI_Out.setup("NDI OUTPUT | " + NDI_Output_Name.get());
-	gui_NDI_Out.add(params_NDI_Output);
-	//gui_NDI_Out.minimizeAll();
-
-#endif
-
-	//--
-
-	doReset_Gui();
-
-	//--
-
-	// Collapse groups
-
-	auto& gi = gui_Controls.getGroup(params_Internal.getName());
-	auto& gp = gi.getGroup(position_Gui.getName());
-	gi.minimize();
-	gp.minimize();
-
-	auto& gpn = gui_Controls.getGroup(params_Panels.getName());
-	gpn.minimize();
 }
 
 //--------------------------------------------------------------
@@ -262,6 +192,55 @@ void ofxNDIHelper::setup()
 
 //--
 
+//--------------------------------------------------------------
+void ofxNDIHelper::setup_Gui()
+{
+	//--
+
+	// Setup Gui
+
+	gui_Controls.setup("ofxNDIHelper");
+	gui_Controls.add(params_Panels);
+	gui_Controls.add(params_User);
+	gui_Controls.add(params_Internal);
+
+#ifdef USE_WEBCAM
+
+	gui_Webcam.setup("WEBCAM");
+	//gui_Webcam.setup("WEBCAM | " + webcam_Name.get());
+
+	gui_Webcam.add(params_Webcam);
+	//gui_Webcam.minimizeAll();
+
+#endif
+
+#ifdef USE_ofxNDI_OUT
+
+	gui_NDI_Out.setup("NDI OUTPUT | " + NDI_Output_Name.get());
+	gui_NDI_Out.add(params_NDI_Output);
+	//gui_NDI_Out.minimizeAll();
+
+#endif
+
+	//--
+
+	doReset_Gui();
+
+	//--
+
+	// Collapse groups
+
+	auto& gi = gui_Controls.getGroup(params_Internal.getName());
+	auto& gp = gi.getGroup(position_Gui.getName());
+	gi.minimize();
+	gp.minimize();
+
+	auto& gpn = gui_Controls.getGroup(params_Panels.getName());
+	gpn.minimize();
+}
+
+//--
+
 #ifdef USE_WEBCAM
 
 //--------------------------------------------------------------
@@ -346,7 +325,9 @@ void ofxNDIHelper::setup_Params()
 	// WEBCAM
 
 #ifdef USE_WEBCAM
+
 	setup_Webcam_Params();
+
 #endif
 
 	//--
@@ -374,10 +355,10 @@ void ofxNDIHelper::setup_Params()
 
 	params_User.setName("NDI HELPER");
 	params_User.add(bHelp);
-	//params_User.add(bLockRatio);
 	params_User.add(bKeys);
 	params_User.add(bResetLayout);
 	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
+	//params_User.add(bLockRatio);
 
 	//--
 
@@ -390,8 +371,10 @@ void ofxNDIHelper::setup_Params()
 	params_Panels.add(bGui_NDI_OUT);
 
 #ifdef USE_ofxNDI_IN
+
 	params_Panels.add(NDI_Input1.bGui_Internal);
 	params_Panels.add(NDI_Input2.bGui_Internal);
+
 #endif
 
 	//--
@@ -399,7 +382,7 @@ void ofxNDIHelper::setup_Params()
 	params_Internal.setName("INTERNAL");
 
 	params_Internal.add(bActive);
-	params_Internal.add(bAutoSave);
+	params_Internal.add(bAutoSave);			
 	params_Internal.add(position_Gui);
 	//params_Internal.add(bDebug);
 
@@ -410,15 +393,19 @@ void ofxNDIHelper::setup_Params()
 	params_Callbacks.setName("Callbacks");
 
 #ifdef USE_WEBCAM
+
 	params_Callbacks.add(bWebcam_Next);
 	params_Callbacks.add(bWebcam_Enable);
 	params_Callbacks.add(bWebcam_Restart);
 	params_Callbacks.add(webcam_Index_Device);
+
 #endif
 
 #ifdef USE_ofxNDI_OUT
+
 	params_Callbacks.add(bNDI_Output_Enable);
 	params_Callbacks.add(NDI_Output_Name);
+
 #endif
 
 	params_Callbacks.add(bResetLayout);
@@ -441,18 +428,12 @@ void ofxNDIHelper::startup()
 
 	//--
 
-	loadSettings();
+	//loadSettings();
 
 	//--
 
 	// Fixes
 	// Workarounds
-
-	//bEdit = bEdit;
-
-	//--
-
-	//TODO: child frame
 
 	//-- 
 
@@ -462,6 +443,10 @@ void ofxNDIHelper::startup()
 	webcam_LoadSettings();
 
 #endif
+
+	//--
+
+	loadSettings();
 }
 
 //--------------------------------------------------------------
@@ -475,6 +460,7 @@ void ofxNDIHelper::update(ofEventArgs& args)
 	// startup waiting
 	if (!bLoadedStartup)
 	{
+
 #ifdef USE_ofxNDI_IN
 
 		if (NDI_Input1.bLoadedStartup && NDI_Input2.bLoadedStartup)
@@ -483,9 +469,9 @@ void ofxNDIHelper::update(ofEventArgs& args)
 
 			bLoadedStartup = true;
 
-			//fix
-			NDI_Input1.doScan();
-			NDI_Input2.doScan();
+			////fix
+			//NDI_Input1.doScan();
+			//NDI_Input2.doScan();
 		}
 
 #endif
@@ -497,7 +483,7 @@ void ofxNDIHelper::update(ofEventArgs& args)
 		return;
 	}
 
-	//-
+	//--
 
 #ifdef USE_WEBCAM
 
@@ -517,14 +503,13 @@ void ofxNDIHelper::update(ofEventArgs& args)
 
 #endif
 
-	//-
+	//--
 
 	if (bWebcam_Enable.get())
 	{
-		//ofBackground(100, 100, 100);
-
 		webcam_Grabber.update();
 
+		//ofBackground(100, 100, 100);
 		//if (webcam_Grabber.isFrameNew()) {
 		//	//ofPixels & pixels = webcam_Grabber.getPixels();
 		//	//for (size_t i = 0; i < pixels.size(); i++) {
@@ -544,7 +529,7 @@ void ofxNDIHelper::update(ofEventArgs& args)
 
 	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
 	{
-		ofLogNotice(__FUNCTION__) << "AutoSaved Settings";
+		ofLogNotice(__FUNCTION__) << "Auto Saved Settings";
 
 		ofLogLevel _logPre = ofGetLogLevel();
 		ofSetLogLevel(OF_LOG_SILENT);
@@ -643,8 +628,13 @@ void ofxNDIHelper::draw_Gui()
 	// Gui Panel
 	if (bGui_Controls)
 	{
+
+#ifdef USE_ofxNDI_IN
+
 		NDI_Input1.drawGui();
 		NDI_Input2.drawGui();
+
+#endif
 
 		// Gui panel
 		gui_Controls.draw();
@@ -846,6 +836,31 @@ void ofxNDIHelper::setGuiVisible(bool b)
 void ofxNDIHelper::setGuiToggleVisible()
 {
 	bGui = !bGui;
+}
+
+//--------------------------------------------------------------
+void ofxNDIHelper::doReset_Gui()
+{
+	// Positions
+	position_Gui = glm::vec2(padg, padg);
+	gui_Controls.setPosition(position_Gui.get().x, position_Gui.get().y);
+
+	float w = gui_Controls.getWidth();
+	glm::vec2 pg = glm::vec2(position_Gui.get());
+	glm::vec2 p = glm::vec2(pg.x + w + padg, pg.y);
+	gui_Webcam.setPosition(p.x, p.y);
+	gui_NDI_Out.setPosition(p.x + gui_Webcam.getWidth() + padg, p.y);
+
+#ifdef USE_ofxNDI_IN
+
+	glm::vec2 pTr = glm::vec2(gui_NDI_Out.getShape().getTopRight());
+	glm::vec2 p2 = glm::vec2(pTr.x + padg, pTr.y);
+	NDI_Input1.setPositionGui(p2);
+
+	glm::vec2 p3 = glm::vec2(p2.x + padg + w, p2.y);
+	NDI_Input2.setPositionGui(p3);
+
+#endif
 }
 
 //--------------------------------------------------------------

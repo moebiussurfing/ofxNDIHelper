@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEFAULT_STARTUP_WAITING_TIME 120 // in frames
+#define DEFAULT_STARTUP_WAITING_TIME 60 // in frames
 
 #define USE_ofxNDI_IN
 
@@ -140,7 +140,7 @@ private:
 	ofParameter<bool> bDrawMini;
 	ofParameter<int> indexDevice;
 	ofParameter<std::string> nameDevice;
-	std::string NDI_INPUT_Names_Devices;
+	std::string NDI_INPUT_Names_Devices = "NO DEVICES FOUND";
 
 public:
 
@@ -148,27 +148,29 @@ public:
 	void draw_NDI_IN_MiniPreview(bool bInfo = false);
 	void draw_NDI_IN_Full();
 
-	void doRefresh_NDI_IN();
+	void doInit();
+	//void doRefresh_NDI_IN();
 	
 	void doNext(); 
 	void doScan(); // scan network NDI devices!
 
 private:
-	
+	int nsenders = 0;
 	bool bEnable_PRE;//workaround
 
 	void setup_NDI_IN_ByIndex(int deviceIndex);
 	void setup_NDI_IN_ByName(string deviceName);
-	void setup_NDI_IN();
+	void setup_Fbo();
+	void setup_Receiver();
 	void draw_InfoDevices();
-	ofxNDIreceiver ndiReceiver; // NDI receiver
+	ofxNDIreceiver NDI_Receiver_Obj; // NDI receiver
 	ofFbo fbo_NDI_Receiver; // Fbo to receive
-	ofTexture ndiReceiveTexture; // Texture to receive
-	ofImage ndiReceiveImage; // Image to receive
-	ofPixels ndiReceivePixels; // Pixels to receive
-	unsigned char* ndiReceiveChars; // unsigned char image array to receive
-	unsigned int receiverWidth; // sender width and height needed to receive char pixels
-	unsigned int receiverHeight;
+	ofTexture tex_NDI_Receiver; // Texture to receive
+	//ofImage ndiReceiveImage; // Image to receive
+	//ofPixels ndiReceivePixels; // Pixels to receive
+	//unsigned char* ndiReceiveChars; // unsigned char image array to receive
+	unsigned int wReceiver; // sender width and height needed to receive char pixels
+	unsigned int hReceiver;
 
 	ofxSurfingBoxInteractive rect_NDI_IN;
 
@@ -176,10 +178,11 @@ private:
 
 	//--
 
+	//TODO:
 	//--------------------------------------------------------------
 	void doFixer()
 	{
-		int nsenders = ndiReceiver.GetSenderCount();
+		int nsenders = NDI_Receiver_Obj.GetSenderCount();
 		indexDevice.setMax(nsenders - 1);
 
 		// List all the senders
@@ -190,7 +193,7 @@ private:
 			NDI_INPUT_Names_Devices = "";
 			for (int i = 0; i < nsenders; i++)
 			{
-				string name = ndiReceiver.GetSenderName(i);
+				string name = NDI_Receiver_Obj.GetSenderName(i);
 				string str = ofToString(i) + " " + name;
 				ofLogNotice(__FUNCTION__) << str;
 
