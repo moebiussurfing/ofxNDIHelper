@@ -2,21 +2,26 @@
 //---
 
 /*
-*
+
 	TODO:
 
-	+ add inner rect container to center the webcam, zoom, rotate, translate inside!
-
+	+ TODO:
+	+ child_frame: make all transforms proportional to sizes
+		+ save load these settings.
+	
 	+ add full screen, fit, scale fit, half screen etc with an kind of ofRectangle ENUM list.
 
 	+ Real preview size or custom/fullsize.
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
 		+ e.g. ndi out do not fits exactly the fullwidth frame.
 
+	+ Split Webcam part as a new helper addon. ?
+	+ make cam a class to allow multiple. check MSA cam addon
+	https://github.com/memo/ofxMSAMultiCam
+
 	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
 
-	+ Fix directives to allow use i.e. only the camera or only the Output.
-		+ Split Webcam part as a new helper addon. ?
+	+ Fix directives+classes to allow use i.e. only the camera or only the Output.
 
 */
 
@@ -39,7 +44,8 @@
 
 //--
 
-#define USE_OFX_CHILD_FRAME //-> for translate webcam
+#define USE_OFX_CHILD_FRAME //-> WIP. For transform the Webcam content: zoom and translate.
+#define CHILD_FRAME_MAX_SCALE 5.f 
 
 
 //----
@@ -89,6 +95,7 @@ public:
 	ofxChildFrame frame_;
 	void mouseDragged(int x, int y, int button);
 	void mouseScrolled(ofMouseEventArgs& mouse);
+	bool bEnable_ChildFrame = true;
 #endif
 
 	ofxNDIHelper();
@@ -160,13 +167,13 @@ public:
 
 private:
 
-	//--------------------------------------------------------------
-	void startupFix()
-	{
-		ofLogNotice(__FUNCTION__);
+	////--------------------------------------------------------------
+	//void startupFix()
+	//{
+	//	ofLogNotice(__FUNCTION__);
 
-		//bEdit = bEdit_PRE;
-	}
+	//	//bEdit = bEdit_PRE;
+	//}
 
 	//--
 
@@ -174,7 +181,7 @@ private:
 
 	ofParameterGroup params_AppsSettings;
 	//ofParameter<bool> bLockRatio;
-	ofParameter<bool> bReset;
+	ofParameter<bool> bResetLayout;
 
 	bool bDoRestartup = false;
 	bool bLoadedStartup = false; // to hide all and waiting startup done to star drawing.
@@ -288,10 +295,24 @@ private:
 	//void exit_Webcam(); // store camera device name to xml
 	vector<ofVideoDevice> _devs;
 
+	//CHILD_FRAME
+	struct ChildFrame
+	{
+		ofVec3f anchor;
+		ofVec3f translat;
+		ofVec3f scale;
+	};
+	ChildFrame childFrame;
+	//char key_ChildFrame = OF_KEY_COMMAND;
+	bool bKeyChildFrameState = false;
+
 	//--
+
+	void setup_Webcam_Params();
 
 	void webcam_SaveSettings();
 	void webcam_LoadSettings();
+	void webcam_Next();
 
 public:
 
@@ -304,6 +325,7 @@ public:
 private:
 
 	ofParameter<bool> bWebcam_LockRatio;
+	ofParameter<bool> bWebcam_Next;
 	ofParameter<int> scaleMode_Index;
 	ofParameter<string> scaleMode_Name;
 	ofParameter<bool> bWebcam_Enable;

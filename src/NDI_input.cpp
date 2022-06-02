@@ -6,6 +6,9 @@
 NDI_input::NDI_input()
 {
 	ofAddListener(ofEvents().update, this, &NDI_input::update);
+	
+	//TODO:
+	doFixer();
 }
 
 //--------------------------------------------------------------
@@ -61,9 +64,26 @@ void NDI_input::setup(string _name)
 	bDISABLE_CALLBACKS = false;
 
 	loadSettings();
+
+	//--
+
+	////workaround
+	//bEnable_PRE = bEnable;
+	//bEnable = !bEnable;
 }
 
 //--
+
+//--------------------------------------------------------------
+void NDI_input::doNext()
+{
+	ofLogNotice(__FUNCTION__);
+
+	int i = indexDevice;
+	i++;
+	if (i == indexDevice.getMax() + 1) i = 0;
+	indexDevice = i;
+}
 
 //--------------------------------------------------------------
 void NDI_input::doScan()
@@ -78,13 +98,19 @@ void NDI_input::startup()
 {
 	ofLogNotice(__FUNCTION__);
 
+	//--
+	
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 	nameDevice = nameDevice;
 #else
 	indexDevice = indexDevice;
 #endif
 
-	//doScan();
+	//--
+
+	//bEnable = bEnable_PRE;//workaround
+
+	doScan();
 }
 
 //--------------------------------------------------------------
@@ -93,6 +119,7 @@ void NDI_input::setup_Params()
 	bGui_Preview.set("NDI PREVIEW " + name, true);
 	bGui_Internal.set("NDI CONTROLS " + name, true);
 
+	bNext.set("NEXT", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
 	bDebug.set("DEBUG", true);
 	position_Gui.set("GUI POSITION",
@@ -102,16 +129,16 @@ void NDI_input::setup_Params()
 	);
 
 	//bEdit.set("LAYOUT EDIT", true);
-
 	bReset.set("RESET PREVIEW", false);
-	bReset.setSerializable(false);
 
+	// Exclude
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 	indexDevice.setSerializable(false);
 #else
 	nameDevice.setSerializable(false);
 #endif
-
+	bReset.setSerializable(false);
+	bNext.setSerializable(false);
 
 	//--
 
@@ -128,6 +155,7 @@ void NDI_input::setup_Params()
 	params_NDI_Input.add(bEnable);
 	params_NDI_Input.add(bDraw);
 	params_NDI_Input.add(bDrawMini);
+	params_NDI_Input.add(bNext);
 	params_NDI_Input.add(indexDevice);
 	params_NDI_Input.add(nameDevice);
 	params_NDI_Input.add(bScan);
@@ -219,7 +247,10 @@ void NDI_input::setup_NDI_IN_ByName(string deviceName)
 
 	//indexDevice.setMax(ndiReceiver.GetSenderCount() - 1);
 
+	//--
+
 	//doRefresh_NDI_IN();
+
 	{
 		ofLogNotice(__FUNCTION__);
 
@@ -376,11 +407,10 @@ void NDI_input::drawGui()
 //--------------------------------------------------------------
 void NDI_input::update(ofEventArgs& args)
 {
-	//cout << __FUNCTION__ << endl;
-
 	if (!bLoadedStartup)
 		if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME)
 		{
+			ofLogNotice(__FUNCTION__) << "DEFAULT_STARTUP_WAITING_TIME Done!" << endl;
 			bLoadedStartup = true;
 
 			startup(); // fix
@@ -581,6 +611,8 @@ void NDI_input::loadSettings()
 {
 	ofLogNotice(__FUNCTION__);
 
+	//doRefresh_NDI_IN();
+
 	// load file settings
 	ofxSurfingHelpers::loadGroup(params, path_GLOBAL + path_Params_AppSettings);
 
@@ -702,6 +734,13 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 			doScan();
 			//doRefresh_NDI_IN();
+		}
+
+		else if (name == bNext.getName() && bNext.get())
+		{
+			bNext = false;
+
+			doNext();
 		}
 
 		//----
