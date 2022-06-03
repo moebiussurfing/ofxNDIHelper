@@ -5,11 +5,13 @@
 
 	TODO:
 
-	+ TODO:
-	+ child_frame: make all transforms proportional to sizes
+	+ Fix mode scale for Webcam
+		+ webcam mode scale move to params like ndi input class
+
+	+ TODO: WIP
+	+ child_frame: Finish make all transforms proportional to sizes
 		+ save load these settings.
-	
-	+ add full screen, fit, scale fit, half screen etc with an kind of ofRectangle ENUM list.
+		only zoom works.
 
 	+ Real preview size or custom/fullsize.
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
@@ -36,11 +38,6 @@
 
 #define USE_WEBCAM // Aux camera
 #define USE_ofxNDI_OUT // NDI out
-//#define USE_ofxNDI_IN // NDI input //-> moved to NDI_Input.h!
-
-// fix workaround startup
-//#define FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
-// NOTE: if webcam hangs during runtime, you should Disable and Enable again to restart/fix!
 
 //--
 
@@ -84,6 +81,7 @@ class ofxNDIHelper /*: public ofBaseApp*/
 {
 
 public:
+
 	float x;
 	float y;
 	float w;
@@ -93,7 +91,7 @@ public:
 
 #ifdef USE_OFX_CHILD_FRAME
 	ofxChildFrame frame_;
-	void mouseDragged(int x, int y, int button);
+	void mouseDragged(ofMouseEventArgs& mouse);
 	void mouseScrolled(ofMouseEventArgs& mouse);
 	bool bEnable_ChildFrame = true;
 #endif
@@ -115,16 +113,19 @@ private:
 	void startup();
 	void update(ofEventArgs& args);
 	void exit();
-
 	void draw_InfoDevices();
+
+	bool bLoadedStartupDone = false;
 
 #ifdef USE_ofxNDI_IN
 
 public:
+
 	void draw_NDI_IN_1();
 	void draw_NDI_IN_2();
 
 private:
+
 	void draw_NDI_IN_1_MiniPreview();
 	void draw_NDI_IN_1_Full();
 	void draw_NDI_IN_2_MiniPreview();
@@ -167,24 +168,12 @@ public:
 
 private:
 
-	////--------------------------------------------------------------
-	//void startupFix()
-	//{
-	//	ofLogNotice(__FUNCTION__);
-
-	//	//bEdit = bEdit_PRE;
-	//}
-
-	//--
-
-private:
-
 	ofParameterGroup params_AppsSettings;
 	//ofParameter<bool> bLockRatio;
 	ofParameter<bool> bResetLayout;
+	ofParameter<bool> bResetGui;
 
 	bool bDoRestartup = false;
-	bool bLoadedStartup = false; // to hide all and waiting startup done to star drawing.
 
 	//--
 

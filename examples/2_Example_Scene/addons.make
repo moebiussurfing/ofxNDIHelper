@@ -5,3 +5,4 @@ ofxSceneTEST
 ofxSurfingBox
 ofxSurfingHelpers
 ofxWindowApp
+ofxChildFrame

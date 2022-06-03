@@ -4,11 +4,14 @@
 
 /*
 	This example is an NDI Sender
+	but you can play too with the other receivers and webcam managers.
+	Notice that on this example, this previews will not been sended to the NDI Out!
+	Only the image scene.
+
 	Draws an animated background image into an NDI Out to be broad casted into your network.
 	Then can be received into any NDI receiver like an NDI Monitor app.
- 
 
-	To Test and understand how the addoon works:
+	To Test and understand how the addon works:
 
 	1. You should install the NDI Tools.
 	2. Run an NDI Monitor to preview what is being sent through the output.

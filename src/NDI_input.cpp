@@ -28,11 +28,13 @@ void NDI_input::setup(string _name)
 	rect_NDI_IN.setPathGlobal(path_GLOBAL);
 	rect_NDI_IN.setMode(ofxSurfingBoxInteractive::FREE_LAYOUT);
 	rect_NDI_IN.setup();
+	rect_NDI_IN.setUseBorder(true);
 
 	path_Params_AppSettings = "NDI_IN_" + name + ".json";
 
 	string _str = "telegrama_render.otf";
 	string _pathFont = "assets/fonts/" + _str;
+
 	float _size;
 	bool b;
 
@@ -54,55 +56,37 @@ void NDI_input::setup(string _name)
 
 	setup_Params();
 
-	bDISABLE_CALLBACKS = false;
-
 	//--
-
-	doInit();//list devices
 
 	setup_Fbo();
 
-	setup_Receiver();
+	doListDevices();
 
-	//--
-
-	loadSettings();
-
-	//--
-
-
-	////workaround
-	//bEnable_PRE = bEnable;
-	//bEnable = !bEnable;
+	bDISABLE_CALLBACKS = false;
 }
 
 //--------------------------------------------------------------
 void NDI_input::startup()
 {
-	ofLogNotice(__FUNCTION__);
+	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
 	loadSettings();
 
 	//--
 
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-	nameDevice = nameDevice;
-#else
-	indexDevice = indexDevice;
-#endif
+	// Force callback!
+
+//#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+//	//nameDevice = nameDevice;
+//	setup_ByName(nameDevice);
+//#else
+//	//indexDevice = indexDevice;
+//	setup_ByIndex(indexDevice);
+//#endif
 
 	//--
 
-	//bEnable = bEnable_PRE;//workaround
-
-	//--
-
-	//bEdit = bEdit;
-	indexDevice = indexDevice;
-
-	doScan();
-
-	setup_NDI_IN_ByName(nameDevice);
+	bLoadedStartupDone = true;
 }
 
 //--------------------------------------------------------------
@@ -110,20 +94,24 @@ void NDI_input::setup_Params()
 {
 	bGui_Preview.set("NDI PREVIEW " + name, true);
 	bGui_Internal.set("NDI CONTROLS " + name, true);
-
 	bNext.set("NEXT", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
 	bDebug.set("DEBUG", true);
+
 	position_Gui.set("GUI POSITION",
 		glm::vec2(screenW * 0.5, screenH * 0.5),
 		glm::vec2(0, 0),
 		glm::vec2(screenW, screenH)
 	);
 
-	//bEdit.set("LAYOUT EDIT", true);
+	scaleMode_Index.set("SCALE MODE", 0, 0, 3);
+	scaleMode_Name.set("SCALE", "");
 	bReset.set("RESET PREVIEW", false);
 
+	//--
+
 	// Exclude
+
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 	indexDevice.setSerializable(false);
 #else
@@ -131,6 +119,7 @@ void NDI_input::setup_Params()
 #endif
 	bReset.setSerializable(false);
 	bNext.setSerializable(false);
+	scaleMode_Name.setSerializable(false);
 
 	//--
 
@@ -139,7 +128,7 @@ void NDI_input::setup_Params()
 	bEnable.set("ENABLE", false);
 	bDraw.set("DRAW", true);
 	indexDevice.set("INDEX", 0, 0, 1);
-	nameDevice.set("NAME", "ofxNDIHelperIN");
+	nameDevice.set("DEVICE", "ofxNDIHelperIN");
 	bDrawMini.set("MINI", true);
 	bScan.set("SCAN!", false);
 	bScan.setSerializable(false);
@@ -147,25 +136,33 @@ void NDI_input::setup_Params()
 	params_NDI_Input.add(bEnable);
 	params_NDI_Input.add(bDraw);
 	params_NDI_Input.add(bDrawMini);
-	params_NDI_Input.add(bNext);
 	params_NDI_Input.add(indexDevice);
 	params_NDI_Input.add(nameDevice);
-	params_NDI_Input.add(bScan);
+	params_NDI_Input.add(bNext);
+	params_NDI_Input.add(scaleMode_Index);
+	params_NDI_Input.add(scaleMode_Name);
+	//params_NDI_Input.add(bScan);//now is automatic
 
 	//--
 
 	// Input
 
 	params_Control.setName("CONTROL");
+	params_Control.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
+	params_Control.add(rect_NDI_IN.bEdit);
 	params_Control.add(bReset);
 	params_Control.add(bLockRatio);
 	params_Control.add(position_Gui);
-	//params_Control.add(bEdit);
-	//params_Control.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 
 	params.setName("NDI INPUT");
 	params.add(params_Control);
 	params.add(params_NDI_Input);
+
+	//--
+
+	// Gui
+
+	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
 	gui_Control.setup("NDI INPUT | " + name);
 	gui_Control.add(params);
@@ -185,148 +182,21 @@ void NDI_input::setup_Params()
 //--
 
 //--------------------------------------------------------------
-void NDI_input::setup_NDI_IN_ByIndex(int deviceIndex)
-{
-	if (indexDevice != deviceIndex) indexDevice = deviceIndex;
-
-	setup_Receiver();
-}
-
-//--------------------------------------------------------------
-void NDI_input::setup_NDI_IN_ByName(string deviceName)
-{
-	// Search the device index by name
-
-	if (nameDevice.get() != deviceName) nameDevice = deviceName;
-
-	int _indexTarget = -1;
-
-#ifdef _WIN64
-	ofLogNotice(__FUNCTION__) << "\nofxNDI example receiver - 64 bit";
-#else //_WIN64
-	ofLogNotice(__FUNCTION__) << "\nofxNDI example receiver - 32 bit";
-#endif //_WIN64
-	ofLogNotice(__FUNCTION__) << NDI_Receiver_Obj.GetNDIversion() << " (http://ndi.tv/)";
-	ofLogNotice(__FUNCTION__) << "Press 'SPACE' to list NDI senders";
-
-	//--
-
-	// TODO:
-
-	// ofFbo
-
-	// receiver dimensions and fps are not known yet
-
-	//wReceiver = (unsigned char)ofGetWidth();
-	//hReceiver = (unsigned char)ofGetHeight();
-
-	wReceiver = 1920;
-	hReceiver = 1080;
-
-	fbo_NDI_Receiver.allocate(wReceiver, hReceiver, GL_RGBA);
-
-	// Clear the fbo so the first frame draw is black
-	fbo_NDI_Receiver.begin();
-	ofClear(0, 0, 0, 255);
-	fbo_NDI_Receiver.end();
-
-	// ofTexture
-	tex_NDI_Receiver.allocate(wReceiver, hReceiver, GL_RGBA);
-
-	//indexDevice.setMax(NDI_Receiver_Obj.GetSenderCount() - 1);
-
-	//--
-
-	//doRefresh_NDI_IN();
-
-	{
-		ofLogNotice(__FUNCTION__);
-
-		//char name[256];
-		nsenders = NDI_Receiver_Obj.GetSenderCount();
-		indexDevice.setMax(nsenders - 1);
-
-		// List all the senders
-		if (nsenders > 0)
-		{
-			ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
-
-			NDI_INPUT_Names_Devices = "";
-			for (int i = 0; i < nsenders; i++)
-			{
-				string name = NDI_Receiver_Obj.GetSenderName(i);
-
-				if (nameDevice.get() == name) {
-					_indexTarget = i;
-					indexDevice = i;
-				}
-
-				string str = ofToString(i) + " " + name;
-				ofLogNotice(__FUNCTION__) << str;
-
-				NDI_INPUT_Names_Devices += str;
-				NDI_INPUT_Names_Devices += "\n";
-
-				//if (i != nsenders - 1) NDI_INPUT_Names_Devices += "\n";
-			}
-
-			//if (nsenders > 1)
-			//	ofLogNotice(__FUNCTION__) << "Press key [0] to [" << nsenders - 1 << "] to select a sender";
-		}
-		else ofLogNotice(__FUNCTION__) << "No NDI senders found";
-
-		if (_indexTarget == -1)
-		{
-			ofLogError(__FUNCTION__) << "Device name not found on NDI senders list!";
-			return;
-		}
-	}
-
-	//-
-
-	//{
-	//	nsenders = NDI_Receiver_Obj.GetSenderCount();
-	//	indexDevice.setMax(nsenders - 1);
-	//	int index = indexDevice.get();
-	//	char name[256];
-
-	//	if (nsenders > 0 && index >= 0 && index < nsenders)
-	//	{
-	//		// Update the receiver with the returned index
-	//		// Returns false if the current sender is selected
-	//		if (NDI_Receiver_Obj.SetSenderIndex(index))
-	//		{
-	//			ofLogNotice(__FUNCTION__) << "Selected [" << NDI_Receiver_Obj.GetSenderName(index) << "]";
-	//			NDI_Receiver_Obj.GetSenderName(name, 256, index);
-	//			ofLogNotice(__FUNCTION__) << "    Sender " << index << " [" << name << "]";
-	//			//std::string my_string(name);
-	//			//nameDevice = my_string;
-	//			nameDevice = NDI_Receiver_Obj.GetSenderName(index);//TODO: not required
-	//			ofLogNotice(__FUNCTION__) << "nameDevice: " << nameDevice.get();
-	//		}
-	//		else ofLogNotice(__FUNCTION__) << "Stay in same sender";
-	//	}
-	//	else
-	//	{
-	//		ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
-	//	}
-	//}
-}
-
-//--------------------------------------------------------------
 void NDI_input::setup_Fbo()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
 	//--
 
-	// ofFbo
+	// Fbo
 
 	// receiver dimensions and fps are not known yet
 
 	//wReceiver = (unsigned char)ofGetWidth();
 	//hReceiver = (unsigned char)ofGetHeight();
 
+	//TODO:
+	// hardcoded
 	wReceiver = 1920;
 	hReceiver = 1080;
 
@@ -338,60 +208,110 @@ void NDI_input::setup_Fbo()
 	fbo_NDI_Receiver.begin();
 	ofClear(0, 0, 0, 255);
 	fbo_NDI_Receiver.end();
+
+	//--
+
+	// ofTexture
+	tex_NDI_Receiver.allocate(wReceiver, hReceiver, GL_RGBA);
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup_Receiver()
+void NDI_input::setup_ByIndex()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
-#ifdef _WIN64
-	ofLogNotice(__FUNCTION__) << "\nofxNDI example receiver - 64 bit";
-#else //_WIN64
-	ofLogNotice(__FUNCTION__) << "\nofxNDI example receiver - 32 bit";
-#endif //_WIN64
-	ofLogNotice(__FUNCTION__) << NDI_Receiver_Obj.GetNDIversion() << " (http://ndi.tv/)";
-	ofLogNotice(__FUNCTION__) << "Press 'SPACE' to list NDI senders";
-
-	//--
-	// 
-	// ofTexture
-	tex_NDI_Receiver.allocate(wReceiver, hReceiver, GL_RGBA);
-
 	//--
 
-	// list devices
-
-	//doRefresh_NDI_IN();
-	//doInit();
-
-	//--
-
-	nsenders = NDI_Receiver_Obj.GetSenderCount();
+	nsenders = NDI_Receiver.GetSenderCount();
 	indexDevice.setMax(nsenders - 1);
-	int index = indexDevice.get();
-	char __name[256];
 
-	if (nsenders > 0 && index >= 0 && index < nsenders)
+	int i = indexDevice.get();
+
+	if (nsenders > 0 && i >= 0 && i < nsenders)
 	{
 		// Update the receiver with the returned index
 		// Returns false if the current sender is selected
 
-		if (NDI_Receiver_Obj.SetSenderIndex(index))
+		if (NDI_Receiver.SetSenderIndex(i))
 		{
-			ofLogNotice(__FUNCTION__) << "Selected [" << NDI_Receiver_Obj.GetSenderName(index) << "]";
-			NDI_Receiver_Obj.GetSenderName(__name, 256, index);
-			ofLogNotice(__FUNCTION__) << "    Sender " << index << " [" << __name << "]";
-			//std::string my_string(name);
-			//nameDevice = my_string;
-			nameDevice = NDI_Receiver_Obj.GetSenderName(index);
-			ofLogNotice(__FUNCTION__) << "nameDevice: " << nameDevice.get();
+			nameDevice.setWithoutEventNotifications(NDI_Receiver.GetSenderName(i));
+
+			ofLogNotice(__FUNCTION__) << "Device Name: " << nameDevice.get() << " #" << i;
 		}
 
-		else ofLogNotice(__FUNCTION__) << "Stay in same sender";
+		else ofLogWarning(__FUNCTION__) << "Stay in same sender #" << i;
 	}
-	else ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
+	else
+	{
+		ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
+		ofLogError(__FUNCTION__) << "OR INDEX OUT OF RANGE.";
+	}
 }
+
+//--------------------------------------------------------------
+void NDI_input::setup_ByIndex(int _indexDevice)
+{
+	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+
+	// Search the device by index
+
+	if (indexDevice != _indexDevice) indexDevice.setWithoutEventNotifications(_indexDevice);
+
+	setup_ByIndex();
+}
+
+//--------------------------------------------------------------
+void NDI_input::setup_ByName(string _nameDevice)
+{
+	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+
+	// Search the device by name
+
+	if (nameDevice.get() != _nameDevice) nameDevice.setWithoutEventNotifications(_nameDevice);
+
+	int _indexTarget = -1;
+
+	//--
+
+	ofLogNotice(__FUNCTION__);
+
+	nsenders = NDI_Receiver.GetSenderCount();
+	indexDevice.setMax(nsenders - 1);
+
+	// List all the senders
+
+	if (nsenders > 0)
+	{
+		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
+
+		for (int i = 0; i < nsenders; i++)
+		{
+			// Same name found!
+
+			if (nameDevice.get() == NDI_Receiver.GetSenderName(i))
+			{
+				_indexTarget = i;
+
+				indexDevice.setWithoutEventNotifications(i);
+				setup_ByIndex(indexDevice);
+
+				break;
+			}
+
+			ofLogNotice(__FUNCTION__) << "Sender: #" << ofToString(i) + " " + name;
+		}
+	}
+	else ofLogNotice(__FUNCTION__) << "No NDI senders found";
+
+	if (_indexTarget == -1)
+	{
+		ofLogError(__FUNCTION__) << "Device name not found on NDI senders names list!";
+
+		return;
+	}
+}
+
+//--
 
 //--------------------------------------------------------------
 void NDI_input::drawGui()
@@ -405,44 +325,66 @@ void NDI_input::drawGui()
 //--------------------------------------------------------------
 void NDI_input::update(ofEventArgs& args)
 {
-	//ofLogWarning(__FUNCTION__);
+	updateWorkaround();
+}
 
-	if (nsenders == 0 && (ofGetFrameNum() % 60 == 0))
-	{
-		ofLogWarning(__FUNCTION__) << "NO DEVICES FOUND..." << endl;
-
-		doInit();//list devices
-		setup_Receiver();
+//--------------------------------------------------------------
+void NDI_input::updateWorkaround()
+{
+	static int nsenders_PRE = 0;
+	if (nsenders != nsenders_PRE) {
+		nsenders_PRE = nsenders;
+		doListDevices();
 	}
 
-	//if (!bLoadedStartup)
-	//	if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME)
-	//	{
-	//		ofLogNotice(__FUNCTION__) << "DEFAULT_STARTUP_WAITING_TIME Done!" << endl;
-	//		bLoadedStartup = true;
+	if (bEnable)
+		if (nsenders == 0 && (ofGetFrameNum() % 120 == 0))
+		{
+			ofLogWarning(__FUNCTION__) << "NO DEVICES FOUND...";
+		}
 
-	//		startup(); // fix
-	//	}
+	//--
+
+	// uncomment to delay some frames...
+	//if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME) 
+	{
+		if (!bLoadedStartupDone)
+		{
+			ofLogNotice(__FUNCTION__) << "DEFAULT_STARTUP_WAITING_TIME Done!" << endl;
+
+			startup(); // fix
+		}
+	}
+
+	if (!bFoundSendersDone && bLoadedStartupDone)
+	{
+		if (nsenders > 0)
+		{
+			bFoundSendersDone = true;
+
+			// reload settings again when senders are found!
+			loadSettings();
+		}
+	}
 }
 
 //--------------------------------------------------------------
 void NDI_input::draw() {
 
 	if (!bGui_Preview) return;
-	if (!bLoadedStartup) return;
-
-	if (bDebug)
-	{
-		// Show what it is receiving
-		draw_InfoDevices();
-	}
+	if (!bLoadedStartupDone) return;
 
 	//-
 
-	// NDI IN
 	if (bEnable.get() && bDraw.get())
 	{
-		draw_NDI_IN();
+		draw_Main();
+
+		if (bDebug)
+		{
+			// Show what it is receiving
+			draw_InfoDevices();
+		}
 	}
 }
 
@@ -453,45 +395,36 @@ void NDI_input::draw_InfoDevices() {
 
 	// NDI IN
 
-	if (bEnable.get() && bDraw.get() && bDrawMini.get())
+	if (bEnable.get() && bDraw.get())
 	{
 		string str = "";
 
-		nsenders = NDI_Receiver_Obj.GetSenderCount();
+		nsenders = NDI_Receiver.GetSenderCount();
 		if (nsenders > 0)
 		{
-			if (NDI_Receiver_Obj.ReceiverCreated())
+			if (NDI_Receiver.ReceiverCreated())
 			{
-				if (NDI_Receiver_Obj.ReceiverConnected())
+				if (NDI_Receiver.ReceiverConnected())
 				{
 					// Show received sender information and received fps
-					str += ofToString(NDI_Receiver_Obj.GetSenderName().c_str());
+					str += ofToString(NDI_Receiver.GetSenderName().c_str());
 					str += " " + ofToString(indexDevice.get()) + "\n";
-					str += ofToString(NDI_Receiver_Obj.GetSenderWidth());
-					str += "x" + ofToString(NDI_Receiver_Obj.GetSenderHeight()) + "px | ";
-					str += "FPS " + ofToString(NDI_Receiver_Obj.GetSenderFps()) + " / ";
-					str += ofToString(NDI_Receiver_Obj.GetFps()) + "";
+					str += ofToString(NDI_Receiver.GetSenderWidth());
+					str += "x" + ofToString(NDI_Receiver.GetSenderHeight()) + "px | ";
+					str += "FPS " + ofToString(NDI_Receiver.GetSenderFps()) + " / ";
+					str += ofToString(NDI_Receiver.GetFps()) + "";
 				}
 				else
 				{
 					// Nothing received
-					str += "> " + ofToString(NDI_Receiver_Obj.GetSenderName().c_str());
+					str += "" + ofToString(NDI_Receiver.GetSenderName().c_str());
 				}
 			}
-
-			//str += "\n\n";
-			//if (nsenders == 1) {
-			//	str += "1 SOURCE";
-			//}
-			//else {
-			//	str += ofToString(nsenders) + " SOURCES \n";
-			//	//str += "Space key > List sources";
-			//}
 		}
 		else
 		{
 			str += "\n";
-			str += "Connecting...";
+			str += "CONNECTING...";
 		}
 
 		str += "\n\n";
@@ -499,99 +432,128 @@ void NDI_input::draw_InfoDevices() {
 		// NDI input devices list
 		if (NDI_INPUT_Names_Devices.size() > 0)
 		{
-			//str += "DEVICES \n\n";
 			str += NDI_INPUT_Names_Devices;
 		}
 
 		//--
 
-		glm::vec2 p = rect_NDI_IN.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+		// Devices
+
+		glm::vec2 p;
+		if (bDrawMini.get()) {
+			p = rect_NDI_IN.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+		}
+		else {
+			auto shape = ofxSurfingHelpers::getShapeBBtextBoxed(font, str);
+			p = glm::vec2(ofGetWidth() - (shape.x), ofGetHeight() - (shape.y));
+		}
 		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
+
+		//--
+
+		// Top info
+
+		if (!bDrawMini.get())
+		{
+			glm::vec2 p = glm::vec2(20 + _padx, 40 + _pady);
+			ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+		}
+		else
+		{
+			glm::vec2 p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+			ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+		}
 	}
 }
 
 //--
 
 //--------------------------------------------------------------
-void NDI_input::draw_NDI_IN_MiniPreview(bool bInfo)
+void NDI_input::draw_MiniPreview()
 {
 	if (!bEnable.get()) return;
 
 	// Receive ofTexture
-	NDI_Receiver_Obj.ReceiveImage(tex_NDI_Receiver);//read to texture
+	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
 
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	if (bLockRatio.get()) {
+	if (bLockRatio.get())
+	{
 		float _ratio = tex_NDI_Receiver.getHeight() / tex_NDI_Receiver.getWidth();
 		rect_NDI_IN.setHeight(rect_NDI_IN.getWidth() * _ratio);
 	}
-	tex_NDI_Receiver.draw(rect_NDI_IN.getX(), rect_NDI_IN.getY(), rect_NDI_IN.getWidth(), rect_NDI_IN.getHeight());
+
+	ofRectangle rSrc(0, 0, tex_NDI_Receiver.getWidth(), tex_NDI_Receiver.getHeight());
+	ofRectangle rTar(rect_NDI_IN.getX(), rect_NDI_IN.getY(), rect_NDI_IN.getWidth(), rect_NDI_IN.getHeight());
+	rSrc.scaleTo(rTar, scaleMode);
+
+	// Image
+	//tex_NDI_Receiver.draw(rect_NDI_IN.getX(), rect_NDI_IN.getY(), rect_NDI_IN.getWidth(), rect_NDI_IN.getHeight());
+	
+	tex_NDI_Receiver.draw(rSrc.getX(), rSrc.getY(), rSrc.getWidth(), rSrc.getHeight());
+	//tex_NDI_Receiver.draw(rTar.getX(), rTar.getY(), rTar.getWidth(), rTar.getHeight());
+
+	// Rect container 
+	// (overlay changes when editing)
 	rect_NDI_IN.draw();
 
-	// bb border
-	ofNoFill();
-	ofSetColor(0);
-	ofSetLineWidth(2.0);
-	ofDrawRectangle(rect_NDI_IN.getRectangle());
-
-	// Top info: Name
-	if (bDebug && bInfo)
-	{
-		glm::vec2 p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-		ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
-	}
+	//// Top info: Name
+	//if (bDebug)
+	//{
+	//	glm::vec2 p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+	//	ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+	//}
 
 	ofPopStyle();
 }
 
 //--------------------------------------------------------------
-void NDI_input::draw_NDI_IN_Full()
+void NDI_input::draw_FullScreen()
 {
 	if (!bEnable.get()) return;
 
 	// Receive ofTexture
-	NDI_Receiver_Obj.ReceiveImage(tex_NDI_Receiver);//read to texture
+	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
 
 	ofPushStyle();
 	ofSetColor(255, 255);
 
 	ofRectangle r(0, 0, tex_NDI_Receiver.getWidth(), tex_NDI_Receiver.getHeight());
-
-	r.scaleTo(ofGetWindowRect());
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_CENTER);
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_STRETCH_TO_FILL);
-	//r.scaleTo(ofGetWindowRect(), OF_SCALEMODE_FILL);
+	r.scaleTo(ofGetWindowRect(), scaleMode);
 
 	tex_NDI_Receiver.draw(r.x, r.y, r.width, r.height);
 
 	ofPopStyle();
-
-	//--
-
-	// Top info
-	if (bDebug)
-	{
-		auto p = glm::vec2(20 + _padx, 40 + _pady);
-		ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
-	}
 }
 
 //--------------------------------------------------------------
-void NDI_input::draw_NDI_IN()
+void NDI_input::draw_Main()
 {
-	if (bDrawMini.get()) draw_NDI_IN_MiniPreview(true);
-	else draw_NDI_IN_Full();
+	if (bDrawMini.get()) draw_MiniPreview();
+	else draw_FullScreen();
 }
 
 //--------------------------------------------------------------
-void NDI_input::doInit()//list devices
+void NDI_input::doListDevices()//list devices
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
-	nsenders = NDI_Receiver_Obj.GetSenderCount();
+#ifdef _WIN64
+	ofLogNotice(__FUNCTION__) << "\n ofxNDI example receiver - 64 bit";
+#else //_WIN64
+	ofLogNotice(__FUNCTION__) << "\n ofxNDI example receiver - 32 bit";
+#endif //_WIN64
+	ofLogNotice(__FUNCTION__) << NDI_Receiver.GetNDIversion() << " (http://ndi.tv/)";
+	ofLogNotice(__FUNCTION__) << "Press 'SPACE' to list NDI senders";
+
+	//--
+
+	nsenders = NDI_Receiver.GetSenderCount();
 	indexDevice.setMax(nsenders - 1);
+
+	//--
 
 	// List all the senders
 
@@ -603,9 +565,7 @@ void NDI_input::doInit()//list devices
 
 		for (int i = 0; i < nsenders; i++)
 		{
-			string name = NDI_Receiver_Obj.GetSenderName(i);
-
-			string str = ofToString(i) + " " + name;
+			string str = ofToString(i) + " " + NDI_Receiver.GetSenderName(i);
 			ofLogNotice(__FUNCTION__) << str;
 
 			NDI_INPUT_Names_Devices += str;
@@ -615,49 +575,13 @@ void NDI_input::doInit()//list devices
 	else ofLogError(__FUNCTION__) << "No NDI senders found";
 }
 
-////--------------------------------------------------------------
-//void NDI_input::doRefresh_NDI_IN()
-//{
-//	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
-//
-//	nsenders = NDI_Receiver_Obj.GetSenderCount();
-//	indexDevice.setMax(nsenders - 1);
-//
-//	// List all the senders
-//
-//	if (nsenders > 0)
-//	{
-//		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
-//
-//		NDI_INPUT_Names_Devices = "";
-//
-//		for (int i = 0; i < nsenders; i++)
-//		{
-//			string name = NDI_Receiver_Obj.GetSenderName(i);
-//
-//			string str = ofToString(i) + " " + name;
-//			ofLogNotice(__FUNCTION__) << str;
-//
-//			NDI_INPUT_Names_Devices += str;
-//			NDI_INPUT_Names_Devices += "\n";
-//		}
-//	}
-//	else ofLogNotice(__FUNCTION__) << "No NDI senders found";
-//}
-
 //--------------------------------------------------------------
 void NDI_input::loadSettings()
 {
 	ofLogNotice(__FUNCTION__);
 
-	//doRefresh_NDI_IN();
-
 	// load file settings
 	ofxSurfingHelpers::loadGroup(params, path_GLOBAL + path_Params_AppSettings);
-
-	//--
-
-	//doRefresh_NDI_IN();
 
 	//--
 
@@ -705,8 +629,7 @@ void NDI_input::doScan()
 {
 	ofLogNotice(__FUNCTION__);
 
-	//doRefresh_NDI_IN();
-	doInit();
+	doListDevices();
 }
 
 //--------------------------------------------------------------
@@ -740,6 +663,56 @@ void NDI_input::Changed(ofAbstractParameter& e)
 	//----
 
 	if (0) {}
+
+	//--
+
+	// Device
+	// NDI IN 
+
+	else if (name == bEnable.getName() && bEnable.get())
+	{
+#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+		setup_ByName(nameDevice);
+#else
+		setup_ByIndex(indexDevice);
+#endif
+		//--
+
+		////TODO:
+		////close device
+		//if (!bEnable) {
+		//	NDI_Receiver.
+		//}
+	}
+
+	//--
+
+#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+	else if (name == nameDevice.getName() /*&& bEnable.get()*/)
+	{
+		setup_ByName(nameDevice);
+	}
+#endif
+
+	//--
+
+	else if (name == indexDevice.getName() /*&& bEnable.get()*/)
+	{
+		setup_ByIndex(indexDevice);
+	}
+
+	//--
+
+	else if (name == scaleMode_Index.getName() /*&& bEnable.get()*/)
+	{
+		switch (scaleMode_Index)
+		{
+		case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
+		case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
+		case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
+		case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+		}
+	}
 
 	//--
 
@@ -786,35 +759,6 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 		doNext();
 	}
-
-	//--
-
-	// NDI IN 
-
-	else if (name == bEnable.getName() && bEnable.get())
-	{
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-		setup_NDI_IN_ByName(nameDevice);
-#else
-		setup_Receiver(indexDevice);
-#endif
-	}
-
-	//--
-
-	else if (name == indexDevice.getName() && bEnable.get())
-	{
-		setup_NDI_IN_ByIndex(indexDevice);
-	}
-
-	//--
-
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-	else if (name == nameDevice.getName() && bEnable.get())
-	{
-		setup_NDI_IN_ByName(nameDevice);
-	}
-#endif
 
 	//--
 

@@ -13,7 +13,7 @@
 #include "ofxGui.h"
 #include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingHelpers.h"
-
+#include "ofxSurfing_ofxGui.h"|
 
 #define DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 
@@ -22,7 +22,8 @@ class NDI_input
 
 public:
 	
-	bool bLoadedStartup = false; // to hide all and waiting startup done to star drawing.
+	bool bLoadedStartupDone = false; // to hide all and waiting startup done to start drawing.
+	bool bFoundSendersDone = false; 
 
 	NDI_input();
 	~NDI_input();
@@ -35,6 +36,8 @@ public:
 	void windowResized(int w, int h);
 	void exit();
 	void startup();
+	
+	void updateWorkaround();//workaround to make sure that settings are loaded fine.
 
 	ofParameterGroup params;
 
@@ -59,9 +62,21 @@ public:
 	ofParameter<glm::vec2> position_Gui;
 
 	ofParameter<bool> bLockRatio;
+	
+	ofParameter<int> scaleMode_Index;
+	ofParameter<string> scaleMode_Name;
+	ofScaleMode scaleMode;
+
 	ofParameter<bool> bDebug;
 	ofParameter<bool> bReset;
 	ofParameter<bool> bNext;
+
+public:
+
+	void setDebug(bool b) { bDebug = b; }
+	void setMini(bool b) { bDrawMini = b; }
+	void setToggleDebug() { bDebug = !bDebug; }
+	void setToggleMini() { bDrawMini = !bDrawMini; }
 
 private:
 
@@ -144,28 +159,32 @@ private:
 
 public:
 
-	void draw_NDI_IN();
-	void draw_NDI_IN_MiniPreview(bool bInfo = false);
-	void draw_NDI_IN_Full();
+	void draw_Main();
+	void draw_MiniPreview();
+	void draw_FullScreen();
 
-	void doInit();
+	void doListDevices();
 	//void doRefresh_NDI_IN();
 	
 	void doNext(); 
 	void doScan(); // scan network NDI devices!
 
 private:
-	int nsenders = 0;
-	bool bEnable_PRE;//workaround
 
-	void setup_NDI_IN_ByIndex(int deviceIndex);
-	void setup_NDI_IN_ByName(string deviceName);
+	int nsenders = 0;
+	//bool bEnable_PRE;//workaround
+
+	void setup_ByIndex(int _indexDevice);
+	void setup_ByName(string _nameDevice);
 	void setup_Fbo();
-	void setup_Receiver();
+	void setup_ByIndex();
+
 	void draw_InfoDevices();
-	ofxNDIreceiver NDI_Receiver_Obj; // NDI receiver
+
+	ofxNDIreceiver NDI_Receiver; // NDI receiver
 	ofFbo fbo_NDI_Receiver; // Fbo to receive
 	ofTexture tex_NDI_Receiver; // Texture to receive
+	
 	//ofImage ndiReceiveImage; // Image to receive
 	//ofPixels ndiReceivePixels; // Pixels to receive
 	//unsigned char* ndiReceiveChars; // unsigned char image array to receive
@@ -182,7 +201,7 @@ private:
 	//--------------------------------------------------------------
 	void doFixer()
 	{
-		int nsenders = NDI_Receiver_Obj.GetSenderCount();
+		int nsenders = NDI_Receiver.GetSenderCount();
 		indexDevice.setMax(nsenders - 1);
 
 		// List all the senders
@@ -193,7 +212,7 @@ private:
 			NDI_INPUT_Names_Devices = "";
 			for (int i = 0; i < nsenders; i++)
 			{
-				string name = NDI_Receiver_Obj.GetSenderName(i);
+				string name = NDI_Receiver.GetSenderName(i);
 				string str = ofToString(i) + " " + name;
 				ofLogNotice(__FUNCTION__) << str;
 

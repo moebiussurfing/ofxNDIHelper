@@ -13,7 +13,7 @@ void ofApp::update()
 {
 	NDIHelper.begin_NDI_OUT();
 	{
-		// Draw Webcam full
+		// Draw Webcam at full screen size
 		NDIHelper.draw_Webcam_Full();
 	}
 	NDIHelper.end_NDI_OUT();
@@ -22,11 +22,6 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	// Draw Webcam preview
-	NDIHelper.draw_Webcam_MiniPreview();
-
-	//--
-
 	// Draw Previews
 	NDIHelper.draw();
 
@@ -40,9 +35,4 @@ void ofApp::draw()
 void ofApp::windowResized(int w, int h) {
 
 	NDIHelper.windowResized(w, h);
-}
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) {
-
-	NDIHelper.mouseDragged(x, y, button);
 }

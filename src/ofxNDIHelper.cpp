@@ -49,6 +49,7 @@ ofxNDIHelper::ofxNDIHelper()
 #ifdef USE_OFX_CHILD_FRAME
 	ofAddListener(ofEvents().update, this, &ofxNDIHelper::update);
 	ofAddListener(ofEvents().mouseScrolled, this, &ofxNDIHelper::mouseScrolled);
+	ofAddListener(ofEvents().mouseDragged, this, &ofxNDIHelper::mouseDragged);
 #endif
 }
 
@@ -64,6 +65,7 @@ ofxNDIHelper::~ofxNDIHelper()
 #ifdef USE_OFX_CHILD_FRAME
 	ofRemoveListener(ofEvents().update, this, &ofxNDIHelper::update);
 	ofRemoveListener(ofEvents().mouseScrolled, this, &ofxNDIHelper::mouseScrolled);
+	ofRemoveListener(ofEvents().mouseDragged, this, &ofxNDIHelper::mouseDragged);
 #endif
 
 	exit();
@@ -151,6 +153,7 @@ void ofxNDIHelper::setup()
 	rect_NDI_OUT.setName(name_rect_NDI_OUT);
 	rect_NDI_OUT.setPathGlobal(path_GLOBAL + path_rect_NDI_OUT);
 	rect_NDI_OUT.setup();
+	rect_NDI_OUT.setUseBorder(true);
 
 #endif
 
@@ -305,13 +308,16 @@ void ofxNDIHelper::setup_Params()
 	//bEdit.set("LAYOUT EDIT", true);
 	//bLockRatio.set("LOCK ASPECT RATIO", true);
 	bResetLayout.set("RESET LAYOUT", false);
+	bResetGui.set("RESET GUI", false);
 	bKeys.set("KEYS", true);
 	bDebug.set("DEBUG", true);
+
 	bResetLayout.setSerializable(false);
+	bResetGui.setSerializable(false);
+	bActive.setSerializable(false);
 
 	// Internal
 	bActive.set("ACTIVE", true);
-	bActive.setSerializable(false);
 	bHelp.set("HELP", false);
 	bAutoSave.set("AUTO SAVE", false);
 	position_Gui.set("GUI POSITION",
@@ -357,6 +363,7 @@ void ofxNDIHelper::setup_Params()
 	params_User.add(bHelp);
 	params_User.add(bKeys);
 	params_User.add(bResetLayout);
+	params_User.add(bResetGui);
 	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
 	//params_User.add(bLockRatio);
 
@@ -382,7 +389,7 @@ void ofxNDIHelper::setup_Params()
 	params_Internal.setName("INTERNAL");
 
 	params_Internal.add(bActive);
-	params_Internal.add(bAutoSave);			
+	params_Internal.add(bAutoSave);
 	params_Internal.add(position_Gui);
 	//params_Internal.add(bDebug);
 
@@ -409,6 +416,7 @@ void ofxNDIHelper::setup_Params()
 #endif
 
 	params_Callbacks.add(bResetLayout);
+	params_Callbacks.add(bResetGui);
 	params_Callbacks.add(position_Gui);
 	params_Callbacks.add(bActive);
 
@@ -423,17 +431,6 @@ void ofxNDIHelper::startup()
 	//---
 
 	bDISABLE_CALLBACKS = false;
-
-	//position_Gui.set(glm::vec2(ofGetWidth() - 210, 10));
-
-	//--
-
-	//loadSettings();
-
-	//--
-
-	// Fixes
-	// Workarounds
 
 	//-- 
 
@@ -452,35 +449,23 @@ void ofxNDIHelper::startup()
 //--------------------------------------------------------------
 void ofxNDIHelper::update(ofEventArgs& args)
 {
-	//if (ofGetFrameNum() == 1)
-	//{
-	//	startupFix();
-	//}
+	if (!bActive) return;
 
 	// startup waiting
-	if (!bLoadedStartup)
+	if (!bLoadedStartupDone)
 	{
 
 #ifdef USE_ofxNDI_IN
 
-		if (NDI_Input1.bLoadedStartup && NDI_Input2.bLoadedStartup)
+		if (NDI_Input1.bLoadedStartupDone && NDI_Input2.bLoadedStartupDone)
 		{
 			ofLogNotice(__FUNCTION__) << "LOADED STARTUP Done";
 
-			bLoadedStartup = true;
-
-			////fix
-			//NDI_Input1.doScan();
-			//NDI_Input2.doScan();
+			bLoadedStartupDone = true;
 		}
 
 #endif
 
-	}
-
-	if (!bActive)
-	{
-		return;
 	}
 
 	//--
@@ -508,17 +493,6 @@ void ofxNDIHelper::update(ofEventArgs& args)
 	if (bWebcam_Enable.get())
 	{
 		webcam_Grabber.update();
-
-		//ofBackground(100, 100, 100);
-		//if (webcam_Grabber.isFrameNew()) {
-		//	//ofPixels & pixels = webcam_Grabber.getPixels();
-		//	//for (size_t i = 0; i < pixels.size(); i++) {
-		//	//	//invert the color of the pixel
-		//	//	videoInverted[i] = 255 - pixels[i];
-		//	//}
-		//	////load the inverted pixels
-		//	//videoTexture.loadData(videoInverted);
-		//}
 	}
 
 #endif
@@ -544,29 +518,29 @@ void ofxNDIHelper::update(ofEventArgs& args)
 // Channel 1
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_1() {
-	NDI_Input1.draw_NDI_IN();
+	NDI_Input1.draw_Main();
 }
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_1_MiniPreview() {
-	NDI_Input1.draw_NDI_IN_MiniPreview();
+	NDI_Input1.draw_MiniPreview();
 }
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_1_Full() {
-	NDI_Input1.draw_NDI_IN_Full();
+	NDI_Input1.draw_FullScreen();
 }
 
 // Channel 2
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_2() {
-	NDI_Input2.draw_NDI_IN();
+	NDI_Input2.draw_Main();
 }
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_2_MiniPreview() {
-	NDI_Input2.draw_NDI_IN_MiniPreview();
+	NDI_Input2.draw_MiniPreview();
 }
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_NDI_IN_2_Full() {
-	NDI_Input2.draw_NDI_IN_Full();
+	NDI_Input2.draw_FullScreen();
 }
 
 #endif
@@ -574,7 +548,7 @@ void ofxNDIHelper::draw_NDI_IN_2_Full() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw() {
 	if (!bGui) return;
-	if (!bLoadedStartup) return;
+	if (!bLoadedStartupDone) return;
 
 	//-
 
@@ -888,6 +862,13 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 		doReset_Mini_PreviewsLayout();
 	}
 
+	else if (name == bResetGui.getName() && bResetGui)
+	{
+		bResetGui = false;
+
+		doReset_Gui();
+	}
+
 	//----
 
 	// WEBCAM
@@ -1087,14 +1068,19 @@ void ofxNDIHelper::setup_Webcam(int index)
 #ifdef USE_OFX_CHILD_FRAME
 
 //--------------------------------------------------------------
-void ofxNDIHelper::mouseDragged(int x, int y, int button) {
+void ofxNDIHelper::mouseDragged(ofMouseEventArgs& mouse) {
+
+	int x = mouse.x;
+	int y = mouse.y;
+	int button = mouse.button;
+
 	if (!bEnable_ChildFrame) return;
 	if (!bKeyChildFrameState) return;
 
 	switch (button)
 	{
 
-		//case OF_MOUSE_BUTTON_2:
+	//case OF_MOUSE_BUTTON_2:
 	case OF_MOUSE_BUTTON_LEFT:
 	{
 		TransformNode& node = frame_.getInnerTransformNode();
@@ -1222,6 +1208,7 @@ void ofxNDIHelper::setup_Webcam() {
 	rect_Webcam.setName(path_rect_Webcam);
 	rect_Webcam.setPathGlobal(path_GLOBAL + path_WebcamSettings);
 	rect_Webcam.setup();
+	rect_Webcam.setUseBorder(true);
 
 #ifdef USE_OFX_CHILD_FRAME
 
@@ -1267,27 +1254,51 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 			h = rect_Webcam.getHeight();
 			wc = w / 2.f;
 			hc = h / 2.f;
+			
+			frame_.setSize(w, h);
 
-			//if (bEnable_ChildFrame)
-			{
-				frame_.setSize(w, h);
-				TransformNode& node = frame_.getInnerTransformNode();
-				node.setAnchorPoint(x + wc, y + hc, 0);
-				node.setTranslation(wc, hc, 0);
-
-				//node.setAnchorPoint(childFrame.anchor);
-				//node.setTranslation(childFrame.translat);
-				//node.setScale(childFrame.scale);
-			}
+			////if (bEnable_ChildFrame)
+			//{
+			//  frame_.setSize(w, h);
+			//	TransformNode& node = frame_.getInnerTransformNode();
+			//	node.setAnchorPoint(x + wc, y + hc, 0);
+			//	node.setTranslation(wc, hc, 0);
+			//	//node.setAnchorPoint(childFrame.anchor);
+			//	//node.setTranslation(childFrame.translat);
+			//	//node.setScale(childFrame.scale);
+			//}
 		}
 
+
+		//if (bEnable_ChildFrame)
+		{
+			x = rect_Webcam.getX();
+			y = rect_Webcam.getY();
+			w = rect_Webcam.getWidth();
+			h = rect_Webcam.getHeight();
+			wc = w / 2.f;
+			hc = h / 2.f;
+
+			// required to mantain position after moving box..
+			//frame_.setSize(w, h);
+			TransformNode& node = frame_.getInnerTransformNode();
+			node.setAnchorPoint(x + wc, y + hc, 0);
+			node.setTranslation(wc, hc, 0);
+
+/*			TransformNode& node = frame_.getInnerTransformNode();
+			node.setAnchorPoint(childFrame.anchor);
+			node.setTranslation(childFrame.translat);
+			node.setScale(childFrame.scale)*/;
+		}
+
+		// draw
 		frame_.begin();
 		ofSetColor(255, 255);
 		webcam_Grabber.draw(x, y, w, h);
 		frame_.end();
 		frame_.draw(x, y);
 
-		//debug
+		// debug
 		if (0)
 		{
 			stringstream ss;
@@ -1299,9 +1310,9 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 #endif
 
 		//--
-		// 
+		 
 		//TODO:
-		// 
+		 
 		// Viewport
 
 		ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
@@ -1334,13 +1345,6 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 
 		// interactive box
 		rect_Webcam.draw();
-
-		// bb border
-		ofNoFill();
-		ofSetColor(0);
-		//ofSetColor(ofColor::red);
-		ofSetLineWidth(2.0);
-		ofDrawRectangle(rect_Webcam.getRectangle());
 
 		ofPopStyle();
 	}
@@ -1812,20 +1816,6 @@ void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo)
 	fbo_NDI_Sender.draw(rect_NDI_OUT.getX(), rect_NDI_OUT.getY(), rect_NDI_OUT.getWidth(), rect_NDI_OUT.getHeight());
 	rect_NDI_OUT.draw();
 
-	// bb border
-	ofNoFill();
-	ofSetColor(0);
-	ofSetLineWidth(2.0);
-	ofDrawRectangle(rect_NDI_OUT.getRectangle());
-
-	//// Top info
-	//if (bDebug && bInfo)
-	//{
-	//	glm::vec2 p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-	//	string s = "NDI OUT | " + NDI_Output_Name.get();
-	//	ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
-	//}
-
 	//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
 
 	ofPopStyle();
@@ -1948,7 +1938,8 @@ void ofxNDIHelper::windowResized(int w, int h)
 	screenW = w;
 	screenH = h;
 
-	//TODO:
+	//TODO:\
+	// don't does nothing yet! 
 	//NDI_OUT_Sender.UpdateSender(1920, 1080);//update size
 
 #ifdef USE_ofxNDI_IN

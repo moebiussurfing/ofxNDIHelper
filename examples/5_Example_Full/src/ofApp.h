@@ -3,12 +3,12 @@
 #include "ofMain.h"
 
 /*
-	This example is an NDI Sender
-	Draws an webcam image at full screen into an NDI Out to be broad casted into your network.
-	Then can be received into any NDI receiver like an NDI Monitor app.
-	Also you will draw the preview webcam for monitoring purposes.
 
-	To Test and understand how the addon works:
+	This example feeds all the manager signals into the NDI Out.
+	The you can pick your network NDI inputs and webcam,
+	resize the mini previews and this layout will be sent to the NDI Out as is.
+
+	To Test and understand how it works:
 
 	1. You should install the NDI Tools.
 	2. Run an NDI Monitor to preview what is being sent through the output.
@@ -19,9 +19,15 @@
 */
 
 
-#include "ofxNDIHelper.h"
+#define USE_ofxNDI //-> ifdef directives stuff to help copy paste to other app projects.
 
+#ifdef USE_ofxNDI
+#include "ofxNDIHelper.h"
+#endif
+
+#include "ofxSurfingHelpers.h"
 #include "ofxGui.h"
+#include "ofxWindowApp.h"
 
 class ofApp : public ofBaseApp
 {
@@ -32,8 +38,20 @@ public:
 	void update();
 	void draw();
 	void windowResized(int w, int h);
+	void exit();
 
 public:
 
+#ifdef USE_ofxNDI
 	ofxNDIHelper NDIHelper;
+#endif
+
+	//--
+
+	ofxWindowApp windowApp;
+
+	//--
+
+	ofxPanel gui;
+	ofParameterGroup params{"ofApp"};
 };

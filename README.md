@@ -66,6 +66,7 @@ void ofApp::draw()
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 * [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
+* [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
 * ofxGui / From oF Core  
 
 <details>
