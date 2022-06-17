@@ -66,11 +66,27 @@ void NDI_input::setup(string _name)
 }
 
 //--------------------------------------------------------------
+void NDI_input::startupDelayed()
+{
+	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+
+	////restore
+	//bEnable = bEnable_PRE;
+	bEnable = bEnable;
+
+}
+
+//--------------------------------------------------------------
 void NDI_input::startup()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
 	loadSettings();
+
+	////store
+	//bEnable_PRE = bEnable;
+	////flip
+	//bEnable = !bEnable;
 
 	//--
 
@@ -331,6 +347,8 @@ void NDI_input::update(ofEventArgs& args)
 //--------------------------------------------------------------
 void NDI_input::updateWorkaround()
 {
+	static int timer = 0;
+
 	static int nsenders_PRE = 0;
 	if (nsenders != nsenders_PRE) {
 		nsenders_PRE = nsenders;
@@ -353,6 +371,8 @@ void NDI_input::updateWorkaround()
 			ofLogNotice(__FUNCTION__) << "DEFAULT_STARTUP_WAITING_TIME Done!" << endl;
 
 			startup(); // fix
+
+			timer = ofGetFrameNum();
 		}
 	}
 
@@ -366,6 +386,14 @@ void NDI_input::updateWorkaround()
 			loadSettings();
 		}
 	}
+
+	//if (bLoadedStartupDone && bFoundSendersDone)
+	//{
+	//	if ((ofGetFrameNum() - timer) == (int)DEFAULT_STARTUP_WAITING_TIME)
+	//	{
+	//		startupDelayed();
+	//	}
+	//}
 }
 
 //--------------------------------------------------------------
@@ -491,7 +519,7 @@ void NDI_input::draw_MiniPreview()
 
 	// Image
 	//tex_NDI_Receiver.draw(rect_NDI_IN.getX(), rect_NDI_IN.getY(), rect_NDI_IN.getWidth(), rect_NDI_IN.getHeight());
-	
+
 	tex_NDI_Receiver.draw(rSrc.getX(), rSrc.getY(), rSrc.getWidth(), rSrc.getHeight());
 	//tex_NDI_Receiver.draw(rTar.getX(), rTar.getY(), rTar.getWidth(), rTar.getHeight());
 

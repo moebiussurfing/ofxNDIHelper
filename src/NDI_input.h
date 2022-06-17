@@ -1,5 +1,15 @@
 #pragma once
 
+/*
+
+	TODO:
+	
+	fix startup
+
+*/
+
+//--
+
 #define DEFAULT_STARTUP_WAITING_TIME 60 // in frames
 
 #define USE_ofxNDI_IN
@@ -24,6 +34,8 @@ public:
 	
 	bool bLoadedStartupDone = false; // to hide all and waiting startup done to start drawing.
 	bool bFoundSendersDone = false; 
+	
+	bool bEnable_PRE = false; 
 
 	NDI_input();
 	~NDI_input();
@@ -36,6 +48,7 @@ public:
 	void windowResized(int w, int h);
 	void exit();
 	void startup();
+	void startupDelayed();
 	
 	void updateWorkaround();//workaround to make sure that settings are loaded fine.
 

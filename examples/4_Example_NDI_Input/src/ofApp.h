@@ -15,7 +15,7 @@
 */
 
 
-#include "NDI_input.h" //-> We can use the NDI input class alone.
+#include "NDI_input.h" //-> We can use the NDI input class alone.`
 
 #include "ofxGui.h"
 

@@ -41,9 +41,7 @@
 
 //--
 
-#define USE_OFX_CHILD_FRAME //-> WIP. For transform the Webcam content: zoom and translate.
-#define CHILD_FRAME_MAX_SCALE 5.f 
-
+//#define USE_OFX_CHILD_FRAME //-> WIP. For transform the Webcam content: zoom and translate. Requires ofxChildFrame.
 
 //----
 
@@ -67,13 +65,16 @@
 
 #include "ofxGui.h"
 #include "ofxSurfingBoxInteractive.h"
+#include "ofxSurfingBoxHelpText.h"
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfing_ofxGui.h"
-#include "TextBoxWidget.h"
+//#include "TextBoxWidget.h"
 
 #ifdef USE_OFX_CHILD_FRAME
 #include "ofxChildFrame.h"
 #endif
+
+#define CHILD_FRAME_MAX_SCALE 5.f 
 
 //--
 
@@ -177,7 +178,7 @@ private:
 
 	//--
 
-	TextBoxWidget textBoxWidget;
+	ofxSurfingBoxHelpText textBoxWidget;
 
 public:
 
