@@ -54,6 +54,11 @@ public:
 
 	ofParameterGroup params;
 
+	//--------------------------------------------------------------
+	ofParameterGroup& getParameters() {
+		return params;
+	}
+
 private:
 
 	ofParameterGroup params_Control;

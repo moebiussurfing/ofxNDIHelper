@@ -5,6 +5,8 @@
 
 	TODO:
 
+	+ split ndi out to a class like for ndi input
+
 	+ Fix mode scale for Webcam
 		+ webcam mode scale move to params like ndi input class
 

@@ -73,7 +73,6 @@ void NDI_input::startupDelayed()
 	////restore
 	//bEnable = bEnable_PRE;
 	bEnable = bEnable;
-
 }
 
 //--------------------------------------------------------------
@@ -108,8 +107,13 @@ void NDI_input::startup()
 //--------------------------------------------------------------
 void NDI_input::setup_Params()
 {
-	bGui_Preview.set("NDI PREVIEW " + name, true);
-	bGui_Internal.set("NDI CONTROLS " + name, true);
+	//TODO: rename toggles
+	//bGui_Preview.set("NDI PREVIEW " + name, true);
+	//bGui_Internal.set("NDI CONTROLS " + name, true);
+
+	bGui_Preview.set("NDI PREVIEW", true);
+	bGui_Internal.set("NDI CONTROLS", true);
+
 	bNext.set("NEXT", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
 	bDebug.set("DEBUG", true);
@@ -171,8 +175,8 @@ void NDI_input::setup_Params()
 	params_Control.add(position_Gui);
 
 	params.setName("NDI INPUT");
-	params.add(params_Control);
 	params.add(params_NDI_Input);
+	params.add(params_Control);
 
 	//--
 
@@ -180,7 +184,8 @@ void NDI_input::setup_Params()
 
 	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
-	gui_Control.setup("NDI INPUT | " + name);
+	//gui_Control.setup("NDI INPUT | " + name);
+	gui_Control.setup("NDI INPUT");
 	gui_Control.add(params);
 
 	auto& gc = gui_Control.getGroup(params.getName()).getGroup(params_Control.getName());
@@ -332,7 +337,7 @@ void NDI_input::setup_ByName(string _nameDevice)
 //--------------------------------------------------------------
 void NDI_input::drawGui()
 {
-	if (!bGui_Preview) return;
+	//if (!bGui_Preview) return;
 	if (!bGui_Internal) return;
 
 	gui_Control.draw();
