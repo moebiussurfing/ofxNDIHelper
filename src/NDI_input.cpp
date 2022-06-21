@@ -32,19 +32,22 @@ void NDI_input::setup(string _name)
 
 	path_Params_AppSettings = "NDI_IN_" + name + ".json";
 
-	string _str = "telegrama_render.otf";
+	//string _str = "telegrama_render.otf";
+	//string _str = "Inconsolata_Condensed-ExtraLight.ttf";
+	string _str = "JetBrainsMonoNL-ExtraBold.ttf";
+	
 	string _pathFont = "assets/fonts/" + _str;
 
 	float _size;
 	bool b;
 
-	_size = 7;
+	_size = 8;
 	b = font.load(_pathFont, _size);
 	if (!b) b = font.load(OF_TTF_MONO, _size);
 
-	_size = 9;
-	b = fontBig.load(_pathFont, _size);
-	if (!b) b = fontBig.load(OF_TTF_MONO, _size);
+	//_size = 9;
+	//b = fontBig.load(_pathFont, _size);
+	//if (!b) b = fontBig.load(OF_TTF_MONO, _size);
 
 	//--
 
@@ -110,9 +113,11 @@ void NDI_input::setup_Params()
 	//TODO: rename toggles
 	//bGui_Preview.set("NDI PREVIEW " + name, true);
 	//bGui_Internal.set("NDI CONTROLS " + name, true);
+	bGui_Preview.set("IN PREVIEW" + name, true);
+	bGui_Internal.set("IN " + name, true);
 
-	bGui_Preview.set("NDI PREVIEW", true);
-	bGui_Internal.set("NDI CONTROLS", true);
+	//bGui_Preview.set("NDI PREVIEW", true);
+	//bGui_Internal.set("NDI CONTROLS", true);
 
 	bNext.set("NEXT", false);
 	bLockRatio.set("LOCK ASPECT RATIO", true);
@@ -150,7 +155,7 @@ void NDI_input::setup_Params()
 	indexDevice.set("INDEX", 0, 0, 1);
 	nameDevice.set("DEVICE", "ofxNDIHelperIN");
 	bDrawMini.set("MINI", true);
-	bScan.set("SCAN!", false);
+	bScan.set("SCAN", false);
 	bScan.setSerializable(false);
 
 	params_NDI_Input.add(bEnable);
@@ -161,7 +166,7 @@ void NDI_input::setup_Params()
 	params_NDI_Input.add(bNext);
 	params_NDI_Input.add(scaleMode_Index);
 	params_NDI_Input.add(scaleMode_Name);
-	//params_NDI_Input.add(bScan);//now is automatic
+	params_NDI_Input.add(bScan);//now is automatic
 
 	//--
 
@@ -185,13 +190,18 @@ void NDI_input::setup_Params()
 	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
 	//gui_Control.setup("NDI INPUT | " + name);
-	gui_Control.setup("NDI INPUT");
+	gui_Control.setup("IN " + name);
+	//gui_Control.setup("NDI IN " + name);
+	//gui_Control.setup("NDI INPUT");
 	gui_Control.add(params);
 
 	auto& gc = gui_Control.getGroup(params.getName()).getGroup(params_Control.getName());
 	auto& gp = gc.getGroup(position_Gui.getName());
 	gc.minimize();
 	gp.minimize();
+	
+	auto& gg = gui_Control.getGroup(params.getName());
+	gg.minimize();
 
 	//--
 
@@ -463,6 +473,7 @@ void NDI_input::draw_InfoDevices() {
 		str += "\n\n";
 
 		// NDI input devices list
+
 		if (NDI_INPUT_Names_Devices.size() > 0)
 		{
 			str += NDI_INPUT_Names_Devices;
@@ -470,32 +481,54 @@ void NDI_input::draw_InfoDevices() {
 
 		//--
 
-		// Devices
-
 		glm::vec2 p;
-		if (bDrawMini.get()) {
-			p = rect_NDI_IN.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
-		}
-		else {
-			auto shape = ofxSurfingHelpers::getShapeBBtextBoxed(font, str);
-			p = glm::vec2(ofGetWidth() - (shape.x), ofGetHeight() - (shape.y));
-		}
-		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
-
-		//--
 
 		// Top info
+		//int px = 2;
 
 		if (!bDrawMini.get())
 		{
-			glm::vec2 p = glm::vec2(20 + _padx, 40 + _pady);
-			ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+			p = glm::vec2(20 + _padx, 40 + _pady);
 		}
 		else
 		{
-			glm::vec2 p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-			ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+			if (bLabelsInner)
+			{
+				int h = pad / 2 + font.getSize() + padLabel;
+				p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, h);
+			}
+			else {
+				p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+			}
 		}
+
+		ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, round, -1, true);
+
+		//--
+
+		// Devices
+
+		if (bDrawMini.get())
+		{
+			p = rect_NDI_IN.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+		}
+		else
+		{
+			auto shape = ofxSurfingHelpers::getShapeBBtextBoxed(font, str);
+			p = glm::vec2(ofGetWidth() - (shape.x), ofGetHeight() - (shape.y));
+		}
+
+		if (bLabelsInner)
+		{
+			int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str);
+			//int h = pad / 2 + font.getSize() + padLabel;
+			p = p - glm::vec2(0, h - 33);
+		}
+		else
+		{
+		}
+		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, round, -1, true);
+
 	}
 }
 
@@ -536,7 +569,7 @@ void NDI_input::draw_MiniPreview()
 	//if (bDebug)
 	//{
 	//	glm::vec2 p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-	//	ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+	//	ofxSurfingHelpers::drawTextBoxed(font, "NDI IN | " + name, p.x, p.y, 255, 0, false, 128, pad,round, -1, true);
 	//}
 
 	ofPopStyle();

@@ -22,14 +22,14 @@ ofxNDIHelper::ofxNDIHelper()
 
 	// Help box
 	textBoxWidget.setPath(path_GLOBAL + "HelpBox/");
-	textBoxWidget.setup();
 
 	// text
 	std::string helpInfo = "";
-
 	helpInfo += "HELP \n";
 	helpInfo += "NDI MANAGER \n";
-	helpInfo += "\n";
+	textBoxWidget.setTitle(helpInfo);
+
+	helpInfo = "";
 	helpInfo += "DoubleClick Previews Edit/Lock \n";
 	helpInfo += "\n";
 	helpInfo += "KEYS \n";
@@ -40,7 +40,12 @@ ofxNDIHelper::ofxNDIHelper()
 	helpInfo += "R              LAYOUT RESET \n";
 	helpInfo += "D              DEBUG \n";
 
+	textBoxWidget.setup();
+
 	textBoxWidget.setText(helpInfo);
+
+	bHelp.makeReferenceTo(textBoxWidget.bGui);
+	//textBoxWidget.bGui.makeReferenceTo(bHelp);
 
 	//--
 
@@ -87,7 +92,11 @@ void ofxNDIHelper::setup()
 
 	// Gui display font
 
-	string _str = "telegrama_render.otf";
+	string _str = "JetBrainsMonoNL-ExtraBold.ttf";
+	//string _str = "telegrama_render.otf";
+	//string _str = "AnonymousPro-Regular.ttf";
+	//string _str = "JetBrainsMono-ExtraBold.ttf";
+	//string _str = "Inconsolata_Condensed-Light.ttf";
 
 	//string _str = "iflash-502.ttf";
 	//string _str = "iflash-705.ttf";
@@ -98,13 +107,15 @@ void ofxNDIHelper::setup()
 	float _size;
 	bool b;
 
-	_size = 7;
+	_size = 8;
+	//_size = 7;
 	b = font.load(_pathFont, _size);
 	if (!b) b = font.load(OF_TTF_MONO, _size);
 
-	_size = 9;
-	b = fontBig.load(_pathFont, _size);
-	if (!b) b = fontBig.load(OF_TTF_MONO, _size);
+	//_size = 13;
+	////_size = 9;
+	//b = fontBig.load(_pathFont, _size);
+	//if (!b) b = fontBig.load(OF_TTF_MONO, _size);
 
 	//--
 
@@ -133,11 +144,11 @@ void ofxNDIHelper::setup()
 #ifdef USE_ofxNDI_IN
 
 	NDI_Input1.setPathGlobal(path_GLOBAL + "NDI_Input1/");
-	NDI_Input1.setup("macOS");
+	NDI_Input1.setup("Patterns");
 	NDI_Input1.bDebug.makeReferenceTo(bDebug);
 
 	NDI_Input2.setPathGlobal(path_GLOBAL + "NDI_Input2/");
-	NDI_Input2.setup("RPi");
+	NDI_Input2.setup("VLC");
 	NDI_Input2.bDebug.makeReferenceTo(bDebug);
 
 #endif
@@ -180,7 +191,7 @@ void ofxNDIHelper::setup()
 	params_AppsSettings.add(params_Panels);
 
 	//params_AppsSettings.add(bLockRatio);
-	//params_AppsSettings.add(params_User); //-> crashes. why??
+	//params_AppsSettings.add(params_Helper); //-> crashes. why??
 
 	//--
 
@@ -204,7 +215,7 @@ void ofxNDIHelper::setup_Gui()
 
 	gui_Controls.setup("ofxNDIHelper");
 	gui_Controls.add(params_Panels);
-	gui_Controls.add(params_User);
+	gui_Controls.add(params_Helper);
 	gui_Controls.add(params_Internal);
 
 #ifdef USE_WEBCAM
@@ -219,7 +230,7 @@ void ofxNDIHelper::setup_Gui()
 
 #ifdef USE_ofxNDI_OUT
 
-	gui_NDI_Out.setup("NDI OUTPUT | " + NDI_Output_Name.get());
+	gui_NDI_Out.setup("OUT | " + NDI_Output_Name.get());
 	gui_NDI_Out.add(params_NDI_Output);
 	//gui_NDI_Out.minimizeAll();
 
@@ -238,8 +249,17 @@ void ofxNDIHelper::setup_Gui()
 	gi.minimize();
 	gp.minimize();
 
+	auto& gh = gui_Controls.getGroup(params_Helper.getName());
+	gh.minimize();
+
 	auto& gpn = gui_Controls.getGroup(params_Panels.getName());
 	gpn.minimize();
+
+	auto& gw = gui_Webcam.getGroup(params_Webcam.getName());
+	gw.minimize();
+
+	auto& go = gui_NDI_Out.getGroup(params_NDI_Output.getName());
+	go.minimize();
 }
 
 //--
@@ -303,7 +323,7 @@ void ofxNDIHelper::setup_Params()
 	bGui.set("NDI HELPER", true);
 	bGui_Controls.set("NDI CONTROLS", true);
 	bGui_Webcam.set("WEBCAM", true);
-	bGui_NDI_OUT.set("NDI OUT", true);
+	bGui_NDI_OUT.set("OUT", true);
 
 	//bEdit.set("LAYOUT EDIT", true);
 	//bLockRatio.set("LOCK ASPECT RATIO", true);
@@ -345,13 +365,13 @@ void ofxNDIHelper::setup_Params()
 	bNDI_Output_Enable.set("OUT ENABLE", false);
 	bNDI_Output_Draw.set("OUT DRAW", true);
 	bNDI_Output_Mini.set("OUT MINI", true);
-	NDI_Output_Name.set("OUT", "oF OUT");
+	NDI_Output_Name.set("OUT", "oF");
 
 	params_NDI_Output.setName("NDI OUTPUT");
+	params_NDI_Output.add(NDI_Output_Name);
 	params_NDI_Output.add(bNDI_Output_Enable);
 	params_NDI_Output.add(bNDI_Output_Draw);
 	params_NDI_Output.add(bNDI_Output_Mini);
-	params_NDI_Output.add(NDI_Output_Name);
 
 #endif
 
@@ -359,30 +379,32 @@ void ofxNDIHelper::setup_Params()
 
 	// Gui Params
 
-	params_User.setName("NDI HELPER");
-	params_User.add(bHelp);
-	params_User.add(bKeys);
-	params_User.add(bResetLayout);
-	params_User.add(bResetGui);
-	params_User.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
-	//params_User.add(bLockRatio);
+	params_Helper.setName("NDI HELPER");
+	params_Helper.add(bHelp);
+	params_Helper.add(bKeys);
+	params_Helper.add(bResetLayout);
+	params_Helper.add(bResetGui);
+	params_Helper.add(bDebug);
+	//TODO: BUG: not linking when makeReference from parent scope..
+	//params_Helper.add(bLockRatio);
 
 	//--
 
 	// Params Internal 
 
 	params_Panels.setName("PANELS");
+
 	//params_Panels.add(bGui);
-	params_Panels.add(bGui_Controls);
+	//params_Panels.add(bGui_Controls);
+
 	params_Panels.add(bGui_Webcam);
-	params_Panels.add(bGui_NDI_OUT);
 
 #ifdef USE_ofxNDI_IN
-
 	params_Panels.add(NDI_Input1.bGui_Internal);
 	params_Panels.add(NDI_Input2.bGui_Internal);
-
 #endif
+
+	params_Panels.add(bGui_NDI_OUT);
 
 	//--
 
@@ -547,8 +569,8 @@ void ofxNDIHelper::draw_NDI_IN_2_Full() {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::draw() {
-	if (!bGui) return;
-	if (!bLoadedStartupDone) return;
+	//if (!bGui) return;
+	//if (!bLoadedStartupDone) return;
 
 	//-
 
@@ -602,6 +624,35 @@ void ofxNDIHelper::draw_Gui()
 	// Gui Panel
 	if (bGui_Controls)
 	{
+		bool bGuiLink = true;
+		if (bGuiLink) {
+			glm::vec2 pad(1, 0);
+			auto p = gui_Controls.getShape().getTopRight() + pad;
+			if (bGui_Webcam) {
+				gui_Webcam.setPosition(p);
+				p = gui_Webcam.getShape().getTopRight() + pad;
+			}
+			if (NDI_Input1.bGui_Internal) {
+				NDI_Input1.gui_Control.setPosition(p);
+				p = NDI_Input1.gui_Control.getShape().getTopRight() + pad;
+			}
+			if (NDI_Input2.bGui_Internal) {
+				NDI_Input2.gui_Control.setPosition(p);
+				p = NDI_Input2.gui_Control.getShape().getTopRight() + pad;
+			}
+			if (bGui_NDI_OUT) {
+				gui_NDI_Out.setPosition(p);
+			}
+		}
+
+		//--
+
+		// Main Gui 
+		gui_Controls.draw();
+
+		// Other panel
+
+		if (bGui_Webcam) gui_Webcam.draw();
 
 #ifdef USE_ofxNDI_IN
 
@@ -610,10 +661,6 @@ void ofxNDIHelper::draw_Gui()
 
 #endif
 
-		// Gui panel
-		gui_Controls.draw();
-
-		if (bGui_Webcam) gui_Webcam.draw();
 		if (bGui_NDI_OUT) gui_NDI_Out.draw();
 	}
 
@@ -828,6 +875,7 @@ void ofxNDIHelper::doReset_Gui()
 #ifdef USE_ofxNDI_IN
 
 	glm::vec2 pTr = glm::vec2(gui_NDI_Out.getShape().getTopRight());
+
 	glm::vec2 p2 = glm::vec2(pTr.x + padg, pTr.y);
 	NDI_Input1.setPositionGui(p2);
 
@@ -1080,7 +1128,7 @@ void ofxNDIHelper::mouseDragged(ofMouseEventArgs& mouse) {
 	switch (button)
 	{
 
-	//case OF_MOUSE_BUTTON_2:
+		//case OF_MOUSE_BUTTON_2:
 	case OF_MOUSE_BUTTON_LEFT:
 	{
 		TransformNode& node = frame_.getInnerTransformNode();
@@ -1238,6 +1286,7 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 		ofPushStyle();
 		//ofSetColor(255, 255);
 
+		//TODO: 
 #ifdef USE_OFX_CHILD_FRAME
 
 		//TODO: child frame
@@ -1254,7 +1303,7 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 			h = rect_Webcam.getHeight();
 			wc = w / 2.f;
 			hc = h / 2.f;
-			
+
 			frame_.setSize(w, h);
 
 			////if (bEnable_ChildFrame)
@@ -1268,7 +1317,6 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 			//	//node.setScale(childFrame.scale);
 			//}
 		}
-
 
 		//if (bEnable_ChildFrame)
 		{
@@ -1285,10 +1333,10 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 			node.setAnchorPoint(x + wc, y + hc, 0);
 			node.setTranslation(wc, hc, 0);
 
-/*			TransformNode& node = frame_.getInnerTransformNode();
-			node.setAnchorPoint(childFrame.anchor);
-			node.setTranslation(childFrame.translat);
-			node.setScale(childFrame.scale)*/;
+			/*			TransformNode& node = frame_.getInnerTransformNode();
+						node.setAnchorPoint(childFrame.anchor);
+						node.setTranslation(childFrame.translat);
+						node.setScale(childFrame.scale)*/;
 		}
 
 		// draw
@@ -1302,17 +1350,26 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 		if (0)
 		{
 			stringstream ss;
-			ss << "anchor   : " << childFrame.anchor << endl;
-			ss << "translat : " << childFrame.translat << endl;
-			ss << "scale    : " << childFrame.scale << endl << endl;
+			ss << "anchor     : " << childFrame.anchor << endl;
+			ss << "translate  : " << childFrame.translat << endl;
+			ss << "scale      : " << childFrame.scale << endl << endl;
 			ofDrawBitmapStringHighlight(ss.str(), x + w + 10, y + h + 10);
 		}
 #endif
 
+#ifndef USE_OFX_CHILD_FRAME
+		x = rect_Webcam.getX();
+		y = rect_Webcam.getY();
+		w = rect_Webcam.getWidth();
+		h = rect_Webcam.getHeight();
+		//ofSetColor(255, 255);
+		webcam_Grabber.draw(x, y, w, h);
+#endif
+
 		//--
-		 
+
 		//TODO:
-		 
+
 		// Viewport
 
 		ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
@@ -1685,31 +1742,50 @@ void ofxNDIHelper::draw_InfoDevices() {
 
 	if (bWebcam_Enable.get() && bWebcam_Draw.get() && bWebcam_Mini.get())
 	{
+		//--
+		
 		// Top info
+
 		if (bDebug)
 		{
-			glm::vec2 p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
-			//int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, "WEBCAM  " + webcam_Name_.get());
-			ofxSurfingHelpers::drawTextBoxed(font, "WEBCAM | " + webcam_Name_.get(), p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+			string s = "WEBCAM | " + webcam_Name_.get();
+			glm::vec2 p;
+
+			if (bLabelsInner)
+			{
+				int h = pad / 2 + font.getSize() + padLabel;
+				p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, h);
+			}
+			else {
+				p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+			}
+
+			ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, pad, round, -1, true);
 		}
 
 		//--
 
-		// display devices
+		// Display devices
 
-		string str;
-		str = "";
-		str += webcam_Name_.get();
-		str += " " + ofToString(webcam_Index_Device.get());
-		str += "\n\n";
-		//str += "DEVICES \n\n";
-		str += webcam_Names_InputDevices;
-		//str += "\n\n";
-		//str += "I key > Next device";
-		//str += " " + ofToString(webcam_Grabber.isInitialized() ? "ON" : "OFF") + "\n";
+		string s;
+		s = "";
+		s += webcam_Name_.get();
+		s += " " + ofToString(webcam_Index_Device.get());
+		s += "\n\n";
+		s += webcam_Names_InputDevices;
 
-		glm::vec2 p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
-		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
+		glm::vec2 p;
+		if (bLabelsInner)
+		{
+			int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, s);
+			p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2 - h + 32);
+		}
+		else
+		{
+			p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+		}
+
+		ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, 20, round, -1, true);
 	}
 
 #endif
@@ -1725,27 +1801,51 @@ void ofxNDIHelper::draw_InfoDevices() {
 		// Show what it's sending
 		if (NDI_OUT_Sender.SenderCreated())
 		{
+			//--
+
 			// Top info
+
 			if (bDebug)
 			{
-				glm::vec2 p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
 				string s = "NDI OUT | " + NDI_Output_Name.get();
-				ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, pad, 3, -1, true);
+				glm::vec2 p;
+
+				if (bLabelsInner)
+				{
+					int h = pad / 2 + font.getSize() + padLabel;
+					p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, h);
+				}
+				else {
+					p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+				}
+
+				ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, pad, round, -1, true);
 			}
 
 			//--
 
-			string str = "";
-			//str += "DEVICE\n";
-			str += ofToString(senderName) + "\n";
-			str += ofToString(senderWidth) + "x" + ofToString(senderHeight) + "px | ";
-			str += "FPS " + ofToString(NDI_OUT_Sender.GetFps()) + " / " + ofToString((int)ofGetFrameRate()) + "";
+			// Display devices
+
+			string s = "";
+			s += ofToString(senderName) + "\n";
+			s += ofToString(senderWidth) + "x" + ofToString(senderHeight) + "px | ";
+			s += "FPS " + ofToString(NDI_OUT_Sender.GetFps()) + " / " + ofToString((int)ofGetFrameRate()) + "";
 
 			x2 = rect_NDI_OUT.getX() + _padx2;
 			y2 = rect_NDI_OUT.getY() + rect_NDI_OUT.getHeight() + _pady2;
 
-			glm::vec2 p = rect_NDI_OUT.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
-			ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, 3, -1, true);
+			glm::vec2 p;
+			if (bLabelsInner)
+			{
+				int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, s);
+				p = rect_NDI_OUT.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2 - h + 32);
+			}
+			else
+			{
+				p = rect_NDI_OUT.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+			}
+
+			ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, 20, round, -1, true);
 		}
 	}
 

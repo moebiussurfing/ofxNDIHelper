@@ -5,7 +5,10 @@
 
 	TODO:
 
-	+ split ndi out to a class like for ndi input
+	+ Allow change layers sorting. store an int vector with position of each layer
+		now drawing order is: ndi in 1, 2, webcam and out.
+
+	+ split NDI out to a class like for ndi input
 
 	+ Fix mode scale for Webcam
 		+ webcam mode scale move to params like ndi input class
@@ -15,12 +18,12 @@
 		+ save load these settings.
 		only zoom works.
 
-	+ Real preview size or custom/fullsize.
+	+ Real preview size or custom / fullsize.
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
 		+ e.g. ndi out do not fits exactly the fullwidth frame.
 
-	+ Split Webcam part as a new helper addon. ?
-	+ make cam a class to allow multiple. check MSA cam addon
+	+ Split Webcam part as a new helper add-on. ?
+	+ make cam a class to allow multiple. check MSA cam add-on
 	https://github.com/memo/ofxMSAMultiCam
 
 	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
@@ -43,7 +46,10 @@
 
 //--
 
-//#define USE_OFX_CHILD_FRAME //-> WIP. For transform the Webcam content: zoom and translate. Requires ofxChildFrame.
+#define USE_OFX_CHILD_FRAME 
+// WIP: BUG: can't be removed... breaks camera.
+// -> WIP. For transform the Webcam content: 
+// zoom and translate. Requires ofxChildFrame.
 
 //----
 
@@ -78,12 +84,14 @@
 
 #define CHILD_FRAME_MAX_SCALE 5.f 
 
+//#define round 3.f 
+
 //--
 
 class ofxNDIHelper /*: public ofBaseApp*/
 {
 
-public:
+private:
 
 	float x;
 	float y;
@@ -98,6 +106,8 @@ public:
 	void mouseScrolled(ofMouseEventArgs& mouse);
 	bool bEnable_ChildFrame = true;
 #endif
+
+public:
 
 	ofxNDIHelper();
 	~ofxNDIHelper();
@@ -184,7 +194,7 @@ private:
 
 public:
 
-	ofParameterGroup params_User;//For the Gui
+	ofParameterGroup params_Helper; // For the Gui
 
 	//--
 
@@ -202,16 +212,20 @@ private:
 	float wPreview = 320;
 	int xPadPreview = 300;
 	int yPadPreview = 100;
-	float _padx = 9;
+	float _padx = 11;
 	float _pady = -11;
 	float _padx2 = 9;
 	float _pady2 = 18;
 	int x2, y2;
-	float rounded = 2.0;
+	//float rounded = 2.0;
+
+	bool bLabelsInner = true;
+	int padLabel = 3;
+	int round = 0;
 
 	// Text Box
 	ofTrueTypeFont font;
-	ofTrueTypeFont fontBig;
+	//ofTrueTypeFont fontBig;
 
 	//-
 
@@ -244,11 +258,13 @@ public:
 	ofParameter<bool> bGui_Webcam;
 	ofParameter<bool> bGui_NDI_OUT;
 
+	ofParameterGroup params_Panels;
+	ofParameterGroup params_Internal;
+
 private:
 
-	ofParameterGroup params_Internal;
 	ofParameterGroup params_Callbacks;
-	ofParameterGroup params_Panels;
+
 	ofParameter<bool> bActive;
 	ofParameter<bool> bKeys;
 	ofParameter<bool> bDebug;

@@ -34,7 +34,11 @@ public:
 	
 	bool bLoadedStartupDone = false; // to hide all and waiting startup done to start drawing.
 	bool bFoundSendersDone = false; 
-	
+
+	bool bLabelsInner = true;
+	int padLabel = 3;
+	int round = 0;
+
 	bool bEnable_PRE = false; 
 
 	NDI_input();
@@ -100,12 +104,16 @@ private:
 
 	// Text Box
 	ofTrueTypeFont font;
-	ofTrueTypeFont fontBig;
+	//ofTrueTypeFont fontBig;
 
 	bool bDISABLE_CALLBACKS = true;
 
+public:
+
 	ofxPanel gui_Control;
 
+private:
+	
 	std::string name;
 
 	std::string path_GLOBAL = "/";//this is to folder all files to avoid mixing with other add-ons data
@@ -119,7 +127,7 @@ private:
 	float rounded = 2.0;
 	int pad = 20;
 	float wPreview = 320;
-	float _padx = 9;
+	float _padx = 11;
 	float _pady = -11;
 	float _padx2 = 9;
 	float _pady2 = 18;

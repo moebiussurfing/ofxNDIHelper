@@ -33,6 +33,9 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
+	ofBackground(24);
+	//ofBackground(ofColor::yellow);
+
 	// Draw Preview Monitors
 	NDIHelper.draw();
 

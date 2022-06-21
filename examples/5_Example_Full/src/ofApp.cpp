@@ -31,8 +31,9 @@ void ofApp::update()
 #ifdef USE_ofxNDI
 
 	NDIHelper.begin_NDI_OUT();
-
 	{
+		ofBackground(ofColor::orange);
+
 		// Feed the NDI Helper Previews:
 		{
 			NDIHelper.draw_NDI_IN_1();
@@ -50,6 +51,7 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
+	ofBackground(ofColor::orange);
 
 #ifdef USE_ofxNDI
 
