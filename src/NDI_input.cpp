@@ -35,7 +35,7 @@ void NDI_input::setup(string _name)
 	//string _str = "telegrama_render.otf";
 	//string _str = "Inconsolata_Condensed-ExtraLight.ttf";
 	string _str = "JetBrainsMonoNL-ExtraBold.ttf";
-	
+
 	string _pathFont = "assets/fonts/" + _str;
 
 	float _size;
@@ -69,16 +69,6 @@ void NDI_input::setup(string _name)
 }
 
 //--------------------------------------------------------------
-void NDI_input::startupDelayed()
-{
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
-
-	////restore
-	//bEnable = bEnable_PRE;
-	bEnable = bEnable;
-}
-
-//--------------------------------------------------------------
 void NDI_input::startup()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
@@ -105,6 +95,18 @@ void NDI_input::startup()
 	//--
 
 	bLoadedStartupDone = true;
+}
+
+//--------------------------------------------------------------
+void NDI_input::startupDelayed()
+{
+	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+
+	////restore
+	//bEnable = bEnable_PRE;
+	//bEnable = bEnable;
+
+	doScan();
 }
 
 //--------------------------------------------------------------
@@ -199,7 +201,7 @@ void NDI_input::setup_Params()
 	auto& gp = gc.getGroup(position_Gui.getName());
 	gc.minimize();
 	gp.minimize();
-	
+
 	auto& gg = gui_Control.getGroup(params.getName());
 	gg.minimize();
 
@@ -362,7 +364,7 @@ void NDI_input::update(ofEventArgs& args)
 //--------------------------------------------------------------
 void NDI_input::updateWorkaround()
 {
-	static int timer = 0;
+	static int timerStartupDone = 0;
 
 	static int nsenders_PRE = 0;
 	if (nsenders != nsenders_PRE) {
@@ -380,6 +382,7 @@ void NDI_input::updateWorkaround()
 
 	// uncomment to delay some frames...
 	//if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME) 
+	if (ofGetFrameNum() >= (int)DEFAULT_STARTUP_WAITING_TIME)
 	{
 		if (!bLoadedStartupDone)
 		{
@@ -387,7 +390,7 @@ void NDI_input::updateWorkaround()
 
 			startup(); // fix
 
-			timer = ofGetFrameNum();
+			timerStartupDone = ofGetFrameNum();
 		}
 	}
 
@@ -402,13 +405,13 @@ void NDI_input::updateWorkaround()
 		}
 	}
 
-	//if (bLoadedStartupDone && bFoundSendersDone)
-	//{
-	//	if ((ofGetFrameNum() - timer) == (int)DEFAULT_STARTUP_WAITING_TIME)
-	//	{
-	//		startupDelayed();
-	//	}
-	//}
+	if (bLoadedStartupDone && bFoundSendersDone)
+	{
+		if ((ofGetFrameNum() - timerStartupDone) == (int)DEFAULT_STARTUP_WAITING_TIME)
+		{
+			startupDelayed();
+		}
+	}
 }
 
 //--------------------------------------------------------------

@@ -35,11 +35,7 @@ public:
 	bool bLoadedStartupDone = false; // to hide all and waiting startup done to start drawing.
 	bool bFoundSendersDone = false; 
 
-	bool bLabelsInner = true;
-	int padLabel = 3;
-	int round = 0;
-
-	bool bEnable_PRE = false; 
+public:
 
 	NDI_input();
 	~NDI_input();
@@ -51,10 +47,15 @@ public:
 	void drawGui();
 	void windowResized(int w, int h);
 	void exit();
+	
+private:
+	
 	void startup();
 	void startupDelayed();
 	
 	void updateWorkaround();//workaround to make sure that settings are loaded fine.
+
+public:
 
 	ofParameterGroup params;
 
@@ -64,6 +65,12 @@ public:
 	}
 
 private:
+
+	bool bLabelsInner = true;
+	int padLabel = 3;
+	int round = 0;
+
+	bool bEnable_PRE = false;
 
 	ofParameterGroup params_Control;
 
@@ -76,10 +83,12 @@ public:
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
 
+	ofParameter<bool> bDebug;
+
 	//void setEdit(bool b) { bEdit = b; }
 	//ofParameter<bool> bEdit;
 
-public:
+private:
 
 	ofParameter<glm::vec2> position_Gui;
 
@@ -89,7 +98,6 @@ public:
 	ofParameter<string> scaleMode_Name;
 	ofScaleMode scaleMode;
 
-	ofParameter<bool> bDebug;
 	ofParameter<bool> bReset;
 	ofParameter<bool> bNext;
 
@@ -138,6 +146,7 @@ private:
 
 public:
 	
+	//--------------------------------------------------------------
 	void setName(string s)
 	{
 		name = s;

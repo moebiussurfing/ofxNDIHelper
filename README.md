@@ -4,7 +4,7 @@
 Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports and input **Webcam** devices with **customizable layout**.
 
 ## Screenshot
-![image](/readme_images/Capture.PNG?raw=true "Capture.PNG")
+![](/readme_images/Capture.PNG)
 
 ## Features
 - Add an **NDI Manager** to your apps **fast**.
@@ -78,11 +78,6 @@ void ofApp::draw()
   </p>
 </details>
 
-Notice that must be present into ```/bin/data/``` :  
-
-  _Processing.NDI.Lib.x64.dll_  
-  _Processing.NDI.Lib.x864.dll_  
-
 <details>
   <summary>HowTo. New to NDI?</summary>
   <p>
@@ -99,7 +94,6 @@ while looking to the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 </details>
 
 ## Tested Systems
-- **Windows 10** / **VS 2017** / **oF 0.11**
 - **Windows 10** / **VS 2022** / **oF 0.12**
 
 ## Author

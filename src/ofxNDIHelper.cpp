@@ -36,7 +36,7 @@ ofxNDIHelper::ofxNDIHelper()
 	helpInfo += "H              HELP \n";
 	helpInfo += "I              WEBCAM NEXT \n";
 	helpInfo += "Alt + MOUSE    WEBCAM TRANSFORM \n";
-	helpInfo += "SPACE          NDI INPUTS SCAN! \n";
+	helpInfo += "SPACE          NDI INPUTS SCAN \n";
 	helpInfo += "R              LAYOUT RESET \n";
 	helpInfo += "D              DEBUG \n";
 
