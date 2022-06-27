@@ -33,7 +33,6 @@ void NDI_input::setup(string _name)
 	path_Params_AppSettings = "NDI_IN_" + name + ".json";
 
 	//string _str = "telegrama_render.otf";
-	//string _str = "Inconsolata_Condensed-ExtraLight.ttf";
 	string _str = "JetBrainsMonoNL-ExtraBold.ttf";
 
 	string _pathFont = "assets/fonts/" + _str;
@@ -44,10 +43,6 @@ void NDI_input::setup(string _name)
 	_size = 8;
 	b = font.load(_pathFont, _size);
 	if (!b) b = font.load(OF_TTF_MONO, _size);
-
-	//_size = 9;
-	//b = fontBig.load(_pathFont, _size);
-	//if (!b) b = fontBig.load(OF_TTF_MONO, _size);
 
 	//--
 
@@ -75,23 +70,6 @@ void NDI_input::startup()
 
 	loadSettings();
 
-	////store
-	//bEnable_PRE = bEnable;
-	////flip
-	//bEnable = !bEnable;
-
-	//--
-
-	// Force callback!
-
-//#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-//	//nameDevice = nameDevice;
-//	setup_ByName(nameDevice);
-//#else
-//	//indexDevice = indexDevice;
-//	setup_ByIndex(indexDevice);
-//#endif
-
 	//--
 
 	bLoadedStartupDone = true;
@@ -102,27 +80,19 @@ void NDI_input::startupDelayed()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
-	////restore
-	//bEnable = bEnable_PRE;
-	//bEnable = bEnable;
-
 	doScan();
 }
 
 //--------------------------------------------------------------
 void NDI_input::setup_Params()
 {
-	//TODO: rename toggles
-	//bGui_Preview.set("NDI PREVIEW " + name, true);
-	//bGui_Internal.set("NDI CONTROLS " + name, true);
-	bGui_Preview.set("IN PREVIEW" + name, true);
-	bGui_Internal.set("IN " + name, true);
+	bGui.set("NDI IN " + name, true);
 
-	//bGui_Preview.set("NDI PREVIEW", true);
-	//bGui_Internal.set("NDI CONTROLS", true);
+	bGui_Internal.set("IN " + name, true);
+	bGui_Preview.set("IN PREVIEW" + name, true);
 
 	bNext.set("NEXT", false);
-	bLockRatio.set("LOCK ASPECT RATIO", true);
+	bLockRatio.set("LOCK ASPECT", true);
 	bDebug.set("DEBUG", true);
 
 	position_Gui.set("GUI POSITION",
@@ -154,21 +124,22 @@ void NDI_input::setup_Params()
 
 	bEnable.set("ENABLE", false);
 	bDraw.set("DRAW", true);
+	bDrawMini.set("MINI", true);
 	indexDevice.set("INDEX", 0, 0, 1);
 	nameDevice.set("DEVICE", "ofxNDIHelperIN");
-	bDrawMini.set("MINI", true);
 	bScan.set("SCAN", false);
 	bScan.setSerializable(false);
 
-	params_NDI_Input.add(bEnable);
-	params_NDI_Input.add(bDraw);
-	params_NDI_Input.add(bDrawMini);
-	params_NDI_Input.add(indexDevice);
-	params_NDI_Input.add(nameDevice);
-	params_NDI_Input.add(bNext);
-	params_NDI_Input.add(scaleMode_Index);
-	params_NDI_Input.add(scaleMode_Name);
-	params_NDI_Input.add(bScan);//now is automatic
+	params_Settings.setName("NDI INPUT");
+	params_Settings.add(bEnable);
+	params_Settings.add(bDraw);
+	params_Settings.add(bDrawMini);
+	params_Settings.add(indexDevice);
+	params_Settings.add(nameDevice);
+	params_Settings.add(bNext);
+	params_Settings.add(scaleMode_Index);
+	params_Settings.add(scaleMode_Name);
+	params_Settings.add(bScan);//now is automatic
 
 	//--
 
@@ -181,8 +152,12 @@ void NDI_input::setup_Params()
 	params_Control.add(bLockRatio);
 	params_Control.add(position_Gui);
 
+	//--
+
+	// All
+
 	params.setName("NDI INPUT");
-	params.add(params_NDI_Input);
+	params.add(params_Settings);
 	params.add(params_Control);
 
 	//--
@@ -191,10 +166,7 @@ void NDI_input::setup_Params()
 
 	ofxSurfingHelpers::setThemeDarkMini_ofxGui();
 
-	//gui_Control.setup("NDI INPUT | " + name);
 	gui_Control.setup("IN " + name);
-	//gui_Control.setup("NDI IN " + name);
-	//gui_Control.setup("NDI INPUT");
 	gui_Control.add(params);
 
 	auto& gc = gui_Control.getGroup(params.getName()).getGroup(params_Control.getName());
@@ -349,7 +321,7 @@ void NDI_input::setup_ByName(string _nameDevice)
 //--------------------------------------------------------------
 void NDI_input::drawGui()
 {
-	//if (!bGui_Preview) return;
+	if (!bGui) return;
 	if (!bGui_Internal) return;
 
 	gui_Control.draw();
@@ -366,10 +338,12 @@ void NDI_input::updateWorkaround()
 {
 	static int timerStartupDone = 0;
 
-	static int nsenders_PRE = 0;
-	if (nsenders != nsenders_PRE) {
-		nsenders_PRE = nsenders;
-		doListDevices();
+	if (bEnable) {
+		static int nsenders_PRE = 0;
+		if (nsenders != nsenders_PRE) {
+			nsenders_PRE = nsenders;
+			if (ofGetFrameNum() % 60 == 0) doListDevices();//make slower. check once per sec
+		}
 	}
 
 	if (bEnable)
@@ -416,21 +390,20 @@ void NDI_input::updateWorkaround()
 
 //--------------------------------------------------------------
 void NDI_input::draw() {
-
+	if (!bGui) return;
+	if (!bEnable) return;
 	if (!bGui_Preview) return;
 	if (!bLoadedStartupDone) return;
+	if (!bDraw) return;
 
 	//-
 
-	if (bEnable.get() && bDraw.get())
-	{
-		draw_Main();
+	draw_Main();
 
-		if (bDebug)
-		{
-			// Show what it is receiving
-			draw_InfoDevices();
-		}
+	if (bDebug)
+	{
+		// Show what it is receiving
+		draw_InfoDevices();
 	}
 }
 
@@ -541,6 +514,8 @@ void NDI_input::draw_InfoDevices() {
 void NDI_input::draw_MiniPreview()
 {
 	if (!bEnable.get()) return;
+	if (!bDraw) return;
+	if (!bDrawMini) return;
 
 	// Receive ofTexture
 	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
@@ -582,6 +557,8 @@ void NDI_input::draw_MiniPreview()
 void NDI_input::draw_FullScreen()
 {
 	if (!bEnable.get()) return;
+	if (!bDraw) return;
+	if (!bDrawMini) return;
 
 	// Receive ofTexture
 	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture

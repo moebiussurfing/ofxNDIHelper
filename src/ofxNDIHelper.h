@@ -84,8 +84,6 @@
 
 #define CHILD_FRAME_MAX_SCALE 5.f 
 
-//#define round 3.f 
-
 //--
 
 class ofxNDIHelper /*: public ofBaseApp*/
@@ -114,6 +112,7 @@ public:
 
 	void setup();
 	void draw();
+	void drawPreviews();
 	void draw_Gui();
 	void windowResized(int w, int h);
 
@@ -182,6 +181,7 @@ public:
 private:
 
 	ofParameterGroup params_AppsSettings;
+
 	//ofParameter<bool> bLockRatio;
 	ofParameter<bool> bResetLayout;
 	ofParameter<bool> bResetGui;
@@ -225,7 +225,6 @@ private:
 
 	// Text Box
 	ofTrueTypeFont font;
-	//ofTrueTypeFont fontBig;
 
 	//-
 
@@ -257,6 +256,7 @@ public:
 	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Webcam;
 	ofParameter<bool> bGui_NDI_OUT;
+	ofParameter<bool> bGui_Internal;//ofxGui
 
 	ofParameterGroup params_Panels;
 	ofParameterGroup params_Internal;
@@ -342,7 +342,7 @@ private:
 	std::string webcam_Names_InputDevices;
 	ofParameter<std::string> webcam_Name_{ "WEBCAM_DEVICE_NAME", "" };
 	ofParameter<std::string> webcam_Name; // can be merged both vars?
-	ofParameter<bool> bWebcam_Mini;
+	ofParameter<bool> bWebcam_DrawMini;
 	ofParameter<int> webcam_Index_Device;
 	std::string path_WebcamSettings;
 	std::string name_WebcamSettings;
@@ -358,12 +358,16 @@ private:
 
 #ifdef USE_ofxNDI_IN
 
+public:
+
 	NDI_input NDI_Input1;
 	NDI_input NDI_Input2;
 
 #endif
 
 	//--
+
+private:
 
 	// 3. NDI OUTPUT
 
@@ -374,10 +378,13 @@ private:
 	ofParameter<bool> bNDI_Output_Mini;
 	ofParameter<std::string> NDI_Output_Name;
 
+public:
+
+	ofxNDIsender NDI_OUT_Sender; // NDI sender object
+
 private:
 
 	void setup_NDI_OUT();
-	ofxNDIsender NDI_OUT_Sender; // NDI sender object
 	ofFbo fbo_NDI_Sender; // Fbo used for graphics and sending
 	unsigned int senderWidth; // Width of the sender output
 	unsigned int senderHeight; // Height of the sender output
@@ -391,12 +398,17 @@ public:
 	void draw_NDI_OUT_MiniPreview(bool bInfo = false);
 	void draw_NDI_OUT_Full();
 
-private:
+public:
 
 	ofParameterGroup params_Webcam;
+
+private:
+
 	ofxSurfingBoxInteractive rect_NDI_OUT;
 	std::string path_rect_NDI_OUT = "NDI_Out";
 	std::string name_rect_NDI_OUT = "NDI_Out_Mini";
+
+public:
 
 	ofParameterGroup params_NDI_Output;
 

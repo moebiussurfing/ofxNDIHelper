@@ -15,9 +15,18 @@
 
 	1. You should install the NDI Tools.
 	2. Run an NDI Monitor to preview what is being sent through the output.
-	3. You can run an NDI Test Patterns to feed a signal into the NDI Addon.
-	4. Have fun with Sources toggles and the addon GUI to explore combinations,
+	3. You can run an NDI Test Patterns to feed a signal into the NDI add-on.
+	4. Have fun with Sources toggles and the add-on GUI to explore combinations,
 	while looking to the NDI Out Preview GUI or the NDI Monitor video.
+
+	IMPORTANT:
+	If you want to use the simpler version, based on ofxGui,
+	you must remove the folder ofxNDIHelper/src/ImGui/ from the project!
+	There's 4 files inside. 
+	(If not, will require ofxSurfingImGui, and some other dependencies:
+	ofxSurfingImGui, ofxImGui 
+	Will replace ofxGui with a cool ImGui base GUI workflow. Check:
+	https://github.com/moebiussurfing/ofxSurfingImGui)
 
 */
 

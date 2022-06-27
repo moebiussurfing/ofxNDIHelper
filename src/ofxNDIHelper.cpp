@@ -144,11 +144,11 @@ void ofxNDIHelper::setup()
 #ifdef USE_ofxNDI_IN
 
 	NDI_Input1.setPathGlobal(path_GLOBAL + "NDI_Input1/");
-	NDI_Input1.setup("Patterns");
+	NDI_Input1.setup("1");
 	NDI_Input1.bDebug.makeReferenceTo(bDebug);
 
 	NDI_Input2.setPathGlobal(path_GLOBAL + "NDI_Input2/");
-	NDI_Input2.setup("VLC");
+	NDI_Input2.setup("2");
 	NDI_Input2.bDebug.makeReferenceTo(bDebug);
 
 #endif
@@ -287,9 +287,9 @@ void ofxNDIHelper::setup_Webcam_Params()
 	bWebcam_Restart.set("CAM RESTART", false);
 	bWebcam_Next.set("CAM NEXT", false);
 	bWebcam_Enable.set("CAM ENABLE", false);
-	bWebcam_LockRatio.set("LOCK ASPECT RATIO", true);
+	bWebcam_LockRatio.set("LOCK ASPECT", true);
 	bWebcam_Draw.set("CAM DRAW", true);
-	bWebcam_Mini.set("CAM MINI", true);
+	bWebcam_DrawMini.set("CAM MINI", true);
 	webcam_Index_Device.set("CAM DEVICE", 0, 0, 1);
 	scaleMode_Index.set("SCALE MODE", 0, 0, 3);
 	scaleMode_Name.set("NAME", "");
@@ -304,7 +304,7 @@ void ofxNDIHelper::setup_Webcam_Params()
 	params_Webcam.setName("WEBCAM");
 	params_Webcam.add(bWebcam_Enable);
 	params_Webcam.add(bWebcam_Draw);
-	params_Webcam.add(bWebcam_Mini);
+	params_Webcam.add(bWebcam_DrawMini);
 	params_Webcam.add(bWebcam_Next);
 	params_Webcam.add(webcam_Index_Device);
 	params_Webcam.add(webcam_Name);
@@ -320,13 +320,14 @@ void ofxNDIHelper::setup_Webcam_Params()
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_Params()
 {
+	bGui_Internal.set("ofxGui", true);
 	bGui.set("NDI HELPER", true);
 	bGui_Controls.set("NDI CONTROLS", true);
 	bGui_Webcam.set("WEBCAM", true);
 	bGui_NDI_OUT.set("OUT", true);
 
 	//bEdit.set("LAYOUT EDIT", true);
-	//bLockRatio.set("LOCK ASPECT RATIO", true);
+	//bLockRatio.set("LOCK ASPECT", true);
 	bResetLayout.set("RESET LAYOUT", false);
 	bResetGui.set("RESET GUI", false);
 	bKeys.set("KEYS", true);
@@ -410,6 +411,7 @@ void ofxNDIHelper::setup_Params()
 
 	params_Internal.setName("INTERNAL");
 
+	params_Internal.add(bGui_Internal);
 	params_Internal.add(bActive);
 	params_Internal.add(bAutoSave);
 	params_Internal.add(position_Gui);
@@ -568,6 +570,49 @@ void ofxNDIHelper::draw_NDI_IN_2_Full() {
 #endif
 
 //--------------------------------------------------------------
+void ofxNDIHelper::drawPreviews() {
+
+	//-
+
+#ifdef USE_ofxNDI_IN
+
+	NDI_Input1.draw_MiniPreview();
+	NDI_Input2.draw_MiniPreview();
+
+#endif
+
+	//-
+
+#ifdef USE_WEBCAM
+
+	// WEBCAM
+
+	if (bWebcam_Enable && bWebcam_Draw) {
+		if (bWebcam_Enable)
+			if (bWebcam_Draw)
+				if (bWebcam_DrawMini) draw_Webcam_MiniPreview(true);
+	}
+
+#endif
+
+	//-
+
+#ifdef USE_ofxNDI_OUT
+
+	// NDI OUT
+
+	if (bNDI_Output_Enable && bNDI_Output_Draw)
+	{
+		if (bNDI_Output_Mini) draw_NDI_OUT_MiniPreview(true);
+	}
+
+#endif
+
+	//-
+
+	if (bDebug) draw_InfoDevices();
+}
+//--------------------------------------------------------------
 void ofxNDIHelper::draw() {
 	//if (!bGui) return;
 	//if (!bLoadedStartupDone) return;
@@ -587,7 +632,7 @@ void ofxNDIHelper::draw() {
 
 	// WEBCAM
 
-	if (bWebcam_Enable.get() && bWebcam_Draw.get())
+	if (bWebcam_Enable && bWebcam_Draw)
 	{
 		draw_Webcam();
 	}
@@ -600,7 +645,7 @@ void ofxNDIHelper::draw() {
 
 	// NDI OUT
 
-	if (bNDI_Output_Enable.get() && bNDI_Output_Draw.get())
+	if (bNDI_Output_Enable && bNDI_Output_Draw)
 	{
 		draw_NDI_OUT();
 	}
@@ -615,54 +660,59 @@ void ofxNDIHelper::draw() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Gui()
 {
-	ofDisableDepthTest();
-
 	if (!bGui) return;
+
+	ofDisableDepthTest();
 
 	//-
 
-	// Gui Panel
-	if (bGui_Controls)
+	if (bGui_Internal)
 	{
-		bool bGuiLink = true;
-		if (bGuiLink) {
-			glm::vec2 pad(1, 0);
-			auto p = gui_Controls.getShape().getTopRight() + pad;
-			if (bGui_Webcam) {
-				gui_Webcam.setPosition(p);
-				p = gui_Webcam.getShape().getTopRight() + pad;
+		// Gui Panel
+		if (bGui_Controls)
+		{
+			bool bGuiLink = true;
+			if (bGuiLink) {
+				glm::vec2 pad(1, 0);
+				auto p = gui_Controls.getShape().getTopRight() + pad;
+				if (bGui_Webcam) {
+					gui_Webcam.setPosition(p);
+					p = gui_Webcam.getShape().getTopRight() + pad;
+				}
+				if (NDI_Input1.bGui_Internal) {
+					NDI_Input1.gui_Control.setPosition(p);
+					p = NDI_Input1.gui_Control.getShape().getTopRight() + pad;
+				}
+				if (NDI_Input2.bGui_Internal) {
+					NDI_Input2.gui_Control.setPosition(p);
+					p = NDI_Input2.gui_Control.getShape().getTopRight() + pad;
+				}
+				if (bGui_NDI_OUT) {
+					gui_NDI_Out.setPosition(p);
+				}
 			}
-			if (NDI_Input1.bGui_Internal) {
-				NDI_Input1.gui_Control.setPosition(p);
-				p = NDI_Input1.gui_Control.getShape().getTopRight() + pad;
-			}
-			if (NDI_Input2.bGui_Internal) {
-				NDI_Input2.gui_Control.setPosition(p);
-				p = NDI_Input2.gui_Control.getShape().getTopRight() + pad;
-			}
-			if (bGui_NDI_OUT) {
-				gui_NDI_Out.setPosition(p);
-			}
-		}
 
-		//--
+			//--
 
-		// Main Gui 
-		gui_Controls.draw();
+			// Main Gui 
+			gui_Controls.draw();
 
-		// Other panel
+			// Other panels
 
-		if (bGui_Webcam) gui_Webcam.draw();
+			// Webcam
+			if (bGui_Webcam) gui_Webcam.draw();
 
 #ifdef USE_ofxNDI_IN
-
-		NDI_Input1.drawGui();
-		NDI_Input2.drawGui();
-
+			// Inputs
+			NDI_Input1.drawGui();
+			NDI_Input2.drawGui();
 #endif
-
-		if (bGui_NDI_OUT) gui_NDI_Out.draw();
+			// Output
+			if (bGui_NDI_OUT) gui_NDI_Out.draw();
+		}
 	}
+
+	//--
 
 	// HelpBox
 	if (bHelp) textBoxWidget.draw();
@@ -1279,132 +1329,135 @@ void ofxNDIHelper::setup_Webcam() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 {
-	if (bWebcam_Enable.get())
-	{
-		//----
+	if (!bWebcam_Enable) return;
+	if (!bWebcam_Draw) return;
+	if (!bWebcam_DrawMini) return;
 
-		ofPushStyle();
-		//ofSetColor(255, 255);
+	//----
 
-		//TODO: 
+	ofPushStyle();
+	//ofSetColor(255, 255);
+
+	//TODO: 
 #ifdef USE_OFX_CHILD_FRAME
 
-		//TODO: child frame
+	//TODO: child frame
 
-		if (rect_Webcam.isChanged())
-		{
-			//cout << __FUNCTION__ << "rect_Webcam.isChanged()" << endl;
+	if (rect_Webcam.isChanged())
+	{
+		//cout << __FUNCTION__ << "rect_Webcam.isChanged()" << endl;
 
-			bEnable_ChildFrame = !rect_Webcam.isEditing();
+		bEnable_ChildFrame = !rect_Webcam.isEditing();
 
-			x = rect_Webcam.getX();
-			y = rect_Webcam.getY();
-			w = rect_Webcam.getWidth();
-			h = rect_Webcam.getHeight();
-			wc = w / 2.f;
-			hc = h / 2.f;
-
-			frame_.setSize(w, h);
-
-			////if (bEnable_ChildFrame)
-			//{
-			//  frame_.setSize(w, h);
-			//	TransformNode& node = frame_.getInnerTransformNode();
-			//	node.setAnchorPoint(x + wc, y + hc, 0);
-			//	node.setTranslation(wc, hc, 0);
-			//	//node.setAnchorPoint(childFrame.anchor);
-			//	//node.setTranslation(childFrame.translat);
-			//	//node.setScale(childFrame.scale);
-			//}
-		}
-
-		//if (bEnable_ChildFrame)
-		{
-			x = rect_Webcam.getX();
-			y = rect_Webcam.getY();
-			w = rect_Webcam.getWidth();
-			h = rect_Webcam.getHeight();
-			wc = w / 2.f;
-			hc = h / 2.f;
-
-			// required to mantain position after moving box..
-			//frame_.setSize(w, h);
-			TransformNode& node = frame_.getInnerTransformNode();
-			node.setAnchorPoint(x + wc, y + hc, 0);
-			node.setTranslation(wc, hc, 0);
-
-			/*			TransformNode& node = frame_.getInnerTransformNode();
-						node.setAnchorPoint(childFrame.anchor);
-						node.setTranslation(childFrame.translat);
-						node.setScale(childFrame.scale)*/;
-		}
-
-		// draw
-		frame_.begin();
-		ofSetColor(255, 255);
-		webcam_Grabber.draw(x, y, w, h);
-		frame_.end();
-		frame_.draw(x, y);
-
-		// debug
-		if (0)
-		{
-			stringstream ss;
-			ss << "anchor     : " << childFrame.anchor << endl;
-			ss << "translate  : " << childFrame.translat << endl;
-			ss << "scale      : " << childFrame.scale << endl << endl;
-			ofDrawBitmapStringHighlight(ss.str(), x + w + 10, y + h + 10);
-		}
-#endif
-
-#ifndef USE_OFX_CHILD_FRAME
 		x = rect_Webcam.getX();
 		y = rect_Webcam.getY();
 		w = rect_Webcam.getWidth();
 		h = rect_Webcam.getHeight();
-		//ofSetColor(255, 255);
-		webcam_Grabber.draw(x, y, w, h);
+		wc = w / 2.f;
+		hc = h / 2.f;
+
+		frame_.setSize(w, h);
+
+		////if (bEnable_ChildFrame)
+		//{
+		//  frame_.setSize(w, h);
+		//	TransformNode& node = frame_.getInnerTransformNode();
+		//	node.setAnchorPoint(x + wc, y + hc, 0);
+		//	node.setTranslation(wc, hc, 0);
+		//	//node.setAnchorPoint(childFrame.anchor);
+		//	//node.setTranslation(childFrame.translat);
+		//	//node.setScale(childFrame.scale);
+		//}
+	}
+
+	//if (bEnable_ChildFrame)
+	{
+		x = rect_Webcam.getX();
+		y = rect_Webcam.getY();
+		w = rect_Webcam.getWidth();
+		h = rect_Webcam.getHeight();
+		wc = w / 2.f;
+		hc = h / 2.f;
+
+		// required to mantain position after moving box..
+		//frame_.setSize(w, h);
+		TransformNode& node = frame_.getInnerTransformNode();
+		node.setAnchorPoint(x + wc, y + hc, 0);
+		node.setTranslation(wc, hc, 0);
+
+		/*
+		TransformNode& node = frame_.getInnerTransformNode();
+		node.setAnchorPoint(childFrame.anchor);
+		node.setTranslation(childFrame.translat);
+		node.setScale(childFrame.scale);
+		*/
+	}
+
+	// draw
+	frame_.begin();
+	ofSetColor(255, 255);
+	webcam_Grabber.draw(x, y, w, h);
+	frame_.end();
+	frame_.draw(x, y);
+
+	// debug
+	if (0)
+	{
+		stringstream ss;
+		ss << "anchor     : " << childFrame.anchor << endl;
+		ss << "translate  : " << childFrame.translat << endl;
+		ss << "scale      : " << childFrame.scale << endl << endl;
+		ofDrawBitmapStringHighlight(ss.str(), x + w + 10, y + h + 10);
+	}
 #endif
 
-		//--
+#ifndef USE_OFX_CHILD_FRAME
+	x = rect_Webcam.getX();
+	y = rect_Webcam.getY();
+	w = rect_Webcam.getWidth();
+	h = rect_Webcam.getHeight();
+	//ofSetColor(255, 255);
+	webcam_Grabber.draw(x, y, w, h);
+#endif
 
-		//TODO:
+	//--
 
-		// Viewport
+	//TODO:
 
-		ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
-		ofRectangle rOut(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+	// Viewport
 
-		if (bWebcam_LockRatio.get())
-		{
-			float _ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
-			rect_Webcam.setHeight(rect_Webcam.getWidth() * _ratio);
-		}
+	ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
+	ofRectangle rOut(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
 
-		ofScaleMode scaleMode;
-		switch (scaleMode_Index)
-		{
-		case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
-		case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
-		case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
-		case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
-		}
-
-		//rOut.scaleTo(rSrc, scaleMode);
-		rSrc.scaleTo(rOut, scaleMode);
-
-		// image
-
-		////webcam_Grabber.draw(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
-
-		////webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
-		//webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
-
-		// interactive box
-		rect_Webcam.draw();
-
-		ofPopStyle();
+	if (bWebcam_LockRatio.get())
+	{
+		float _ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
+		rect_Webcam.setHeight(rect_Webcam.getWidth() * _ratio);
 	}
+
+	ofScaleMode scaleMode;
+	switch (scaleMode_Index)
+	{
+	case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
+	case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
+	case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
+	case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+	}
+
+	//rOut.scaleTo(rSrc, scaleMode);
+	rSrc.scaleTo(rOut, scaleMode);
+
+	// image
+
+	////webcam_Grabber.draw(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+
+	////webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
+	//webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
+
+	// interactive box
+	rect_Webcam.draw();
+
+	ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -1634,13 +1687,19 @@ void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam()
 {
-	if (bWebcam_Mini) draw_Webcam_MiniPreview(true);
+	if (!bWebcam_Enable) return;
+	if (!bWebcam_Draw) return;
+
+	if (bWebcam_DrawMini) draw_Webcam_MiniPreview(true);
 	else draw_Webcam_Full();
 }
 
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Webcam_Full()
 {
+	if (!bWebcam_Enable) return;
+	if (!bWebcam_Draw) return;
+
 	//TODO:
 	// making fit viewports
 
@@ -1740,10 +1799,10 @@ void ofxNDIHelper::draw_InfoDevices() {
 
 #ifdef USE_WEBCAM
 
-	if (bWebcam_Enable.get() && bWebcam_Draw.get() && bWebcam_Mini.get())
+	if (bWebcam_Enable.get() && bWebcam_Draw.get() && bWebcam_DrawMini.get())
 	{
 		//--
-		
+
 		// Top info
 
 		if (bDebug)

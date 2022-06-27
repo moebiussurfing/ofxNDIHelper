@@ -57,12 +57,15 @@ private:
 
 public:
 
-	ofParameterGroup params;
+	ofParameterGroup params;//all
 
 	//--------------------------------------------------------------
 	ofParameterGroup& getParameters() {
 		return params;
 	}
+
+	ofParameterGroup params_Settings;
+	ofParameterGroup params_Control;
 
 private:
 
@@ -72,7 +75,6 @@ private:
 
 	bool bEnable_PRE = false;
 
-	ofParameterGroup params_Control;
 
 	void Changed(ofAbstractParameter& e);
 
@@ -80,13 +82,11 @@ public:
 
 	void doReset_Mini_PreviewsSize();
 
+	ofParameter<bool> bGui;
 	ofParameter<bool> bGui_Preview;
 	ofParameter<bool> bGui_Internal;
 
 	ofParameter<bool> bDebug;
-
-	//void setEdit(bool b) { bEdit = b; }
-	//ofParameter<bool> bEdit;
 
 private:
 
@@ -227,8 +227,6 @@ private:
 	unsigned int hReceiver;
 
 	ofxSurfingBoxInteractive rect_NDI_IN;
-
-	ofParameterGroup params_NDI_Input{ "NDI INPUT" };
 
 	//--
 

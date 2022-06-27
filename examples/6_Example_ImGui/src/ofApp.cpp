@@ -3,17 +3,23 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
+
+#ifdef USE_ofxNDI
+
 	NDIHelper.setup();
+
+#endif
 
 	//--
 
-	image.loadImage("assets/image.jpg");
+	params.add(NDIHelper.bGui);
+	params.add(NDIHelper.bGui_Controls);
 
 	gui.setup("ofApp");
-	gui.add(bDrawImage);
-	gui.add(NDIHelper.bGui);
-	gui.add(NDIHelper.bGui_Controls);
-	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 40);
+	gui.add(params);
+	gui.setPosition(40, ofGetHeight() - gui.getHeight() - 40);
+
+	ofxSurfingHelpers::loadGroup(params);
 }
 
 //--------------------------------------------------------------
@@ -22,28 +28,42 @@ void ofApp::update()
 	// Draw inside to feed the NDI Video Output.
 	// that's the signal we will send!
 
+#ifdef USE_ofxNDI
+
 	NDIHelper.begin_NDI_OUT();
 	{
-		// Draw a simple and animated scene:
-		drawScene();
+		ofBackground(ofColor::orange);
+
+		// Feed the NDI Helper Previews:
+		{
+			NDIHelper.draw_NDI_IN_1();
+			NDIHelper.draw_NDI_IN_2();
+			NDIHelper.draw_Webcam();
+		}
 	}
+
 	NDIHelper.end_NDI_OUT();
+
+#endif
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	ofBackground(24);
+	ofBackground(ofColor::orange);
 
-	// Draw the full Canvas layout 
-	// With all the enabled devices/channels draws.
-	// Like Preview Monitors and Full Screen previews!
+#ifdef USE_ofxNDI
+
+	// Draw Preview Monitors
 	NDIHelper.draw();
 
 	//----
 
 	// Gui
 	NDIHelper.draw_Gui();
+
+#endif
 
 	//----
 
@@ -54,5 +74,16 @@ void ofApp::draw()
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
 
+#ifdef USE_ofxNDI
+
 	NDIHelper.windowResized(w, h);
+
+#endif
+
+}
+
+//--------------------------------------------------------------
+void ofApp::exit()
+{
+	ofxSurfingHelpers::saveGroup(params);
 }
