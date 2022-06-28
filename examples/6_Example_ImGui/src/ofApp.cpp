@@ -6,14 +6,14 @@ void ofApp::setup()
 
 #ifdef USE_ofxNDI
 
-	NDIHelper.setup();
+	ndi.setup();
 
 #endif
 
 	//--
 
-	params.add(NDIHelper.bGui);
-	params.add(NDIHelper.bGui_Controls);
+	params.add(ndi.bGui);
+	params.add(ndi.bGui_Controls);
 
 	gui.setup("ofApp");
 	gui.add(params);
@@ -30,22 +30,16 @@ void ofApp::update()
 
 #ifdef USE_ofxNDI
 
-	NDIHelper.begin_NDI_OUT();
+	ndi.begin_NDI_OUT();
 	{
 		ofBackground(ofColor::orange);
 
-		// Feed the NDI Helper Previews:
-		{
-			NDIHelper.draw_NDI_IN_1();
-			NDIHelper.draw_NDI_IN_2();
-			NDIHelper.draw_Webcam();
-		}
+		ndi.drawSignals();
 	}
 
-	NDIHelper.end_NDI_OUT();
+	ndi.end_NDI_OUT();
 
 #endif
-
 }
 
 //--------------------------------------------------------------
@@ -55,13 +49,17 @@ void ofApp::draw()
 
 #ifdef USE_ofxNDI
 
-	// Draw Preview Monitors
-	NDIHelper.draw();
+	ndi.draw();
+
+#endif
+
+	// Gui
 
 	//----
 
-	// Gui
-	NDIHelper.draw_Gui();
+#ifdef USE_ofxNDI
+
+	ndi.drawGui();
 
 #endif
 
@@ -76,7 +74,7 @@ void ofApp::windowResized(int w, int h) {
 
 #ifdef USE_ofxNDI
 
-	NDIHelper.windowResized(w, h);
+	ndi.windowResized(w, h);
 
 #endif
 

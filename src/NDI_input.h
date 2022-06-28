@@ -2,15 +2,12 @@
 
 /*
 
-	TODO:
-	
-	fix startup
 
 */
 
 //--
 
-#define DEFAULT_STARTUP_WAITING_TIME 60 // in frames
+#define DEFAULT_STARTUP_WAITING_TIME 60 // in frames. 60 = 1 sec
 
 #define USE_ofxNDI_IN
 
@@ -19,11 +16,12 @@
 #ifdef USE_ofxNDI_IN
 
 #include "ofMain.h"
+
 #include "ofxNDI.h"
 #include "ofxGui.h"
 #include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingHelpers.h"
-#include "ofxSurfing_ofxGui.h"|
+#include "ofxSurfing_ofxGui.h"
 
 #define DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 

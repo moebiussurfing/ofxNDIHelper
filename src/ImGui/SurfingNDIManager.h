@@ -47,18 +47,30 @@ public:
 		bGui_Controls.makeReferenceTo(NDIHelper.bGui_Controls);
 	};
 
+	void draw() { // all the channels for user preview. take car with overwritten by other draws!
+		NDIHelper.draw();
+	};
+
 	void drawSignals(){
 		NDIHelper.draw_NDI_IN_1();
 		NDIHelper.draw_NDI_IN_2();
 		NDIHelper.draw_Webcam();
 	};
 
-	void drawGuiInternal() {
-		NDIHelper.draw_Gui();
+	void draw_NDI_IN_1(){
+		NDIHelper.draw_NDI_IN_1();
 	};
 
-	void draw() { // all the channels for user preview. take car with overwritten by other draws!
-		NDIHelper.draw();
+	void draw_NDI_IN_2(){
+		NDIHelper.draw_NDI_IN_2();
+	};
+
+	void draw_Webcam(){
+		NDIHelper.draw_Webcam();
+	};
+
+	void drawGuiInternal() {
+		NDIHelper.draw_Gui();
 	};
 
 	void drawPreviews() {
