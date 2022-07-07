@@ -24,6 +24,7 @@ public:
 
 		NDIGui.setup();
 
+		// Panels
 		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_Controls);
 		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_Webcam);
 		NDIGui.guiManager.addWindowSpecial(NDIHelper.NDI_Input1.bGui);
@@ -33,6 +34,8 @@ public:
 		NDIGui.startup();
 		
 		//--
+
+		// Styles
 
 		NDIGui.guiManager.ClearStyles();
 		
@@ -47,20 +50,40 @@ public:
 		bGui_Controls.makeReferenceTo(NDIHelper.bGui_Controls);
 	};
 
-	void draw() { // all the channels for user preview. take car with overwritten by other draws!
+	// all the channels for user preview. take care with overwritten or to drawing twice by other draws!
+	void draw() {
 		NDIHelper.draw();
 	};
 
+	// all enabled channels drawn on the full layout canvas
 	void drawSignals(){
 		NDIHelper.draw_NDI_IN_1();
 		NDIHelper.draw_NDI_IN_2();
 		NDIHelper.draw_Webcam();
 	};
 
+	// all enabled channels drawn at full screen size
+	void drawSignalsFullScreen(){
+		NDIHelper.draw_NDI_IN_1_Full();
+		NDIHelper.draw_NDI_IN_2_Full();
+		NDIHelper.draw_Webcam_Full();
+	};
+
+	// each channel drawn at full screen size
+	void draw_NDI_IN_1_Full(){
+		NDIHelper.draw_NDI_IN_1_Full();
+	};
+	void draw_NDI_IN_2_Full(){
+		NDIHelper.draw_NDI_IN_2_Full();
+	};
+	void draw_Webcam_Full(){
+		NDIHelper.draw_Webcam_Full();
+	};
+
+	// each channel drawn at mini from canvas layout or full screen size
 	void draw_NDI_IN_1(){
 		NDIHelper.draw_NDI_IN_1();
 	};
-
 	void draw_NDI_IN_2(){
 		NDIHelper.draw_NDI_IN_2();
 	};
@@ -77,8 +100,10 @@ public:
 		NDIHelper.drawPreviews();
 	};
 
-	void drawGui() {
+	void drawGui()
+	{
 		drawGuiInternal();
+
 		drawImGui();
 	};
 
@@ -109,8 +134,8 @@ public:
 
 				// In 1
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(2)) {
-				//if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input1.bGui)) {
+				//if (NDIGui.guiManager.beginWindowSpecial(2)) {
+				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input1.bGui)) {
 					ImGui::Text("Hello");
 					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input1.params);
 					NDIGui.guiManager.endWindowSpecial();
@@ -118,8 +143,8 @@ public:
 
 				// In 2
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(3)) {
-				//if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input2.bGui)) {
+				//if (NDIGui.guiManager.beginWindowSpecial(3)) {
+				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input2.bGui)) {
 					ImGui::Text("Hello");
 					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input2.params);
 					NDIGui.guiManager.endWindowSpecial();

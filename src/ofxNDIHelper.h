@@ -3,6 +3,9 @@
 
 /*
 
+	This add-on stills a bit WIP !!
+
+
 	TODO:
 
 	+ Allow change layers sorting. store an int vector with position of each layer
@@ -111,8 +114,8 @@ public:
 	~ofxNDIHelper();
 
 	void setup();
-	void draw();
-	void drawPreviews();
+	void draw(); // main draw with all the GUI, previews and debug info.
+	void drawPreviews(); // draw mini previews
 	void draw_Gui();
 	void windowResized(int w, int h);
 
@@ -138,8 +141,11 @@ public:
 
 private:
 
+public:
+
 	void draw_NDI_IN_1_MiniPreview();
 	void draw_NDI_IN_1_Full();
+
 	void draw_NDI_IN_2_MiniPreview();
 	void draw_NDI_IN_2_Full();
 
@@ -245,6 +251,7 @@ private:
 	//-
 
 	void Changed(ofAbstractParameter& e);
+	void Changed_Webcam(ofAbstractParameter& e);
 
 	//-
 

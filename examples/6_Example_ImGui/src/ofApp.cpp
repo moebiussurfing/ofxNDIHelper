@@ -36,7 +36,6 @@ void ofApp::update()
 
 		ndi.drawSignals();
 	}
-
 	ndi.end_NDI_OUT();
 
 #endif

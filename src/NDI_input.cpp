@@ -392,9 +392,9 @@ void NDI_input::updateWorkaround()
 void NDI_input::draw() {
 	if (!bGui) return;
 	if (!bEnable) return;
+	if (!bDraw) return;
 	if (!bGui_Preview) return;
 	if (!bLoadedStartupDone) return;
-	if (!bDraw) return;
 
 	//-
 
@@ -558,7 +558,7 @@ void NDI_input::draw_FullScreen()
 {
 	if (!bEnable.get()) return;
 	if (!bDraw) return;
-	if (!bDrawMini) return;
+	//if (!bDrawMini) return;
 
 	// Receive ofTexture
 	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
