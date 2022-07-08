@@ -3,8 +3,16 @@
 ## Overview
 Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports and input **Webcam** devices with **customizable layout**.
 
-## Screenshot
+## Screenshots
+
+### 4_Example_Input
+A received NDI Input drawing into oF.
 ![](/1_Examples_ofxGui/4_Example_Input/Capture.PNG)
+
+### 5_Example_Full
+All the signal channels are drawen into a Canvas Layout,
+and sended to an NDI Output,
+ broadcasted to the network.
 ![](/1_Examples_ofxGui/5_Example_Full/Capture.PNG)
 
 ## Features
