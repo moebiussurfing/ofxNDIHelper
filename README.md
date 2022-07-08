@@ -52,6 +52,39 @@ ndi.setMode_ImGui();
 
 Look Examples for **ofxGui** or **ImGui** modes.
 
+```.cpp
+#include "ofxNDIHelper.h"
+ofxNDIHelper NDIHelper;
+
+void ofApp::update()
+{
+  NDIHelper.setup();
+}
+
+void ofApp::update()
+{
+	// Draw inside to feed the NDI Video Output.
+	// that's the signal we will send!
+	NDIHelper.begin_NDI_OUT();
+	{
+		// Draw Scene
+	}
+	NDIHelper.end_NDI_OUT();
+}
+
+void ofApp::draw()
+{
+	// Draw the full Canvas layout, 
+	// with all the enabled devices/channels draws.
+	// Like Preview Monitors and/or Full Screen previews,
+	// with help/debug info included.
+	NDIHelper.draw();
+
+	// Gui Settings
+	NDIHelper.draw_Gui();
+}
+```
+
 ## Dependencies
 
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
