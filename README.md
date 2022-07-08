@@ -21,14 +21,9 @@ A received NDI Input drawing into oF.
 
 ### 5_Example_Full
 
-All the incoming channels are drawn into a Canvas Layout,
-
-and sent to an NDI Output.
-
-Broadcasted to the network and previewed into an NDI Monitor App.
-
+All the incoming channels are drawn into a Canvas Layout, and sent to an NDI Output. 
+Broadcasted to the network and previewed into an NDI Monitor App. 
 Also receiving an NDI Pattern generator as an NDI Input, to be drawn into oF. 
-
 
 ![](/1_Examples_ofxGui/5_Example_Full/Capture.PNG)
 
