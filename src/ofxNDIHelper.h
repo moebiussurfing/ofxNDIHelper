@@ -266,6 +266,23 @@ private:
 
 	// Control Params
 
+private:
+
+	bool bMode_ofxGui = true;
+	bool bMode_ImGui = false;
+
+public:
+
+	void setMode_ofxGui() {
+		bMode_ofxGui = true;
+		bMode_ImGui = false;
+	};
+
+	void setMode_ImGui() {
+		bMode_ofxGui = false;
+		bMode_ImGui = true;
+	};
+
 public:
 
 	//ofParameter<bool> bGui_Controls;

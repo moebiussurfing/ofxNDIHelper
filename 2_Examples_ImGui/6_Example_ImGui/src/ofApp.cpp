@@ -7,14 +7,15 @@ void ofApp::setup()
 #ifdef USE_ofxNDI
 
 	ndi.setup();
-	ndi.setGuiInternalVisible(true);
+	ndi.setMode_ImGui();
+	
+	//ndi.setGuiInternalVisible(true);//debug
 
 #endif
 
 	//--
 
 	params.add(ndi.bGui);
-	params.add(ndi.bGui_Controls);
 
 	gui.setup("ofApp");
 	gui.add(params);
@@ -45,8 +46,7 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::drawBg()
 {
-	ofBackground(20);
-	//ofBackground(ofColor::orange);
+	ofBackground(24);
 }
 
 //--------------------------------------------------------------

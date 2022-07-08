@@ -14,8 +14,20 @@ public:
 	SurfingNDIGui NDIGui;
 
 	ofParameter<bool> bGui{"NDIManager", true};
-	ofParameter<bool> bGui_Controls{"Controls", true};
-	
+	//ofParameter<bool> bGui_Controls{"Controls", true};
+
+public:
+
+	void setMode_ofxGui() {
+		NDIHelper.setMode_ofxGui();
+	};
+
+	void setMode_ImGui() {
+		NDIHelper.setMode_ImGui();
+	};
+
+public:
+
 	void setGuiInternalVisible(bool b)//debug
 	{
 		NDIHelper.bGui_Internal = b;
@@ -30,10 +42,10 @@ public:
 		NDIGui.setup();
 
 		// Panels
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_Controls);
+		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui);
 		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_Webcam);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.NDI_Input1.bGui);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.NDI_Input2.bGui);
+		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_IN1);
+		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_IN2);
 		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_OUT);
 
 		NDIGui.startup();
@@ -52,7 +64,6 @@ public:
 		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.params_NDI_Output, OFX_IM_TOGGLE_SMALL);
 
 		bGui.makeReferenceTo(NDIHelper.bGui);
-		bGui_Controls.makeReferenceTo(NDIHelper.bGui_Controls);
 	};
 
 	// all the channels for user preview. take care with overwritten or to drawing twice by other draws!
@@ -119,48 +130,65 @@ public:
 		{
 			NDIGui.guiManager.begin();
 			{
-				float w = 175;
+				float w = 165;
 				ImVec2 size_min = ImVec2(w, -1);
 				ImVec2 size_max = ImVec2(w, -1);
+				
+				SurfingImGuiGroupStyle flags = SurfingImGuiGroupStyle_Collapsed;
 
 				// Main
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_Controls)) {
+				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui)) {
 					NDIGui.guiManager.AddGroup(NDIHelper.params_Panels);
+
 					NDIGui.guiManager.endWindowSpecial();
 				}
 
 				// Webcam
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
 				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_Webcam)) {
-					NDIGui.guiManager.AddGroup(NDIHelper.params_Webcam);
+					NDIGui.guiManager.AddGroup(NDIHelper.params_Webcam, flags);
+
 					NDIGui.guiManager.endWindowSpecial();
 				}
 
 				// In 1
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
 				//if (NDIGui.guiManager.beginWindowSpecial(2)) {
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input1.bGui)) {
-					ImGui::Text("Hello");
-					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input1.params);
+				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_IN1)) {
+					//ImGui::Text("Hello");
+					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input1.params, flags);
+
 					NDIGui.guiManager.endWindowSpecial();
 				}
 
 				// In 2
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
 				//if (NDIGui.guiManager.beginWindowSpecial(3)) {
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.NDI_Input2.bGui)) {
-					ImGui::Text("Hello");
-					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input2.params);
+				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_IN2)) {
+					//ImGui::Text("Hello");
+					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input2.params, flags);
+
 					NDIGui.guiManager.endWindowSpecial();
 				}
 
 				// Out
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
 				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_OUT)) {
-					NDIGui.guiManager.AddGroup(NDIHelper.params_NDI_Output);
+					NDIGui.guiManager.AddGroup(NDIHelper.params_NDI_Output, flags);
+
 					NDIGui.guiManager.endWindowSpecial();
 				}
+
+				//--
+
+				//if (NDIGui.guiManager.beginWindow("NDIHelper")) {
+				//	NDIGui.guiManager.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE);
+				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_IN1, OFX_IM_TOGGLE);
+				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_IN2, OFX_IM_TOGGLE);
+				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_OUT, OFX_IM_TOGGLE);
+				//	NDIGui.guiManager.endWindow();
+				//}
 			}
 			NDIGui.guiManager.end();
 		}

@@ -5,7 +5,7 @@
 
 ## Overview
 
-Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports  
+Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports,  
 and input **Webcam** devices with **customizable Canvas Layout**.  
 
 Distribute your NDI and Webcam Inputs to the Canvas Layout,  
@@ -20,9 +20,7 @@ Feed your oF drawing easy into a network broadcasted NDI Output.
 
 A received NDI Input drawing into oF.  
 
-
 ![](/1_Examples_ofxGui/4_Example_Input/Capture.PNG)
-
 
 ### 5_Example_Full
 
@@ -32,6 +30,16 @@ Also receiving an NDI Pattern generator as an NDI Input, to be drawn into oF.
 
 ![](/1_Examples_ofxGui/5_Example_Full/Capture.PNG)
 
+### 6_Example_ImGui
+
+Using **ImGui** instead of **ofxGui**.
+```.cpp  
+ndi.setup();
+ndi.setMode_ImGui();
+```
+
+
+![](/2_Examples_ImGui/6_Example_ImGui/Capture.PNG)
 
 ## Features
 
@@ -45,11 +53,9 @@ Also receiving an NDI Pattern generator as an NDI Input, to be drawn into oF.
 
 - Auto **store and recall** all the **settings**.
 
-
 ## Usage:
 
 Look Examples for **ofxGui** or **ImGui** modes.
-
 
 ## Dependencies
 

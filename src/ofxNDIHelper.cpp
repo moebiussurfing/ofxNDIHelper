@@ -657,9 +657,15 @@ void ofxNDIHelper::draw() {
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_Gui()
 {
-	if (!bGui) return;
-
 	ofDisableDepthTest();
+
+	// HelpBox
+	if (bHelp) textBoxWidget.draw();
+
+	//--
+	
+	if (!bGui) return;
+	if (!bMode_ofxGui) return;
 
 	//-
 
@@ -667,6 +673,7 @@ void ofxNDIHelper::draw_Gui()
 	{
 		// Gui Panel
 		//if (bGui_Controls)
+		if (bMode_ofxGui) 
 		{
 			bool bGuiLink = true;
 			if (bGuiLink) {
@@ -691,28 +698,27 @@ void ofxNDIHelper::draw_Gui()
 
 			//--
 
-			// Main Gui 
-			gui_Controls.draw();
+			if (bMode_ofxGui) 
+			{
+				// Main Gui 
+				gui_Controls.draw();
 
-			// Other panels
+				// Other panels
 
-			// Webcam
-			if (bGui_Webcam) gui_Webcam.draw();
+				// Webcam
+				if (bGui_Webcam) gui_Webcam.draw();
 
 #ifdef USE_ofxNDI_IN
-			// Inputs
-			NDI_Input1.drawGui();
-			NDI_Input2.drawGui();
+				// Inputs
+				NDI_Input1.drawGui();
+				NDI_Input2.drawGui();
 #endif
-			// Output
-			if (bGui_NDI_OUT) gui_NDI_Out.draw();
+				// Output
+				if (bGui_NDI_OUT) gui_NDI_Out.draw();
+			}
 		}
 	}
 
-	//--
-
-	// HelpBox
-	if (bHelp) textBoxWidget.draw();
 
 }
 
