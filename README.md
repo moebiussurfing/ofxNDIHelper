@@ -11,7 +11,7 @@ and input **Webcam** devices, to be drawn into a **customizable Canvas Layout**.
 Distribute your **NDI** and **Webcam Inputs** to the **Canvas Layout**,  
 at full screen or mini **previews**: _draggable and scalable_ by using the mouse.  
 
-Feed your oF drawing easy into a network broadcasted **NDI Output**.
+Feed your **oF** drawing easy into a **NDI Output** Broadcasted to the Network.
 
 ## Screenshots
 
