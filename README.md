@@ -5,20 +5,20 @@
 
 ## Overview
 
-Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2x**Inputs** / 1x**Output** ports,  
+Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 2 x **Inputs** / 1 x **Output** Ports,  
 and input **Webcam** devices with **customizable Canvas Layout**.  
 
-Distribute your NDI and Webcam Inputs to the Canvas Layout,  
-at full screen or mini previews: draggable and scalable by mouse.  
+Distribute your **NDI** and **Webcam Inputs** to the **Canvas Layout**,  
+at full screen or mini **previews**: draggable and scalable by mouse.  
 
-Feed your oF drawing easy into a network broadcasted NDI Output.
+Feed your oF drawing easy into a network broadcasted **NDI Output**.
 
 ## Screenshots
 
 
 ### 4_Example_Input
 
-A received NDI Input drawing into oF.  
+A received **NDI Input** drawing into **oF**.  
 
 ![](/1_Examples_ofxGui/4_Example_Input/Capture.PNG)
 
