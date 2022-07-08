@@ -58,7 +58,7 @@ ofxNDIHelper NDIHelper;
 
 void ofApp::update()
 {
-  NDIHelper.setup();
+        NDIHelper.setup();
 }
 
 void ofApp::update()
