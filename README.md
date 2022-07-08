@@ -8,7 +8,8 @@ Helper add-on for **openFrameworks** to handle [NDI](https://www.ndi.tv/tools/) 
 and input **Webcam** devices, to be drawn into a **customizable Canvas Layout**.  
 
 Distribute your **NDI** and **Webcam Inputs** to the **Canvas Layout**,  
-at full screen or mini **previews**: _draggable and scalable_ by using the mouse.  
+at full screen or mini **previews**:  
+_draggable and scalable_ by using the mouse.  
 
 Feed your **oF** drawing easy into a **NDI Output** Broadcasted to the Network.
 
@@ -56,7 +57,7 @@ Look Examples for **ofxGui** or **ImGui** modes.
 #include "ofxNDIHelper.h"
 ofxNDIHelper NDIHelper;
 
-void ofApp::update()
+void ofApp::setup()
 {
         NDIHelper.setup();
 }
