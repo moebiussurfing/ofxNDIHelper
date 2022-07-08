@@ -102,7 +102,6 @@ void ofApp::draw()
 
 
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp)
-
 * [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST)
 
   </p>
