@@ -76,7 +76,7 @@ void ofApp::update()
 void ofApp::draw()
 {
 	// Draw the full Canvas layout, 
-	// with all the enabled devices/channels draws.
+	// with all the enabled devices/channels drawn.
 	// Like Preview Monitors and/or Full Screen previews,
 	// with help/debug info included.
 	NDIHelper.draw();
