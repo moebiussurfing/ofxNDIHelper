@@ -58,9 +58,10 @@ void NDI_input::setup(string _name)
 
 	setup_Fbo();
 
-	doListDevices();
-
 	bDISABLE_CALLBACKS = false;
+
+	//doScan();
+	loadSettings();
 }
 
 //--------------------------------------------------------------
@@ -68,7 +69,9 @@ void NDI_input::startup()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
-	loadSettings();
+	//loadSettings();
+
+	doScan();
 
 	//--
 
@@ -80,7 +83,9 @@ void NDI_input::startupDelayed()
 {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
-	doScan();
+	loadSettings();
+
+	bStartupDelayedDone = true;
 }
 
 //--------------------------------------------------------------
@@ -90,6 +95,8 @@ void NDI_input::setup_Params()
 
 	bGui_Internal.set("IN " + name, true);
 	bGui_Preview.set("IN PREVIEW" + name, true);
+
+	bLoad.set("Load Settings");
 
 	bNext.set("NEXT", false);
 	bLockRatio.set("LOCK ASPECT", true);
@@ -114,6 +121,7 @@ void NDI_input::setup_Params()
 #else
 	nameDevice.setSerializable(false);
 #endif
+	bLoad.setSerializable(false);
 	bReset.setSerializable(false);
 	bNext.setSerializable(false);
 	scaleMode_Name.setSerializable(false);
@@ -137,8 +145,6 @@ void NDI_input::setup_Params()
 	params_Settings.add(indexDevice);
 	params_Settings.add(nameDevice);
 	params_Settings.add(bNext);
-	params_Settings.add(scaleMode_Index);
-	params_Settings.add(scaleMode_Name);
 	params_Settings.add(bScan);//now is automatic
 
 	//--
@@ -150,6 +156,9 @@ void NDI_input::setup_Params()
 	params_Control.add(rect_NDI_IN.bEdit);
 	params_Control.add(bReset);
 	params_Control.add(bLockRatio);
+	params_Control.add(scaleMode_Index);
+	params_Control.add(scaleMode_Name);
+	params_Control.add(bLoad);
 	params_Control.add(position_Gui);
 
 	//--
@@ -321,7 +330,7 @@ void NDI_input::setup_ByName(string _nameDevice)
 //--------------------------------------------------------------
 void NDI_input::drawGui()
 {
-	if (!bGui) return;
+	//if (!bGui) return;
 	if (!bGui_Internal) return;
 
 	gui_Control.draw();
@@ -336,6 +345,10 @@ void NDI_input::update(ofEventArgs& args)
 //--------------------------------------------------------------
 void NDI_input::updateWorkaround()
 {
+	//TODO: need to improve the startup process to correctly load settings
+	// when scanning is ready done and corrent NDI sender name is found 
+	// currently broadcasting on the network.
+
 	static int timerStartupDone = 0;
 
 	if (bEnable) {
@@ -354,8 +367,8 @@ void NDI_input::updateWorkaround()
 
 	//--
 
-	// uncomment to delay some frames...
-	//if (ofGetFrameNum() == (int)DEFAULT_STARTUP_WAITING_TIME) 
+	// Startup phases:
+ 
 	if (ofGetFrameNum() >= (int)DEFAULT_STARTUP_WAITING_TIME)
 	{
 		if (!bLoadedStartupDone)
@@ -385,6 +398,12 @@ void NDI_input::updateWorkaround()
 		{
 			startupDelayed();
 		}
+	}
+
+	if (bStartupDelayedDone) 
+	{
+		bStartupDelayedDone = false;
+		doScan();
 	}
 }
 
@@ -734,7 +753,7 @@ void NDI_input::Changed(ofAbstractParameter& e)
 	//--
 
 #ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-	else if (name == nameDevice.getName() /*&& bEnable.get()*/)
+	else if (name == nameDevice.getName())
 	{
 		setup_ByName(nameDevice);
 	}
@@ -742,14 +761,14 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//--
 
-	else if (name == indexDevice.getName() /*&& bEnable.get()*/)
+	else if (name == indexDevice.getName())
 	{
 		setup_ByIndex(indexDevice);
 	}
 
 	//--
 
-	else if (name == scaleMode_Index.getName() /*&& bEnable.get()*/)
+	else if (name == scaleMode_Index.getName())
 	{
 		switch (scaleMode_Index)
 		{
@@ -786,6 +805,11 @@ void NDI_input::Changed(ofAbstractParameter& e)
 		bReset = false;
 
 		doReset_Mini_PreviewsSize();
+	}
+
+	else if (name == bLoad.getName())
+	{
+		loadSettings();
 	}
 
 	//--

@@ -1,8 +1,0 @@
-ofxGui
-ofxNDI
-ofxNDIHelper
-ofxSceneTEST
-ofxSurfingBox
-ofxSurfingHelpers
-ofxWindowApp
-ofxChildFrame

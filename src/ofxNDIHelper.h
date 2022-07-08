@@ -8,22 +8,22 @@
 
 	TODO:
 
-	+ Allow change layers sorting. store an int vector with position of each layer
-		now drawing order is: ndi in 1, 2, webcam and out.
+	+ Layout Canvas: Allow change layers sorting. store an int vector with position of each layer
+		now drawing order is: NDI in 1, 2, Webcam and out.
 
-	+ split NDI out to a class like for ndi input
+	+ split NDI out to a class like for NDI input
 
 	+ Fix mode scale for Webcam
-		+ webcam mode scale move to params like ndi input class
+		+ webcam mode scale move to params like NDI input class
 
 	+ TODO: WIP
 	+ child_frame: Finish make all transforms proportional to sizes
 		+ save load these settings.
 		only zoom works.
 
-	+ Real preview size or custom / fullsize.
+	+ Real preview size or custom / full size.
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
-		+ e.g. ndi out do not fits exactly the fullwidth frame.
+		+ e.g. ndi out do not fits exactly the full width frame.
 
 	+ Split Webcam part as a new helper add-on. ?
 	+ make cam a class to allow multiple. check MSA cam add-on
@@ -34,6 +34,7 @@
 	+ Fix directives+classes to allow use i.e. only the camera or only the Output.
 
 */
+
 
 //---
 
@@ -157,6 +158,7 @@ public:
 
 	void setActive(bool b);
 	void setGuiVisible(bool b);
+	void setGuiInternalVisible(bool b);
 	void setGuiToggleVisible();
 	void setPathGlobal(std::string s);
 	void setLogLevel(ofLogLevel level);
@@ -251,7 +253,14 @@ private:
 	//-
 
 	void Changed(ofAbstractParameter& e);
+
+#ifdef USE_WEBCAM 
 	void Changed_Webcam(ofAbstractParameter& e);
+#endif
+
+#ifdef USE_ofxNDI_OUT 
+	void Changed_NDI_Out(ofAbstractParameter& e);
+#endif
 
 	//-
 
@@ -259,11 +268,15 @@ private:
 
 public:
 
-	ofParameter<bool> bGui_Controls;
+	//ofParameter<bool> bGui_Controls;
 	ofParameter<bool> bGui;
-	ofParameter<bool> bGui_Webcam;
-	ofParameter<bool> bGui_NDI_OUT;
 	ofParameter<bool> bGui_Internal;//ofxGui
+	ofParameter<bool> bGui_Webcam;
+#ifdef USE_ofxNDI_IN
+	ofParameter<bool> bGui_NDI_IN1;
+	ofParameter<bool> bGui_NDI_IN2;
+#endif
+	ofParameter<bool> bGui_NDI_OUT;
 
 	ofParameterGroup params_Panels;
 	ofParameterGroup params_Internal;
@@ -401,7 +414,7 @@ private:
 
 public:
 
-	void draw_NDI_OUT();//-> for internal use
+	void draw_NDI_OUT(); // -> for internal use
 	void draw_NDI_OUT_MiniPreview(bool bInfo = false);
 	void draw_NDI_OUT_Full();
 

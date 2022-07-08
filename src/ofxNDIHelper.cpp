@@ -71,6 +71,10 @@ ofxNDIHelper::~ofxNDIHelper()
 	ofRemoveListener(params_Webcam.parameterChangedE(), this, &ofxNDIHelper::Changed_Webcam);
 #endif
 
+#ifdef USE_ofxNDI_OUT
+	ofRemoveListener(params_NDI_Output.parameterChangedE(), this, &ofxNDIHelper::Changed_NDI_Out);
+#endif
+
 #ifdef USE_OFX_CHILD_FRAME
 	ofRemoveListener(ofEvents().update, this, &ofxNDIHelper::update);
 	ofRemoveListener(ofEvents().mouseScrolled, this, &ofxNDIHelper::mouseScrolled);
@@ -322,7 +326,7 @@ void ofxNDIHelper::setup_Params()
 {
 	bGui_Internal.set("ofxGui", true);
 	bGui.set("NDI HELPER", true);
-	bGui_Controls.set("NDI CONTROLS", true);
+	//bGui_Controls.set("NDI CONTROLS", true);
 	bGui_Webcam.set("WEBCAM", true);
 	bGui_NDI_OUT.set("OUT", true);
 
@@ -360,16 +364,17 @@ void ofxNDIHelper::setup_Params()
 	// NDI OUT
 
 #ifdef USE_ofxNDI_OUT
-	bNDI_Output_Enable.set("OUT ENABLE", false);
-	bNDI_Output_Draw.set("OUT DRAW", true);
-	bNDI_Output_Mini.set("OUT MINI", true);
-	NDI_Output_Name.set("OUT", "oF");
+	bNDI_Output_Enable.set("ENABLE", false);
+	bNDI_Output_Draw.set("DRAW", true);
+	bNDI_Output_Mini.set("MINI", true);
+	NDI_Output_Name.set("NAME", "oF");
 
 	params_NDI_Output.setName("NDI OUTPUT");
 	params_NDI_Output.add(NDI_Output_Name);
 	params_NDI_Output.add(bNDI_Output_Enable);
 	params_NDI_Output.add(bNDI_Output_Draw);
 	params_NDI_Output.add(bNDI_Output_Mini);
+	params_NDI_Output.add(rect_NDI_OUT.bEdit);
 #endif
 
 	//--
@@ -397,8 +402,12 @@ void ofxNDIHelper::setup_Params()
 	params_Panels.add(bGui_Webcam);
 
 #ifdef USE_ofxNDI_IN
-	params_Panels.add(NDI_Input1.bGui_Internal);
-	params_Panels.add(NDI_Input2.bGui_Internal);
+
+	bGui_NDI_IN1.makeReferenceTo(NDI_Input1.bGui_Internal);
+	bGui_NDI_IN2.makeReferenceTo(NDI_Input2.bGui_Internal);
+	params_Panels.add(bGui_NDI_IN1);
+	params_Panels.add(bGui_NDI_IN2);
+
 #endif
 
 	params_Panels.add(bGui_NDI_OUT);
@@ -419,18 +428,6 @@ void ofxNDIHelper::setup_Params()
 
 	params_Callbacks.setName("Callbacks");
 
-#ifdef USE_WEBCAM
-	params_Callbacks.add(bWebcam_Next);
-	params_Callbacks.add(bWebcam_Enable);
-	params_Callbacks.add(bWebcam_Restart);
-	params_Callbacks.add(webcam_Index_Device);
-#endif
-
-#ifdef USE_ofxNDI_OUT
-	params_Callbacks.add(bNDI_Output_Enable);
-	params_Callbacks.add(NDI_Output_Name);
-#endif
-
 	params_Callbacks.add(bResetLayout);
 	params_Callbacks.add(bResetGui);
 	params_Callbacks.add(position_Gui);
@@ -440,6 +437,10 @@ void ofxNDIHelper::setup_Params()
 
 #ifdef USE_WEBCAM
 	ofAddListener(params_Webcam.parameterChangedE(), this, &ofxNDIHelper::Changed_Webcam);
+#endif
+
+#ifdef USE_ofxNDI_OUT
+	ofAddListener(params_NDI_Output.parameterChangedE(), this, &ofxNDIHelper::Changed_NDI_Out);
 #endif
 }
 
@@ -665,7 +666,7 @@ void ofxNDIHelper::draw_Gui()
 	if (bGui_Internal)
 	{
 		// Gui Panel
-		if (bGui_Controls)
+		//if (bGui_Controls)
 		{
 			bool bGuiLink = true;
 			if (bGuiLink) {
@@ -765,10 +766,10 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	{
 		bGui = !bGui;
 	}
-	else if (key == 'g')
-	{
-		bGui_Controls = !bGui_Controls;
-	}
+	//else if (key == 'g')
+	//{
+	//	bGui_Controls = !bGui_Controls;
+	//}
 
 	//--
 
@@ -900,6 +901,12 @@ void ofxNDIHelper::setGuiVisible(bool b)
 }
 
 //--------------------------------------------------------------
+void ofxNDIHelper::setGuiInternalVisible(bool b)
+{
+	bGui_Internal = b;
+}
+
+//--------------------------------------------------------------
 void ofxNDIHelper::setGuiToggleVisible()
 {
 	bGui = !bGui;
@@ -931,6 +938,49 @@ void ofxNDIHelper::doReset_Gui()
 #endif
 }
 
+#ifdef USE_ofxNDI_OUT 
+//--------------------------------------------------------------
+void ofxNDIHelper::Changed_NDI_Out(ofAbstractParameter& e)
+{
+	if (bDISABLE_CALLBACKS) return;
+
+	string name = e.getName();
+
+	// exclude debugs
+	if (name != scaleMode_Name.getName()
+		//	&& name != "exclude"
+		)
+	{
+		ofLogNotice(__FUNCTION__) << name << " : " << e;
+	}
+
+	if (0) {}
+
+	//----
+
+	// NDI OUT
+
+	else if (name == bNDI_Output_Enable.getName())
+		//else if (name == bNDI_Output_Enable.getName() && bNDI_Output_Enable.get())
+	{
+		if (bNDI_Output_Enable.get())
+		{
+			//setup_NDI_OUT();
+		}
+		else
+		{
+			//NDI_OUT_Sender.ReleaseSender();//?
+		}
+	}
+	else if (name == NDI_Output_Name.getName())
+	{
+		setup_NDI_OUT();
+	}
+
+}
+#endif
+
+#ifdef USE_WEBCAM
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed_Webcam(ofAbstractParameter& e)
 {
@@ -939,19 +989,18 @@ void ofxNDIHelper::Changed_Webcam(ofAbstractParameter& e)
 	string name = e.getName();
 
 	// exclude debugs
-	//if (name != "exclude"
-	//	&& name != "exclude")
+	if (name != scaleMode_Name.getName()
+		//	&& name != "exclude"
+		)
 	{
 		ofLogNotice(__FUNCTION__) << name << " : " << e;
 	}
-	
+
 	if (0) {}
 
 	//----
 
 	// WEBCAM
-
-#ifdef USE_WEBCAM
 
 	else if (name == bWebcam_Enable.getName())
 	{
@@ -988,9 +1037,8 @@ void ofxNDIHelper::Changed_Webcam(ofAbstractParameter& e)
 		setup_Webcam(webcam_Index_Device);
 		bWebcam_Enable = true;
 	}
-
-#endif
 }
+#endif
 
 //--------------------------------------------------------------
 void ofxNDIHelper::Changed(ofAbstractParameter& e)
@@ -1023,31 +1071,6 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 
 		doReset_Gui();
 	}
-
-	//----
-
-	// NDI OUT
-
-#ifdef USE_ofxNDI_OUT 
-
-	else if (name == bNDI_Output_Enable.getName())
-		//else if (name == bNDI_Output_Enable.getName() && bNDI_Output_Enable.get())
-	{
-		if (bNDI_Output_Enable.get())
-		{
-			//setup_NDI_OUT();
-		}
-		else
-		{
-			//NDI_OUT_Sender.ReleaseSender();//?
-		}
-	}
-	else if (name == NDI_Output_Name.getName())
-	{
-		setup_NDI_OUT();
-	}
-
-#endif
 
 	//----
 

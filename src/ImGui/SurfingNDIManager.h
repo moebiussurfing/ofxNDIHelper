@@ -15,7 +15,12 @@ public:
 
 	ofParameter<bool> bGui{"NDIManager", true};
 	ofParameter<bool> bGui_Controls{"Controls", true};
-
+	
+	void setGuiInternalVisible(bool b)//debug
+	{
+		NDIHelper.bGui_Internal = b;
+	}
+	
 	void setup() {
 		NDIHelper.setup();
 		NDIHelper.bGui_Internal = false;

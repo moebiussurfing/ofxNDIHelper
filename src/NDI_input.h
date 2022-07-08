@@ -32,13 +32,14 @@ public:
 	
 	bool bLoadedStartupDone = false; // to hide all and waiting startup done to start drawing.
 	bool bFoundSendersDone = false; 
+	bool bStartupDelayedDone = false;
 
 public:
 
 	NDI_input();
 	~NDI_input();
 
-	void setup(string name = "myInput");
+	void setup(string name = "InputToOF");
 	void setup_Params();
 	void update(ofEventArgs& args); 
 	void draw();
@@ -98,13 +99,15 @@ private:
 
 	ofParameter<bool> bReset;
 	ofParameter<bool> bNext;
+	ofParameter<void> bLoad;
 
 public:
 
 	void setDebug(bool b) { bDebug = b; }
 	void setMini(bool b) { bDrawMini = b; }
 	void setToggleDebug() { bDebug = !bDebug; }
-	void setToggleMini() { bDrawMini = !bDrawMini; }
+	void setToggleMini() { bDrawMini = !bDrawMini; } // Legacy API
+	void setToggleFullScreen() { setToggleMini(); }
 
 private:
 
