@@ -1,5 +1,4 @@
 
-
 # ofxNDIHelper
 
 
@@ -44,13 +43,9 @@ ndi.setMode_ImGui();
 ## Features
 
 - Add an **NDI Manager** to your apps **fast**.
-
 - 1 Webcam INPUT + 2 NDI INPUTS + 1 NDI OUTPUT.
-
 - List, select and draw **NDI INPUT Devices** from, feed to an OUTPUT, and draw or route a **Webcam** device too.
-
 - Draggable and scalable **Mini Previews Layout**.
-
 - Auto **store and recall** all the **settings**.
 
 ## Usage:
@@ -60,15 +55,10 @@ Look Examples for **ofxGui** or **ImGui** modes.
 ## Dependencies
 
 * [ofxNDI](https://github.com/leadedge/ofxNDI)
-
 * [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
-
 * [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
-
 * [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
-
 * ofxGui / oF Core  
-
 
 <details>
 
@@ -88,7 +78,7 @@ Look Examples for **ofxGui** or **ImGui** modes.
 
 <details>
 
-  <summary>HowTo. New to NDI?</summary>
+  <summary>HowTo Start? New to NDI?</summary>
 
   <p>
 
@@ -116,7 +106,7 @@ while looking at the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 
 ## Tested Systems
 
-- **Windows 10** / **VS 2022** / **oF 0.12**
+- **Windows 10** / **VS 2022** / **oF 0.12+**
 
 
 ## Author
