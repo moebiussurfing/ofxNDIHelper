@@ -13,7 +13,7 @@ at full screen or mini **previews**: _draggable and scalable_ by using the mouse
 
 Feed your **oF** drawing easy into a **NDI Output** Broadcasted to the Network.
 
-## Screenshots
+## Usage
 
 
 ### 4_Example_Input
