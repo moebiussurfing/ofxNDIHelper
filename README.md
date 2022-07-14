@@ -95,16 +95,13 @@ void ofApp::draw()
 - ofxGui / oF Core  
 
 <details>
-
-  <summary>For examples only</summary>
-
-  <p>
-
+<summary>For examples only. Not required</summary>
+<p>
 
 * [ofxWindowApp](https://github.com/moebiussurfing/ofxWindowApp)
 * [ofxSceneTEST](https://github.com/moebiussurfing/ofxSceneTEST)
 
-  </p>
+</p>
 
 </details>
 
