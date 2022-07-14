@@ -88,8 +88,7 @@ void ofApp::draw()
 
 ## Dependencies
 
-- [ofxNDI](https://github.com/leadedge/ofxNDI)
-- [Runtime](https://ndi.palakis.fr/runtime/)
+- [ofxNDI](https://github.com/leadedge/ofxNDI) / [macOS requires installing the Runtime, not just NDI Tools](https://ndi.palakis.fr/runtime/)
 - [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 - [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
 - [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
@@ -134,6 +133,7 @@ while looking at the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 ## Tested Systems
 
 - **MS Windows 10** / **VS 2022** / **oF 0.12+**
+- **macOS 11.6.7 Big Sur** / **Xcode 13.2.1** / **oF 0.11.2**  
 
 
 ## Author
