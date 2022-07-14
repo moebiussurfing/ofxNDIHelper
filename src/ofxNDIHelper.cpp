@@ -1786,8 +1786,11 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	//strcpy_s(senderName, 256, "OF NDI Sender"); // Set the sender name
 
 	const std::string str = NDI_Output_Name.get();
-	strcpy_s(senderName, 256, str.c_str()); //Set the sender name
-
+    
+//    strcpy_s(senderName, 256, str.c_str()); //Set the sender name // VS Windows. fails on macOS
+//    strncpy(senderName, 256, str.c_str()); //Set the sender name // macOS Xcode
+    std::snprintf(senderName, sizeof(senderName), "%s", str.c_str()); // macOS Xcode
+    
 	// Set the dimensions of the sender output here
 	// This is independent of the size of the display window
 	// Sender dimensions and fps are not known yet
