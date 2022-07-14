@@ -88,7 +88,7 @@ void ofApp::draw()
 
 ## Dependencies
 
-- [ofxNDI](https://github.com/leadedge/ofxNDI) / [macOS requires installing the Runtime, not just NDI Tools](https://ndi.palakis.fr/runtime/)
+- [ofxNDI](https://github.com/leadedge/ofxNDI) / (macOS requires installing the [Runtime](https://ndi.palakis.fr/runtime/), not just NDI Tools)
 - [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 - [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
 - [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
