@@ -88,11 +88,12 @@ void ofApp::draw()
 
 ## Dependencies
 
-* [ofxNDI](https://github.com/leadedge/ofxNDI)
-* [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
-* [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
-* [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
-* ofxGui / oF Core  
+- [ofxNDI](https://github.com/leadedge/ofxNDI)
+- [Runtime](https://ndi.palakis.fr/runtime/)
+- [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
+- [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
+- [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
+- ofxGui / oF Core  
 
 <details>
 
