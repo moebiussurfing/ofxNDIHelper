@@ -129,7 +129,7 @@ while looking at the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 
 ## Tested Systems
 
-- **MS Windows 10** / **VS 2022** / **oF 0.12+**
+- **Windows 10** / **VS 2022** / **oF 0.12+**
 - **macOS 11.6.7 Big Sur** / **Xcode 13.2.1** / **oF 0.11.2**  
 
 
