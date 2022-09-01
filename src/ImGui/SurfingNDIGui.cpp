@@ -20,9 +20,9 @@ void SurfingNDIGui::setup()
 {
 	ofLogNotice(__FUNCTION__);
 
-	guiManager.setName("NDIGui");
-	guiManager.setWindowsMode(IM_GUI_MODE_WINDOWS_SPECIAL_ORGANIZER);
-	guiManager.setup();
+	ui.setName("NDIGui");
+	ui.setWindowsMode(IM_GUI_MODE_WINDOWS_SPECIAL_ORGANIZER);
+	ui.setup();
 }
 
 //--------------------------------------------------------------
@@ -30,7 +30,7 @@ void SurfingNDIGui::startup()
 {
 	ofLogNotice(__FUNCTION__);
 
-	guiManager.startup();
+	ui.startup();
 }
 
 //--------------------------------------------------------------
@@ -38,13 +38,13 @@ void SurfingNDIGui::draw()
 {
 	//ofLogNotice(__FUNCTION__);
 
-	//guiManager.begin();
+	//ui.begin();
 	//{
 	//	//IMGUI_SUGAR__WINDOWS_CONSTRAINTSW;
-	//	//if (guiManager.beginWindowSpecial("ofApp"))
+	//	//if (ui.beginWindowSpecial("ofApp"))
 	//	//{
-	//	//	guiManager.endWindowSpecial();
+	//	//	ui.endWindowSpecial();
 	//	//}
 	//}
-	//guiManager.end();
+	//ui.end();
 }

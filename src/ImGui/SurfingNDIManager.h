@@ -42,11 +42,11 @@ public:
 		NDIGui.setup();
 
 		// Panels
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_Webcam);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_IN1);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_IN2);
-		NDIGui.guiManager.addWindowSpecial(NDIHelper.bGui_NDI_OUT);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_Webcam);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_NDI_IN1);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_NDI_IN2);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_NDI_OUT);
 
 		NDIGui.startup();
 		
@@ -54,14 +54,14 @@ public:
 
 		// Styles
 
-		NDIGui.guiManager.ClearStyles();
+		NDIGui.ui.ClearStyles();
 		
-		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.params_Panels, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_Panels, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
 
-		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.params_Webcam, OFX_IM_TOGGLE_SMALL);
-		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.NDI_Input1.params, OFX_IM_TOGGLE_SMALL);
-		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.NDI_Input2.params, OFX_IM_TOGGLE_SMALL);
-		NDIGui.guiManager.AddStyleGroupForBools(NDIHelper.params_NDI_Output, OFX_IM_TOGGLE_SMALL);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_Webcam, OFX_IM_TOGGLE_SMALL);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.NDI_Input1.params, OFX_IM_TOGGLE_SMALL);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.NDI_Input2.params, OFX_IM_TOGGLE_SMALL);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_NDI_Output, OFX_IM_TOGGLE_SMALL);
 
 		bGui.makeReferenceTo(NDIHelper.bGui);
 	};
@@ -128,69 +128,69 @@ public:
 
 		if (NDIHelper.bGui)
 		{
-			NDIGui.guiManager.begin();
+			NDIGui.ui.Begin();
 			{
 				float w = 165;
 				ImVec2 size_min = ImVec2(w, -1);
 				ImVec2 size_max = ImVec2(w, -1);
 				
-				SurfingImGuiGroupStyle flags = SurfingImGuiGroupStyle_Collapsed;
+				SurfingGuiGroupStyle flags = SurfingGuiGroupStyle_Collapsed;
 
 				// Main
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui)) {
-					NDIGui.guiManager.AddGroup(NDIHelper.params_Panels);
+				if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui)) {
+					NDIGui.ui.AddGroup(NDIHelper.params_Panels);
 
-					NDIGui.guiManager.endWindowSpecial();
+					NDIGui.ui.EndWindowSpecial();
 				}
 
 				// Webcam
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_Webcam)) {
-					NDIGui.guiManager.AddGroup(NDIHelper.params_Webcam, flags);
+				if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_Webcam)) {
+					NDIGui.ui.AddGroup(NDIHelper.params_Webcam, flags);
 
-					NDIGui.guiManager.endWindowSpecial();
+					NDIGui.ui.EndWindowSpecial();
 				}
 
 				// In 1
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				//if (NDIGui.guiManager.beginWindowSpecial(2)) {
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_IN1)) {
+				//if (NDIGui.ui.BeginWindowSpecial(2)) {
+				if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_NDI_IN1)) {
 					//ImGui::Text("Hello");
-					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input1.params, flags);
+					NDIGui.ui.AddGroup(NDIHelper.NDI_Input1.params, flags);
 
-					NDIGui.guiManager.endWindowSpecial();
+					NDIGui.ui.EndWindowSpecial();
 				}
 
 				// In 2
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				//if (NDIGui.guiManager.beginWindowSpecial(3)) {
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_IN2)) {
+				//if (NDIGui.ui.BeginWindowSpecial(3)) {
+				if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_NDI_IN2)) {
 					//ImGui::Text("Hello");
-					NDIGui.guiManager.AddGroup(NDIHelper.NDI_Input2.params, flags);
+					NDIGui.ui.AddGroup(NDIHelper.NDI_Input2.params, flags);
 
-					NDIGui.guiManager.endWindowSpecial();
+					NDIGui.ui.EndWindowSpecial();
 				}
 
 				// Out
 				ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-				if (NDIGui.guiManager.beginWindowSpecial(NDIHelper.bGui_NDI_OUT)) {
-					NDIGui.guiManager.AddGroup(NDIHelper.params_NDI_Output, flags);
+				if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_NDI_OUT)) {
+					NDIGui.ui.AddGroup(NDIHelper.params_NDI_Output, flags);
 
-					NDIGui.guiManager.endWindowSpecial();
+					NDIGui.ui.EndWindowSpecial();
 				}
 
 				//--
 
-				//if (NDIGui.guiManager.beginWindow("NDIHelper")) {
-				//	NDIGui.guiManager.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE);
-				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_IN1, OFX_IM_TOGGLE);
-				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_IN2, OFX_IM_TOGGLE);
-				//	NDIGui.guiManager.Add(NDIHelper.bGui_NDI_OUT, OFX_IM_TOGGLE);
-				//	NDIGui.guiManager.endWindow();
+				//if (NDIGui.ui.BeginWindow("NDIHelper")) {
+				//	NDIGui.ui.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE);
+				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_IN1, OFX_IM_TOGGLE);
+				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_IN2, OFX_IM_TOGGLE);
+				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_OUT, OFX_IM_TOGGLE);
+				//	NDIGui.ui.EndWindow();
 				//}
 			}
-			NDIGui.guiManager.end();
+			NDIGui.ui.End();
 		}
 	};
 

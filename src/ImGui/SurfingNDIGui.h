@@ -23,6 +23,6 @@ public:
 	void startup();
 	void draw();
 
-	ofxSurfing_ImGui_Manager guiManager;
+	ofxSurfingGui ui;
 };
 
