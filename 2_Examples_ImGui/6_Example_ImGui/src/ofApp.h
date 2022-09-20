@@ -26,6 +26,7 @@ public:
 
 public:
 
+	// NDI
 #ifdef USE_ofxNDI
 	SurfingNDIManager ndi;
 #endif

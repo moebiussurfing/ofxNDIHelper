@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-
+	// NDI
 #ifdef USE_ofxNDI
 
 	ndi.setup();
@@ -29,7 +29,8 @@ void ofApp::update()
 {
 	// Draw inside to feed the NDI Video Output.
 	// that's the signal we will send!
-
+	
+	// NDI
 #ifdef USE_ofxNDI
 
 	ndi.begin_NDI_OUT();
@@ -54,6 +55,7 @@ void ofApp::draw()
 {
 	drawBg();
 
+	// NDI Preview
 #ifdef USE_ofxNDI
 
 	ndi.draw();
@@ -64,6 +66,7 @@ void ofApp::draw()
 
 	//----
 
+	// NDI Gui
 #ifdef USE_ofxNDI
 
 	ndi.drawGui();

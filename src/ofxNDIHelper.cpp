@@ -172,6 +172,7 @@ void ofxNDIHelper::setup()
 	rect_NDI_OUT.setPathGlobal(path_GLOBAL + path_rect_NDI_OUT);
 	rect_NDI_OUT.setup();
 	rect_NDI_OUT.setUseBorder(true);
+	rect_NDI_OUT.setBorderColor(ofColor(0, 200));
 #endif
 
 	//--

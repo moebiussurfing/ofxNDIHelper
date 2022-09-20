@@ -8,6 +8,8 @@
 
 	TODO:
 
+	+ customize ui widgets better, not using groups!
+
 	+ Layout Canvas: Allow change layers sorting. store an int vector with position of each layer
 		now drawing order is: NDI in 1, 2, Webcam and out.
 
@@ -17,6 +19,7 @@
 		+ webcam mode scale move to params like NDI input class
 
 	+ TODO: WIP
+	+ should replace by ofxComponent
 	+ child_frame: Finish make all transforms proportional to sizes
 		+ save load these settings.
 		only zoom works.
@@ -50,8 +53,9 @@
 
 //--
 
-#define USE_OFX_CHILD_FRAME 
+//TODO:
 // WIP: BUG: can't be removed... breaks camera.
+//#define USE_OFX_CHILD_FRAME 
 // -> WIP. For transform the Webcam content: 
 // zoom and translate. Requires ofxChildFrame.
 
