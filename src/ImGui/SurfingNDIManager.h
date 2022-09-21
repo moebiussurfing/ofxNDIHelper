@@ -167,7 +167,10 @@ public:
 					NDIGui.ui.EndWindowSpecial();
 				}
 
+				//--
+
 				// Webcam
+
 				if (NDIHelper.bGui_Webcam || !NDIGui.ui.bMinimize)
 				{
 					if (NDIHelper.bGui_Webcam) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
@@ -197,7 +200,10 @@ public:
 					}
 				}
 
+				//--
+
 				// Out
+
 				if (NDIHelper.bGui_NDI_OUT || !NDIGui.ui.bMinimize)
 				{
 					if (NDIHelper.bGui_NDI_OUT) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
@@ -212,13 +218,17 @@ public:
 
 						if (!NDIGui.ui.bMinimize) {
 							NDIGui.ui.Add(NDIHelper.rect_NDI_OUT.bEdit, OFX_IM_TOGGLE);
+							NDIGui.ui.Add(NDIHelper.NDI_Output_Name, OFX_IM_TEXT_INPUT);
 						}
 
 						NDIGui.ui.EndWindowSpecial();
 					}
 				}
 
+				//--
+
 				// In 1
+
 				if (NDIHelper.bGui_NDI_IN1 || !NDIGui.ui.bMinimize)
 				{
 					if (NDIHelper.bGui_NDI_IN1) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
@@ -233,9 +243,6 @@ public:
 								NDIGui.ui.Add(NDIHelper.NDI_Input1.bDrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
 						//NDIGui.ui.Add(NDIHelper.NDI_Input1.bNext, OFX_IM_BUTTON_SMALL);
 
-						if (!NDIGui.ui.bMinimize)
-							NDIGui.ui.Add(NDIHelper.NDI_Input1.bScan, OFX_IM_TOGGLE_SMALL);
-
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input1.indexDevice, NDIHelper.NDI_Input1.namesDevices);
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input1.scaleMode_Index, NDIHelper.NDI_Input1.scaleMode_Names);
 						if (!NDIGui.ui.bMinimize) {
@@ -244,11 +251,17 @@ public:
 							NDIGui.ui.Add(NDIHelper.NDI_Input1.bReset, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
 						}
 
+						if (!NDIGui.ui.bMinimize)
+							NDIGui.ui.Add(NDIHelper.NDI_Input1.bScan, OFX_IM_TOGGLE_SMALL);
+
 						NDIGui.ui.EndWindowSpecial();
 					}
 				}
 
+				//--
+
 				// In 2
+
 				if (NDIHelper.bGui_NDI_IN2 || !NDIGui.ui.bMinimize)
 				{
 					if (NDIHelper.bGui_NDI_IN2) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
@@ -263,9 +276,6 @@ public:
 								NDIGui.ui.Add(NDIHelper.NDI_Input2.bDrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
 						//NDIGui.ui.Add(NDIHelper.NDI_Input2.bNext, OFX_IM_BUTTON_SMALL);
 
-						if (!NDIGui.ui.bMinimize)
-							NDIGui.ui.Add(NDIHelper.NDI_Input2.bScan, OFX_IM_TOGGLE_SMALL);
-
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input2.indexDevice, NDIHelper.NDI_Input2.namesDevices);
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input2.scaleMode_Index, NDIHelper.NDI_Input2.scaleMode_Names);
 						if (!NDIGui.ui.bMinimize) {
@@ -273,6 +283,9 @@ public:
 							NDIGui.ui.Add(NDIHelper.NDI_Input2.rect_NDI_IN.bEdit, OFX_IM_TOGGLE);
 							NDIGui.ui.Add(NDIHelper.NDI_Input2.bReset, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
 						}
+
+						if (!NDIGui.ui.bMinimize)
+							NDIGui.ui.Add(NDIHelper.NDI_Input2.bScan, OFX_IM_TOGGLE_SMALL);
 
 						NDIGui.ui.EndWindowSpecial();
 					}
