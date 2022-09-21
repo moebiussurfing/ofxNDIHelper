@@ -87,18 +87,24 @@ public:
 
 	ofParameter<bool> bDebug;
 
+	ofParameter<bool> bNext;
+
+	vector<std::string> namesDevices;
+	ofParameter<int> scaleMode_Index;
+	vector<std::string> scaleMode_Names;
+
+	ofParameter<bool> bLockRatio;
+
+	ofParameter<bool> bReset;
 private:
 
 	ofParameter<glm::vec2> position_Gui;
 
-	ofParameter<bool> bLockRatio;
 	
-	ofParameter<int> scaleMode_Index;
 	ofParameter<string> scaleMode_Name;
 	ofScaleMode scaleMode;
+	
 
-	ofParameter<bool> bReset;
-	ofParameter<bool> bNext;
 	ofParameter<void> bLoad;
 
 public:
@@ -181,7 +187,8 @@ public:
 
 	//--
 
-private:
+//private:
+public:
 
 	// 2. NDI INPUT
 
@@ -205,6 +212,8 @@ public:
 	void doNext(); 
 	void doScan(); // scan network NDI devices!
 
+	ofxSurfingBoxInteractive rect_NDI_IN;
+
 private:
 
 	int nsenders = 0;
@@ -227,7 +236,6 @@ private:
 	unsigned int wReceiver; // sender width and height needed to receive char pixels
 	unsigned int hReceiver;
 
-	ofxSurfingBoxInteractive rect_NDI_IN;
 
 	//--
 

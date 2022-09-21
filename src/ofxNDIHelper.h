@@ -51,13 +51,11 @@
 #define USE_WEBCAM // Aux camera
 #define USE_ofxNDI_OUT // NDI out
 
-//--
-
 //TODO:
 // WIP: BUG: can't be removed... breaks camera.
-//#define USE_OFX_CHILD_FRAME 
 // -> WIP. For transform the Webcam content: 
 // zoom and translate. Requires ofxChildFrame.
+#define USE_OFX_CHILD_FRAME 
 
 //----
 
@@ -128,7 +126,7 @@ public:
 
 private:
 
-	void setup_Gui();
+	void setup_GuiInternal();
 	void setup_Params();
 	void startup();
 	void update(ofEventArgs& args);
@@ -371,25 +369,30 @@ public:
 	void draw_Webcam_MiniPreview(bool bInfo = false);
 	void draw_Webcam_Full();
 
-private:
+	//private:
 
 	ofParameter<bool> bWebcam_LockRatio;
 	ofParameter<bool> bWebcam_Next;
 	ofParameter<int> scaleMode_Index;
 	ofParameter<string> scaleMode_Name;
+	vector<std::string> scaleMode_Names;
 	ofParameter<bool> bWebcam_Enable;
 	ofParameter<bool> bWebcam_Restart;
 	ofParameter<bool> bWebcam_Draw;
 	std::string webcam_Names_InputDevices;
+	vector<std::string> webcam_Names;
 	ofParameter<std::string> webcam_Name_{ "WEBCAM_DEVICE_NAME", "" };
 	ofParameter<std::string> webcam_Name; // can be merged both vars?
 	ofParameter<bool> bWebcam_DrawMini;
 	ofParameter<int> webcam_Index_Device;
+
+private:
 	std::string path_WebcamSettings;
 	std::string name_WebcamSettings;
 
-	ofxSurfingBoxInteractive rect_Webcam;
 	std::string path_rect_Webcam = "Webcam_Mini";
+public:
+	ofxSurfingBoxInteractive rect_Webcam;
 
 #endif
 
@@ -408,7 +411,8 @@ public:
 
 	//--
 
-private:
+//private:
+public:
 
 	// 3. NDI OUTPUT
 
@@ -445,11 +449,11 @@ public:
 
 private:
 
-	ofxSurfingBoxInteractive rect_NDI_OUT;
 	std::string path_rect_NDI_OUT = "NDI_Out";
 	std::string name_rect_NDI_OUT = "NDI_Out_Mini";
 
 public:
+	ofxSurfingBoxInteractive rect_NDI_OUT;
 
 	ofParameterGroup params_NDI_Output;
 

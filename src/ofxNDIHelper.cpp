@@ -202,7 +202,7 @@ void ofxNDIHelper::setup()
 
 	//--
 
-	setup_Gui();
+	setup_GuiInternal();
 
 	//--
 
@@ -214,7 +214,7 @@ void ofxNDIHelper::setup()
 //--
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Gui()
+void ofxNDIHelper::setup_GuiInternal()
 {
 	//--
 
@@ -296,7 +296,7 @@ void ofxNDIHelper::setup_Webcam_Params()
 	bWebcam_Draw.set("DRAW", true);
 	bWebcam_DrawMini.set("MINI", true);
 	webcam_Index_Device.set("DEVICE", 0, 0, 1);
-	scaleMode_Index.set("SCALE MODE", 0, 0, 3);
+	scaleMode_Index.set("SCALE", 0, 0, 3);
 	scaleMode_Name.set("NAME", "");
 	webcam_Name.set("", "");
 
@@ -318,6 +318,13 @@ void ofxNDIHelper::setup_Webcam_Params()
 	params_Webcam.add(bWebcam_LockRatio);
 	params_Webcam.add(rect_Webcam.bEdit);
 	params_Webcam.add(bWebcam_Restart);
+
+
+	scaleMode_Names.clear();
+	scaleMode_Names.push_back("FIT");
+	scaleMode_Names.push_back("FILL");
+	scaleMode_Names.push_back("CENTER");
+	scaleMode_Names.push_back("STRETCH_TO_FILL");
 }
 
 #endif
@@ -664,7 +671,7 @@ void ofxNDIHelper::draw_Gui()
 	if (bHelp) textBoxWidget.draw();
 
 	//--
-	
+
 	if (!bGui) return;
 	if (!bMode_ofxGui) return;
 
@@ -674,7 +681,7 @@ void ofxNDIHelper::draw_Gui()
 	{
 		// Gui Panel
 		//if (bGui_Controls)
-		if (bMode_ofxGui) 
+		if (bMode_ofxGui)
 		{
 			bool bGuiLink = true;
 			if (bGuiLink) {
@@ -699,7 +706,7 @@ void ofxNDIHelper::draw_Gui()
 
 			//--
 
-			if (bMode_ofxGui) 
+			if (bMode_ofxGui)
 			{
 				// Main Gui 
 				gui_Controls.draw();
@@ -719,8 +726,6 @@ void ofxNDIHelper::draw_Gui()
 			}
 		}
 	}
-
-
 }
 
 // keys
@@ -1132,11 +1137,14 @@ void ofxNDIHelper::setup_Webcam(int index)
 
 	// get all dev names
 	webcam_Names_InputDevices = "";
+	webcam_Names.clear();
 	for (size_t i = 0; i < _devs.size(); i++)
 	{
 		// queue devices names
 		webcam_Names_InputDevices += ofToString(i) + " " + _devs[i].deviceName;
 		if (i != _devs.size() - 1) webcam_Names_InputDevices += "\n";
+
+		webcam_Names.push_back(_devs[i].deviceName);
 	}
 
 	//-
@@ -1315,6 +1323,8 @@ void ofxNDIHelper::setup_Webcam() {
 	webcam_Index_Device.setMax(_devs.size() - 1);
 	ofLogNotice(__FUNCTION__) << "LIST WEBCAM DEVICES:";
 
+	webcam_Names.clear();
+
 	// log list devices
 	for (size_t i = 0; i < _devs.size(); i++)
 	{
@@ -1338,6 +1348,8 @@ void ofxNDIHelper::setup_Webcam() {
 			// log the device and note it as unavailable
 			ofLogNotice(__FUNCTION__) << _devs[i].id << ": " << _devs[i].deviceName << " - unavailable ";
 		}
+
+		webcam_Names.push_back(_devs[i].deviceName);
 	}
 
 	//--
@@ -1451,7 +1463,7 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 		ss << "translate  : " << childFrame.translat << endl;
 		ss << "scale      : " << childFrame.scale << endl << endl;
 		ofDrawBitmapStringHighlight(ss.str(), x + w + 10, y + h + 10);
-	}
+}
 #endif
 
 #ifndef USE_OFX_CHILD_FRAME
@@ -1530,7 +1542,7 @@ void ofxNDIHelper::webcam_LoadSettings()
 		bDoRestartup = true;
 		bWebcam_Enable = false;
 		webcam_Grabber.close();
-	}
+}
 
 #endif	
 
@@ -1787,11 +1799,11 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	//strcpy_s(senderName, 256, "OF NDI Sender"); // Set the sender name
 
 	const std::string str = NDI_Output_Name.get();
-    
-//    strcpy_s(senderName, 256, str.c_str()); //Set the sender name // VS Windows. fails on macOS
-//    strncpy(senderName, 256, str.c_str()); //Set the sender name // macOS Xcode
-    std::snprintf(senderName, sizeof(senderName), "%s", str.c_str()); // macOS Xcode
-    
+
+	//    strcpy_s(senderName, 256, str.c_str()); //Set the sender name // VS Windows. fails on macOS
+	//    strncpy(senderName, 256, str.c_str()); //Set the sender name // macOS Xcode
+	std::snprintf(senderName, sizeof(senderName), "%s", str.c_str()); // macOS Xcode
+
 	// Set the dimensions of the sender output here
 	// This is independent of the size of the display window
 	// Sender dimensions and fps are not known yet

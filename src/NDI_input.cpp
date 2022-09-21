@@ -108,9 +108,16 @@ void NDI_input::setup_Params()
 		glm::vec2(screenW, screenH)
 	);
 
-	scaleMode_Index.set("SCALE MODE", 0, 0, 3);
-	scaleMode_Name.set("SCALE", "");
+	scaleMode_Index.set("SCALE", 0, 0, 3);
+	scaleMode_Name.set("SCALE MODE", "");
+
 	bReset.set("RESET PREVIEW", false);
+
+	scaleMode_Names.clear();
+	scaleMode_Names.push_back("FIT");
+	scaleMode_Names.push_back("FILL");
+	scaleMode_Names.push_back("CENTER");
+	scaleMode_Names.push_back("STRETCH_TO_FILL");
 
 	//--
 
@@ -133,8 +140,8 @@ void NDI_input::setup_Params()
 	bEnable.set("ENABLE", false);
 	bDraw.set("DRAW", true);
 	bDrawMini.set("MINI", true);
-	indexDevice.set("INDEX", 0, 0, 1);
-	nameDevice.set("DEVICE", "ofxNDIHelperIN");
+	indexDevice.set("DEVICE", 0, 0, 1);
+	nameDevice.set("NAME", "ofxNDIHelperIN");
 	bScan.set("SCAN", false);
 	bScan.setSerializable(false);
 
@@ -622,6 +629,8 @@ void NDI_input::doListDevices()//list devices
 
 	// List all the senders
 
+	namesDevices.clear();
+
 	if (nsenders > 0)
 	{
 		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
@@ -632,6 +641,8 @@ void NDI_input::doListDevices()//list devices
 		{
 			string str = ofToString(i) + " " + NDI_Receiver.GetSenderName(i);
 			ofLogNotice(__FUNCTION__) << str;
+
+			namesDevices.push_back(NDI_Receiver.GetSenderName(i));
 
 			NDI_INPUT_Names_Devices += str;
 			NDI_INPUT_Names_Devices += "\n";
