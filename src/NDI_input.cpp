@@ -26,7 +26,7 @@ void NDI_input::setup(string _name)
 
 	rect_NDI_IN.setName(path_rect_NDI_IN);
 	rect_NDI_IN.setPathGlobal(path_GLOBAL);
-	rect_NDI_IN.setMode(ofxSurfingBoxInteractive::FREE_LAYOUT);
+	rect_NDI_IN.setModeLayout(ofxSurfingBox::FREE_LAYOUT);
 	rect_NDI_IN.setup();
 	rect_NDI_IN.setUseBorder(true);
 

@@ -28,7 +28,7 @@ void ofApp::setup()
 void ofApp::update()
 {
 	// Draw inside to feed the NDI Video Output.
-	// that's the signal we will send!
+	// that's the signal we will send! 
 	
 	// NDI
 #ifdef USE_ofxNDI

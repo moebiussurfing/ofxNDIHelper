@@ -167,7 +167,7 @@ void ofxNDIHelper::setup()
 	setup_NDI_OUT();
 
 	//rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
-	rect_NDI_OUT.setMode(ofxSurfingBoxInteractive::FREE_LAYOUT);
+	rect_NDI_OUT.setModeLayout(ofxSurfingBox::FREE_LAYOUT);
 	rect_NDI_OUT.setName(name_rect_NDI_OUT);
 	rect_NDI_OUT.setPathGlobal(path_GLOBAL + path_rect_NDI_OUT);
 	rect_NDI_OUT.setup();
@@ -1357,7 +1357,7 @@ void ofxNDIHelper::setup_Webcam() {
 #ifdef USE_WEBCAM
 
 	//rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
-	rect_Webcam.setMode(ofxSurfingBoxInteractive::FREE_LAYOUT);
+	rect_Webcam.setModeLayout(ofxSurfingBox::FREE_LAYOUT);
 	rect_Webcam.setName(path_rect_Webcam);
 	rect_Webcam.setPathGlobal(path_GLOBAL + path_WebcamSettings);
 	rect_Webcam.setup();

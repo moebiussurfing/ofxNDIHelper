@@ -5,18 +5,15 @@
 #define USE_ofxNDI //-> ifdef directives stuff to help copy paste to your app projects.
 
 #ifdef USE_ofxNDI
-#include "SurfingNDIManager.h"
+	#include "SurfingNDIManager.h"
 #endif
 
-#include "ofxSurfingHelpers.h"
 #include "ofxGui.h"
+#include "ofxSurfingHelpers.h"
 #include "ofxWindowApp.h"
 
-class ofApp : public ofBaseApp
-{
-
+class ofApp : public ofBaseApp {
 public:
-
 	void setup();
 	void update();
 	void draw();
@@ -25,7 +22,6 @@ public:
 	void exit();
 
 public:
-
 	// NDI
 #ifdef USE_ofxNDI
 	SurfingNDIManager ndi;
@@ -38,5 +34,5 @@ public:
 	//--
 
 	ofxPanel gui;
-	ofParameterGroup params{"ofApp"};
+	ofParameterGroup params { "ofApp" };
 };
