@@ -92,7 +92,7 @@ void ofApp::draw()
 - [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 - [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
 - [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
-- ofxGui / oF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
+- ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
 - [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui) / Optional. We can use ofxGui.
 
 

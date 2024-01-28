@@ -30,23 +30,19 @@
 
 */
 
-
 #include "ofxNDIHelper.h"
 
 #include "ofxGui.h"
 
-class ofApp : public ofBaseApp
-{
+class ofApp : public ofBaseApp {
 
 public:
-
 	void setup();
 	void update();
 	void draw();
 	void windowResized(int w, int h);
 
 public:
-
 	ofxNDIHelper NDIHelper;
 
 	//--
@@ -55,14 +51,13 @@ public:
 
 	// Bg image
 	ofImage image;
-	ofParameter<bool>bDrawImage{ "Image to feed NDI OUT", true };
+	ofParameter<bool> bDrawImage { "Image to feed NDI OUT", true };
 
 	//--
-	 
+
 	// A simple and animated BG Image scene using an image file:
 	//--------------------------------------------------------------
-	void drawScene()
-	{
+	void drawScene() {
 		if (!bDrawImage) {
 			ofBackground(32);
 			return;

@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-	ofSetWindowPosition(-1920 + 55, 60);
+	//ofSetWindowPosition(-1920 + 55, 60);
 
 	NDIHelper.setup();
 
