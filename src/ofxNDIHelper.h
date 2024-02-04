@@ -11,11 +11,11 @@
 	+ customize ui widgets better, not using groups!
 
 	+ Layout Canvas: Allow change layers sorting. store an int vector with position of each layer
-		now drawing order is: NDI in 1, 2, Webcam and out.
+		now drawing order is: NDI in 1, 2, WebCam and out.
 
 	+ split NDI out to a class like for NDI input
 
-	+ Fix mode scale for Webcam
+	+ Fix mode scale for WebCam
 		+ webcam mode scale move to params like NDI input class
 
 	+ TODO: WIP
@@ -28,7 +28,7 @@
 	+ Fix resizing exact size of windows to NDI Out or weird margins, real full screen.
 		+ e.g. ndi out do not fits exactly the full width frame.
 
-	+ Split Webcam part as a new helper add-on. ?
+	+ Split WebCam part as a new helper add-on. ?
 	+ make cam a class to allow multiple. check MSA cam add-on
 	https://github.com/memo/ofxMSAMultiCam
 
@@ -38,57 +38,68 @@
 
 */
 
-
 //---
 
-
 #pragma once
-
 #include "ofMain.h"
+
+//----
+
+// MODULES / OPTIONAL / DEBUG
+
+//#define USE_WEBCAM // WebCam as camera input. //TODO: fails in OF 0.12+?
+//#define USE_ofxNDI_OUT // NDI output
+//#define USE_ofxNDI_IN // NDI input
 
 //--
 
-#define USE_WEBCAM // Aux camera
-#define USE_ofxNDI_OUT // NDI out
-
 //TODO:
-// WIP: BUG: can't be removed... breaks camera.
-// -> WIP. For transform the Webcam content: 
-// zoom and translate. Requires ofxChildFrame.
-#define USE_OFX_CHILD_FRAME 
+// WIP: BUG: could break WebCam.
+// Requires ofxChildFrame.
+// For transform the WebCam content:
+// zoom and translate / crop viewport to send.
+#define USE_OFX_CHILD_FRAME
+#ifndef USE_WEBCAM
+	#ifdef USE_OFX_CHILD_FRAME
+		#undef USE_OFX_CHILD_FRAME
+	#endif
+#endif
 
 //----
 
 // DEVICES
-// 
-// 1. Webcam
+//
+// 1. WebCam
 // 2. 2 x NDI INPUTS
 // 3. NDI OUTPUT
 
 //----
-
 
 //--
 
 // Dependencies
 
 #ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN
-#include "ofxNDI.h"
-#include "NDI_input.h"
+	#include "ofxNDI.h"
+	#ifdef USE_ofxNDI_IN
+		#include "NDI_input.h"
+	#endif
 #endif
 
 #include "ofxGui.h"
-#include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingBoxHelpText.h"
+#include "ofxSurfingBoxInteractive.h"
 #include "ofxSurfingHelpers.h"
 #include "ofxSurfing_ofxGui.h"
 //#include "TextBoxWidget.h"
 
-#ifdef USE_OFX_CHILD_FRAME
-#include "ofxChildFrame.h"
-#endif
 
-#define CHILD_FRAME_MAX_SCALE 5.f 
+#ifdef USE_WEBCAM
+	#ifdef USE_OFX_CHILD_FRAME
+		#include "ofxChildFrame.h"
+	#endif
+	#define CHILD_FRAME_MAX_SCALE 5.f
+#endif
 
 //--
 
@@ -96,7 +107,6 @@ class ofxNDIHelper /*: public ofBaseApp*/
 {
 
 private:
-
 	float x;
 	float y;
 	float w;
@@ -106,13 +116,12 @@ private:
 
 #ifdef USE_OFX_CHILD_FRAME
 	ofxChildFrame frame_;
-	void mouseDragged(ofMouseEventArgs& mouse);
-	void mouseScrolled(ofMouseEventArgs& mouse);
+	void mouseDragged(ofMouseEventArgs & mouse);
+	void mouseScrolled(ofMouseEventArgs & mouse);
 	bool bEnable_ChildFrame = true;
 #endif
 
 public:
-
 	ofxNDIHelper();
 	~ofxNDIHelper();
 
@@ -125,11 +134,10 @@ public:
 	void doReset_Gui();
 
 private:
-
 	void setup_GuiInternal();
 	void setup_Params();
 	void startup();
-	void update(ofEventArgs& args);
+	void update(ofEventArgs & args);
 	void exit();
 	void draw_InfoDevices();
 
@@ -138,14 +146,11 @@ private:
 #ifdef USE_ofxNDI_IN
 
 public:
-
 	void draw_NDI_IN_1();
 	void draw_NDI_IN_2();
 
 private:
-
 public:
-
 	void draw_NDI_IN_1_MiniPreview();
 	void draw_NDI_IN_1_Full();
 
@@ -157,7 +162,6 @@ public:
 	//--
 
 public:
-
 	void setActive(bool b);
 	void setGuiVisible(bool b);
 	void setGuiInternalVisible(bool b);
@@ -168,7 +172,6 @@ public:
 	//--
 
 public:
-
 	// API
 
 	// Feed the sender aka NDI Out
@@ -179,17 +182,14 @@ public:
 	//--
 
 public:
-
 	//--------------------------------------------------------------
-	void setAutoSave(bool b)
-	{
+	void setAutoSave(bool b) {
 		bAutoSave = b;
 	}
 
 	//--
 
 private:
-
 	ofParameterGroup params_AppsSettings;
 
 	//ofParameter<bool> bLockRatio;
@@ -203,17 +203,14 @@ private:
 	ofxSurfingBoxHelpText textBoxWidget;
 
 public:
-
 	ofParameterGroup params_Helper; // For the Gui
 
 	//--
 
 public:
-
 	void doReset_Mini_PreviewsLayout();
 
 private:
-
 	// Default layout
 	// Preview viewport sizes
 
@@ -239,7 +236,6 @@ private:
 	//-
 
 private:
-
 	// Updating some params before save will trigs also the group callbacks
 	// so we disable this callbacks just in case params updating's are required
 	// in this case we will need to update gui position param
@@ -250,18 +246,18 @@ private:
 	// auto save
 	ofParameter<bool> bAutoSave;
 	uint64_t timerLast_Autosave = 0;
-	int timeToAutosave = 10000;//10 secs
+	int timeToAutosave = 10000; //10 secs
 
 	//-
 
-	void Changed(ofAbstractParameter& e);
+	void Changed(ofAbstractParameter & e);
 
-#ifdef USE_WEBCAM 
-	void Changed_Webcam(ofAbstractParameter& e);
+#ifdef USE_WEBCAM
+	void Changed_WebCam(ofAbstractParameter & e);
 #endif
 
-#ifdef USE_ofxNDI_OUT 
-	void Changed_NDI_Out(ofAbstractParameter& e);
+#ifdef USE_ofxNDI_OUT
+	void Changed_NDI_Out(ofAbstractParameter & e);
 #endif
 
 	//-
@@ -269,12 +265,10 @@ private:
 	// Control Params
 
 private:
-
 	bool bMode_ofxGui = true;
 	bool bMode_ImGui = false;
 
 public:
-
 	void setMode_ofxGui() {
 		bMode_ofxGui = true;
 		bMode_ImGui = false;
@@ -286,22 +280,26 @@ public:
 	};
 
 public:
-
 	//ofParameter<bool> bGui_Controls;
 	ofParameter<bool> bGui;
-	ofParameter<bool> bGui_Internal;//ofxGui
-	ofParameter<bool> bGui_Webcam;
+	ofParameter<bool> bGui_Internal; //ofxGui
+
+#ifdef USE_WEBCAM
+	ofxPanel gui_WebCam;
+	ofParameter<bool> bGui_WebCam;
+#endif
+
 #ifdef USE_ofxNDI_IN
 	ofParameter<bool> bGui_NDI_IN1;
 	ofParameter<bool> bGui_NDI_IN2;
 #endif
+
 	ofParameter<bool> bGui_NDI_OUT;
 
 	ofParameterGroup params_Panels;
 	ofParameterGroup params_Internal;
 
 private:
-
 	ofParameterGroup params_Callbacks;
 
 	ofParameter<bool> bActive;
@@ -312,39 +310,36 @@ private:
 
 	// Gui
 	ofxPanel gui_Controls;
-	ofxPanel gui_Webcam;
 	ofxPanel gui_NDI_Out;
 
 	// Keys
-	void keyPressed(ofKeyEventArgs& eventArgs);
-	void keyReleased(ofKeyEventArgs& eventArgs);
+	void keyPressed(ofKeyEventArgs & eventArgs);
+	void keyReleased(ofKeyEventArgs & eventArgs);
 	void addKeysListeners();
 	void removeKeysListeners();
 
 	// Settings
-	std::string path_GLOBAL;//this is to folder all files to avoid mixing with other add-ons data
+	std::string path_GLOBAL; //this is to folder all files to avoid mixing with other add-ons data
 	std::string path_Params_AppSettings;
 
 	void loadSettings();
 	void saveSettings();
 
 	//--
-	// 
-	// 1. Webcam
+	//
+	// 1. WebCam
 
 #ifdef USE_WEBCAM
 
 private:
-
 	ofVideoGrabber webcam_Grabber;
-	void setup_Webcam(); // setup webcam from name device nor index
-	void setup_Webcam(int index); // setup webcam from device index
-	//void exit_Webcam(); // store camera device name to xml
+	void setup_WebCam(); // setup webcam from name device nor index
+	void setup_WebCam(int index); // setup webcam from device index
+	//void exit_WebCam(); // store camera device name to xml
 	vector<ofVideoDevice> _devs;
 
 	//CHILD_FRAME
-	struct ChildFrame
-	{
+	struct ChildFrame {
 		ofVec3f anchor;
 		ofVec3f translat;
 		ofVec3f scale;
@@ -355,44 +350,47 @@ private:
 
 	//--
 
-	void setup_Webcam_Params();
+	void setup_WebCam_Params();
 
 	void webcam_SaveSettings();
 	void webcam_LoadSettings();
 	void webcam_Next();
 
 public:
+	void doRestart_WebCam(); // restart camera using the current index camera
 
-	void doRestart_Webcam(); // restart camera using the current index camera
-
-	void draw_Webcam();//-> for internal use
-	void draw_Webcam_MiniPreview(bool bInfo = false);
-	void draw_Webcam_Full();
+	void draw_WebCam(); //-> for internal use
+	void draw_WebCam_MiniPreview(bool bInfo = false);
+	void draw_WebCam_Full();
 
 	//private:
 
-	ofParameter<bool> bWebcam_LockRatio;
-	ofParameter<bool> bWebcam_Next;
+	ofParameter<bool> bWebCam_LockRatio;
+	ofParameter<bool> bWebCam_Next;
 	ofParameter<int> scaleMode_Index;
 	ofParameter<string> scaleMode_Name;
 	vector<std::string> scaleMode_Names;
-	ofParameter<bool> bWebcam_Enable;
-	ofParameter<bool> bWebcam_Restart;
-	ofParameter<bool> bWebcam_Draw;
+	ofParameter<bool> bWebCam_Enable;
+	ofParameter<bool> bWebCam_Restart;
+	ofParameter<bool> bWebCam_Draw;
 	std::string webcam_Names_InputDevices;
 	vector<std::string> webcam_Names;
-	ofParameter<std::string> webcam_Name_{ "WEBCAM_DEVICE_NAME", "" };
+	ofParameter<std::string> webcam_Name_ { "WEBCAM_DEVICE_NAME", "" };
 	ofParameter<std::string> webcam_Name; // can be merged both vars?
-	ofParameter<bool> bWebcam_DrawMini;
+	ofParameter<bool> bWebCam_DrawMini;
 	ofParameter<int> webcam_Index_Device;
 
-private:
-	std::string path_WebcamSettings;
-	std::string name_WebcamSettings;
-
-	std::string path_rect_Webcam = "Webcam_Mini";
 public:
-	ofxSurfingBoxInteractive rect_Webcam;
+	ofParameterGroup params_WebCam;
+
+private:
+	std::string path_WebCamSettings;
+	std::string name_WebCamSettings;
+
+	std::string path_rect_WebCam = "WebCam_Mini";
+
+public:
+	ofxSurfingBoxInteractive rect_WebCam;
 
 #endif
 
@@ -403,7 +401,6 @@ public:
 #ifdef USE_ofxNDI_IN
 
 public:
-
 	NDI_input NDI_Input1;
 	NDI_input NDI_Input2;
 
@@ -411,9 +408,8 @@ public:
 
 	//--
 
-//private:
+	//private:
 public:
-
 	// 3. NDI OUTPUT
 
 #ifdef USE_ofxNDI_OUT
@@ -424,11 +420,9 @@ public:
 	ofParameter<std::string> NDI_Output_Name;
 
 public:
-
 	ofxNDIsender NDI_OUT_Sender; // NDI sender object
 
 private:
-
 	void setup_NDI_OUT();
 	ofFbo fbo_NDI_Sender; // Fbo used for graphics and sending
 	unsigned int senderWidth; // Width of the sender output
@@ -438,17 +432,11 @@ private:
 	//--
 
 public:
-
 	void draw_NDI_OUT(); // -> for internal use
 	void draw_NDI_OUT_MiniPreview(bool bInfo = false);
 	void draw_NDI_OUT_Full();
 
-public:
-
-	ofParameterGroup params_Webcam;
-
 private:
-
 	std::string path_rect_NDI_OUT = "NDI_Out";
 	std::string name_rect_NDI_OUT = "NDI_Out_Mini";
 
@@ -457,6 +445,5 @@ public:
 
 	ofParameterGroup params_NDI_Output;
 
-#endif//USE_ofxNDI_OUT
-
+#endif //USE_ofxNDI_OUT
 };

@@ -560,3 +560,8 @@ ofxNDIHelper_example/bin/data/ofxNDIHelper/settings_NDI_Out_Mini.xml
 ofxNDIHelper_example/bin/data/ofxNDIHelper/settings_Webcam_Mini.xml
 ofxNDIHelper_example/bin/data/ofxNDIHelper/webcam_Settings.xml
 2_Examples_ImGui/6_Example_ImGui/bin/imgui.ini
+1_Examples_ofxGui/1_Example_NDI-Basic/enc_temp_folder/6f9697e2fbdbbcf3eb563ec8a6e7239b/ofxNDIHelper.cpp
+1_Examples_ofxGui/1_Example_NDI-Basic/config.make
+1_Examples_ofxGui/1_Example_NDI-Basic/Makefile
+1_Examples_ofxGui/1_Example_NDI-Basic/openFrameworks-Info.plist
+1_Examples_ofxGui/1_Example_NDI-Basic/Project.xcconfig

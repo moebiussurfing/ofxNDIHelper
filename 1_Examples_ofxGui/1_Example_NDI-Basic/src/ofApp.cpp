@@ -1,8 +1,7 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup()
-{
+void ofApp::setup() {
 	//ofSetWindowPosition(-1920, 25);
 
 	NDIHelper.setup();
@@ -18,8 +17,7 @@ void ofApp::setup()
 }
 
 //--------------------------------------------------------------
-void ofApp::update()
-{
+void ofApp::update() {
 	// Draw inside to feed the NDI Video Output.
 	// that's the signal we will send!
 
@@ -32,11 +30,10 @@ void ofApp::update()
 }
 
 //--------------------------------------------------------------
-void ofApp::draw()
-{
+void ofApp::draw() {
 	ofBackground(32);
 
-	// Draw the full Canvas layout, 
+	// Draw the full Canvas layout,
 	// with all the enabled devices/channels draws.
 	// Like Preview Monitors and/or Full Screen previews,
 	// with help/debug info included.
@@ -58,3 +55,26 @@ void ofApp::windowResized(int w, int h) {
 
 	NDIHelper.windowResized(w, h);
 }
+
+//--
+
+// A simple and animated BG Image scene using an image file:
+//--------------------------------------------------------------
+void ofApp::drawScene() {
+	if (!bDrawImage) {
+		ofBackground(32);
+		return;
+	}
+
+	if (!image.isAllocated()) return;
+	ofPushMatrix();
+	const float noiseAmnt = 0.07f;
+	ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+	float scale = ofMap(ofxSurfingHelpers::Bounce(), 0, 1, 1, 1.08f);
+	float noise = ofMap(ofxSurfingHelpers::Noise(), -1, 1, -noiseAmnt, noiseAmnt);
+	int xOffset = noise * 500;
+	int vOffset = noise * 300;
+	ofScale(scale + noise);
+	image.draw(xOffset - ofGetWidth() / 2, vOffset - ofGetHeight() / 2, ofGetWidth(), ofGetHeight());
+	ofPopMatrix();
+};

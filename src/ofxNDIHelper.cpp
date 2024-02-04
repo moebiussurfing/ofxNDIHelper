@@ -1,8 +1,7 @@
 #include "ofxNDIHelper.h"
 
 //--------------------------------------------------------------
-ofxNDIHelper::ofxNDIHelper()
-{
+ofxNDIHelper::ofxNDIHelper() {
 	bDISABLE_CALLBACKS = true;
 
 	// Path for settings
@@ -12,10 +11,8 @@ ofxNDIHelper::ofxNDIHelper()
 	path_Params_AppSettings = "Settings_App.json";
 
 #ifdef USE_WEBCAM
-
-	name_WebcamSettings = "Settings_Webcam.xml";
-	path_WebcamSettings = "Webcam/";
-
+	name_WebCamSettings = "Settings_WebCam.xml";
+	path_WebCamSettings = "WebCam/";
 #endif
 
 	//--
@@ -59,8 +56,7 @@ ofxNDIHelper::ofxNDIHelper()
 }
 
 //--------------------------------------------------------------
-ofxNDIHelper::~ofxNDIHelper()
-{
+ofxNDIHelper::~ofxNDIHelper() {
 	setActive(false); // remove keys and mouse listeners
 
 	// remove params callbacks listeners
@@ -68,7 +64,7 @@ ofxNDIHelper::~ofxNDIHelper()
 	ofRemoveListener(params_Callbacks.parameterChangedE(), this, &ofxNDIHelper::Changed);
 
 #ifdef USE_WEBCAM
-	ofRemoveListener(params_Webcam.parameterChangedE(), this, &ofxNDIHelper::Changed_Webcam);
+	ofRemoveListener(params_WebCam.parameterChangedE(), this, &ofxNDIHelper::Changed_WebCam);
 #endif
 
 #ifdef USE_ofxNDI_OUT
@@ -85,8 +81,7 @@ ofxNDIHelper::~ofxNDIHelper()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup()
-{
+void ofxNDIHelper::setup() {
 	// log mode
 	ofSetLogLevel("ofxNDIHelper", OF_LOG_NOTICE);
 
@@ -142,15 +137,12 @@ void ofxNDIHelper::setup()
 	// must be called before the loading of settings bc how callbacks are listening...
 
 #ifdef USE_WEBCAM
-
-	setup_Webcam();
-
+	setup_WebCam();
 #endif
 
 	//--
 
 #ifdef USE_ofxNDI_IN
-
 	NDI_Input1.setPathGlobal(path_GLOBAL + "NDI_Input1/");
 	NDI_Input1.setup("1");
 	NDI_Input1.bDebug.makeReferenceTo(bDebug);
@@ -158,7 +150,6 @@ void ofxNDIHelper::setup()
 	NDI_Input2.setPathGlobal(path_GLOBAL + "NDI_Input2/");
 	NDI_Input2.setup("2");
 	NDI_Input2.bDebug.makeReferenceTo(bDebug);
-
 #endif
 
 	//--
@@ -188,14 +179,16 @@ void ofxNDIHelper::setup()
 	params_AppsSettings.add(params_Internal);
 
 #ifdef USE_WEBCAM
-	params_AppsSettings.add(params_Webcam);
+	params_AppsSettings.add(params_WebCam);
 #endif
 
 #ifdef USE_ofxNDI_OUT
 	params_AppsSettings.add(params_NDI_Output);
 #endif
 
+#ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN || USE_WEBCAM
 	params_AppsSettings.add(params_Panels);
+#endif
 
 	//params_AppsSettings.add(bLockRatio);
 	//params_AppsSettings.add(params_Helper); //-> crashes. why??
@@ -214,8 +207,7 @@ void ofxNDIHelper::setup()
 //--
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_GuiInternal()
-{
+void ofxNDIHelper::setup_GuiInternal() {
 	//--
 
 	// Setup Gui
@@ -226,11 +218,11 @@ void ofxNDIHelper::setup_GuiInternal()
 	gui_Controls.add(params_Internal);
 
 #ifdef USE_WEBCAM
-	gui_Webcam.setup("WEBCAM");
-	//gui_Webcam.setup("WEBCAM | " + webcam_Name.get());
+	gui_WebCam.setup("WEBCAM");
+	//gui_WebCam.setup("WEBCAM | " + webcam_Name.get());
 
-	gui_Webcam.add(params_Webcam);
-	//gui_Webcam.minimizeAll();
+	gui_WebCam.add(params_WebCam);
+	//gui_WebCam.minimizeAll();
 #endif
 
 #ifdef USE_ofxNDI_OUT
@@ -247,24 +239,26 @@ void ofxNDIHelper::setup_GuiInternal()
 
 	// Collapse groups
 
-	auto& gi = gui_Controls.getGroup(params_Internal.getName());
-	auto& gp = gi.getGroup(position_Gui.getName());
+	auto & gi = gui_Controls.getGroup(params_Internal.getName());
+	auto & gp = gi.getGroup(position_Gui.getName());
 	gi.minimize();
 	gp.minimize();
 
-	auto& gh = gui_Controls.getGroup(params_Helper.getName());
+	auto & gh = gui_Controls.getGroup(params_Helper.getName());
 	gh.minimize();
 
-	auto& gpn = gui_Controls.getGroup(params_Panels.getName());
+	auto & gpn = gui_Controls.getGroup(params_Panels.getName());
 	gpn.minimize();
 
 #ifdef USE_WEBCAM
-	auto& gw = gui_Webcam.getGroup(params_Webcam.getName());
+	auto & gw = gui_WebCam.getGroup(params_WebCam.getName());
 	gw.minimize();
 #endif
 
-	auto& go = gui_NDI_Out.getGroup(params_NDI_Output.getName());
+#ifdef USE_ofxNDI_OUT
+	auto & go = gui_NDI_Out.getGroup(params_NDI_Output.getName());
 	go.minimize();
+#endif
 }
 
 //--
@@ -272,8 +266,7 @@ void ofxNDIHelper::setup_GuiInternal()
 #ifdef USE_WEBCAM
 
 //--------------------------------------------------------------
-void ofxNDIHelper::webcam_Next()
-{
+void ofxNDIHelper::webcam_Next() {
 	auto _devs = webcam_Grabber.listDevices();
 	webcam_Index_Device++;
 	if (webcam_Index_Device.get() > _devs.size() - 1) webcam_Index_Device = 0;
@@ -287,14 +280,13 @@ void ofxNDIHelper::webcam_Next()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Webcam_Params()
-{
-	bWebcam_Restart.set("RESTART", false);
-	bWebcam_Next.set("NEXT", false);
-	bWebcam_Enable.set("ENABLE", false);
-	bWebcam_LockRatio.set("LOCK ASPECT", true);
-	bWebcam_Draw.set("DRAW", true);
-	bWebcam_DrawMini.set("MINI", true);
+void ofxNDIHelper::setup_WebCam_Params() {
+	bWebCam_Restart.set("RESTART", false);
+	bWebCam_Next.set("NEXT", false);
+	bWebCam_Enable.set("ENABLE", false);
+	bWebCam_LockRatio.set("LOCK ASPECT", true);
+	bWebCam_Draw.set("DRAW", true);
+	bWebCam_DrawMini.set("MINI", true);
 	webcam_Index_Device.set("DEVICE", 0, 0, 1);
 	scaleMode_Index.set("SCALE", 0, 0, 3);
 	scaleMode_Name.set("NAME", "");
@@ -303,22 +295,21 @@ void ofxNDIHelper::setup_Webcam_Params()
 	webcam_Index_Device.setSerializable(false);
 	webcam_Name.setSerializable(false);
 	scaleMode_Name.setSerializable(false);
-	bWebcam_Restart.setSerializable(false);
-	bWebcam_Next.setSerializable(false);
+	bWebCam_Restart.setSerializable(false);
+	bWebCam_Next.setSerializable(false);
 
-	params_Webcam.setName("WEBCAM");
-	params_Webcam.add(bWebcam_Enable);
-	params_Webcam.add(bWebcam_Draw);
-	params_Webcam.add(bWebcam_DrawMini);
-	params_Webcam.add(bWebcam_Next);
-	params_Webcam.add(webcam_Index_Device);
-	params_Webcam.add(webcam_Name);
-	params_Webcam.add(scaleMode_Index);
-	params_Webcam.add(scaleMode_Name);
-	params_Webcam.add(bWebcam_LockRatio);
-	params_Webcam.add(rect_Webcam.bEdit);
-	params_Webcam.add(bWebcam_Restart);
-
+	params_WebCam.setName("WEBCAM");
+	params_WebCam.add(bWebCam_Enable);
+	params_WebCam.add(bWebCam_Draw);
+	params_WebCam.add(bWebCam_DrawMini);
+	params_WebCam.add(bWebCam_Next);
+	params_WebCam.add(webcam_Index_Device);
+	params_WebCam.add(webcam_Name);
+	params_WebCam.add(scaleMode_Index);
+	params_WebCam.add(scaleMode_Name);
+	params_WebCam.add(bWebCam_LockRatio);
+	params_WebCam.add(rect_WebCam.bEdit);
+	params_WebCam.add(bWebCam_Restart);
 
 	scaleMode_Names.clear();
 	scaleMode_Names.push_back("FIT");
@@ -330,12 +321,15 @@ void ofxNDIHelper::setup_Webcam_Params()
 #endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Params()
-{
+void ofxNDIHelper::setup_Params() {
 	bGui_Internal.set("ofxGui", true);
 	bGui.set("NDI HELPER", true);
 	//bGui_Controls.set("NDI CONTROLS", true);
-	bGui_Webcam.set("WEBCAM", true);
+
+#ifdef USE_WEBCAM
+	bGui_WebCam.set("WEBCAM", true);
+#endif
+
 	bGui_NDI_OUT.set("OUT", true);
 
 	//bEdit.set("LAYOUT EDIT", true);
@@ -356,15 +350,14 @@ void ofxNDIHelper::setup_Params()
 	position_Gui.set("GUI POSITION",
 		glm::vec2(padg, padg),
 		glm::vec2(0, 0),
-		glm::vec2(screenW, screenH)
-	);
+		glm::vec2(screenW, screenH));
 
 	//--
 
 	// WEBCAM
 
 #ifdef USE_WEBCAM
-	setup_Webcam_Params();
+	setup_WebCam_Params();
 #endif
 
 	//--
@@ -390,35 +383,35 @@ void ofxNDIHelper::setup_Params()
 	// Gui Params
 
 	params_Helper.setName("NDI HELPER");
-	params_Helper.add(bHelp);
-	params_Helper.add(bKeys);
 	params_Helper.add(bResetLayout);
 	params_Helper.add(bResetGui);
-	params_Helper.add(bDebug);
 	//TODO: BUG: not linking when makeReference from parent scope..
 	//params_Helper.add(bLockRatio);
 
+	params_Helper.add(bDebug);
+	params_Helper.add(bKeys);
+	params_Helper.add(bHelp);
+
 	//--
 
-	// Params Internal 
+	// Params Internal
 
 	params_Panels.setName("PANELS");
 
-	//params_Panels.add(bGui);
-	//params_Panels.add(bGui_Controls);
-
-	params_Panels.add(bGui_Webcam);
+#ifdef USE_WEBCAM
+	params_Panels.add(bGui_WebCam);
+#endif
 
 #ifdef USE_ofxNDI_IN
-
 	bGui_NDI_IN1.makeReferenceTo(NDI_Input1.bGui_Internal);
 	bGui_NDI_IN2.makeReferenceTo(NDI_Input2.bGui_Internal);
 	params_Panels.add(bGui_NDI_IN1);
 	params_Panels.add(bGui_NDI_IN2);
-
 #endif
 
+#ifdef USE_ofxNDI_OUT
 	params_Panels.add(bGui_NDI_OUT);
+#endif
 
 	//--
 
@@ -428,7 +421,6 @@ void ofxNDIHelper::setup_Params()
 	params_Internal.add(bActive);
 	params_Internal.add(bAutoSave);
 	params_Internal.add(position_Gui);
-	//params_Internal.add(bDebug);
 
 	//--
 
@@ -444,7 +436,7 @@ void ofxNDIHelper::setup_Params()
 	ofAddListener(params_Callbacks.parameterChangedE(), this, &ofxNDIHelper::Changed);
 
 #ifdef USE_WEBCAM
-	ofAddListener(params_Webcam.parameterChangedE(), this, &ofxNDIHelper::Changed_Webcam);
+	ofAddListener(params_WebCam.parameterChangedE(), this, &ofxNDIHelper::Changed_WebCam);
 #endif
 
 #ifdef USE_ofxNDI_OUT
@@ -453,85 +445,83 @@ void ofxNDIHelper::setup_Params()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::startup()
-{
+void ofxNDIHelper::startup() {
 	ofLogNotice(__FUNCTION__);
 
 	//---
 
 	bDISABLE_CALLBACKS = false;
 
-	//-- 
+	//--
 
 #ifdef USE_WEBCAM
-
 	// load settings file
 	webcam_LoadSettings();
-
 #endif
 
 	//--
 
+	// set to 1 to reset and ignore settings.
+	// useful when something is broke, like gui not visible etc.
+#define RESET_SETTINGS 0
+#if (RESET_SETTINGS)
+	bGui_Internal = true;
+	bGui_NDI_IN1 = true;
+	bGui_NDI_IN2 = true;
+	bAutoSave = true;
+	bActive = true;
+	position_Gui = { 10, 10 };
+	bResetGui = true;
+	bResetLayout = true;
+#else
 	loadSettings();
+#endif
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::update(ofEventArgs& args)
-{
+void ofxNDIHelper::update(ofEventArgs & args) {
 	if (!bActive) return;
 
 	// startup waiting
-	if (!bLoadedStartupDone)
-	{
+	if (!bLoadedStartupDone) {
 
 #ifdef USE_ofxNDI_IN
-
-		if (NDI_Input1.bLoadedStartupDone && NDI_Input2.bLoadedStartupDone)
-		{
+		if (NDI_Input1.bLoadedStartupDone && NDI_Input2.bLoadedStartupDone) {
 			ofLogNotice(__FUNCTION__) << "LOADED STARTUP Done";
 
 			bLoadedStartupDone = true;
 		}
-
 #endif
-
 	}
 
 	//--
 
 #ifdef USE_WEBCAM
-
-#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
-
+	#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes WebCam hangs on startup
 	// workaround
 	// restart camera after startup to make sure will be initialized fine.
 	static const float _timeWait = 5.0f;
 	// in x seconds at 60fps
 
-	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60)))
-	{
+	if (bDoRestartup && (ofGetFrameNum() == (int)(_timeWait * 60))) {
 		//webcam_Grabber.close();
-		doRestart_Webcam();
-		bWebcam_Enable = true;
+		doRestart_WebCam();
+		bWebCam_Enable = true;
 	}
-
-#endif
+	#endif
 
 	//--
 
-	if (bWebcam_Enable.get())
-	{
+	if (bWebCam_Enable.get()) {
 		webcam_Grabber.update();
 	}
-
 #endif
 
 	//--
 
 	// auto save
 
-	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave)
-	{
+	if (bAutoSave && ofGetElapsedTimeMillis() - timerLast_Autosave > timeToAutosave) {
 		ofLogNotice(__FUNCTION__) << "Auto Saved Settings";
 
 		ofLogLevel _logPre = ofGetLogLevel();
@@ -577,43 +567,32 @@ void ofxNDIHelper::draw_NDI_IN_2_Full() {
 //--------------------------------------------------------------
 void ofxNDIHelper::drawPreviews() {
 
-	//-
-
 #ifdef USE_ofxNDI_IN
-
 	NDI_Input1.draw_MiniPreview();
 	NDI_Input2.draw_MiniPreview();
-
 #endif
 
-	//-
+	//--
 
 #ifdef USE_WEBCAM
-
 	// WEBCAM
-
-	if (bWebcam_Enable && bWebcam_Draw) {
-		if (bWebcam_Enable)
-			if (bWebcam_Draw)
-				if (bWebcam_DrawMini) draw_Webcam_MiniPreview(true);
+	if (bWebCam_Enable && bWebCam_Draw) {
+		if (bWebCam_Enable)
+			if (bWebCam_Draw)
+				if (bWebCam_DrawMini) draw_WebCam_MiniPreview(true);
 	}
-
 #endif
 
-	//-
+	//--
 
 #ifdef USE_ofxNDI_OUT
-
 	// NDI OUT
-
-	if (bNDI_Output_Enable && bNDI_Output_Draw)
-	{
+	if (bNDI_Output_Enable && bNDI_Output_Draw) {
 		if (bNDI_Output_Mini) draw_NDI_OUT_MiniPreview(true);
 	}
-
 #endif
 
-	//-
+	//--
 
 	if (bDebug) draw_InfoDevices();
 }
@@ -622,49 +601,40 @@ void ofxNDIHelper::draw() {
 	//if (!bGui) return;
 	//if (!bLoadedStartupDone) return;
 
-	//-
+	//--
 
 #ifdef USE_ofxNDI_IN
-
 	NDI_Input1.draw();
 	NDI_Input2.draw();
-
 #endif
 
-	//-
+	//--
 
 #ifdef USE_WEBCAM
-
 	// WEBCAM
-
-	if (bWebcam_Enable && bWebcam_Draw)
-	{
-		draw_Webcam();
+	if (bWebCam_Enable && bWebCam_Draw) {
+		draw_WebCam();
 	}
-
 #endif
 
-	//-
+	//--
 
 #ifdef USE_ofxNDI_OUT
-
 	// NDI OUT
 
-	if (bNDI_Output_Enable && bNDI_Output_Draw)
-	{
+	if (bNDI_Output_Enable && bNDI_Output_Draw) {
 		draw_NDI_OUT();
 	}
 
 #endif
 
-	//-
+	//--
 
 	if (bDebug) draw_InfoDevices();
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Gui()
-{
+void ofxNDIHelper::draw_Gui() {
 	ofDisableDepthTest();
 
 	// HelpBox
@@ -675,22 +645,25 @@ void ofxNDIHelper::draw_Gui()
 	if (!bGui) return;
 	if (!bMode_ofxGui) return;
 
-	//-
+	//--
 
-	if (bGui_Internal)
-	{
+	if (bGui_Internal) {
 		// Gui Panel
 		//if (bGui_Controls)
-		if (bMode_ofxGui)
-		{
+		if (bMode_ofxGui) {
 			bool bGuiLink = true;
 			if (bGuiLink) {
 				glm::vec2 pad(1, 0);
 				auto p = gui_Controls.getShape().getTopRight() + pad;
-				if (bGui_Webcam) {
-					gui_Webcam.setPosition(p);
-					p = gui_Webcam.getShape().getTopRight() + pad;
+
+#ifdef USE_WEBCAM
+				if (bGui_WebCam) {
+					gui_WebCam.setPosition(p);
+					p = gui_WebCam.getShape().getTopRight() + pad;
 				}
+#endif
+
+#ifdef USE_ofxNDI_IN
 				if (NDI_Input1.bGui_Internal) {
 					NDI_Input1.gui_Control.setPosition(p);
 					p = NDI_Input1.gui_Control.getShape().getTopRight() + pad;
@@ -699,30 +672,38 @@ void ofxNDIHelper::draw_Gui()
 					NDI_Input2.gui_Control.setPosition(p);
 					p = NDI_Input2.gui_Control.getShape().getTopRight() + pad;
 				}
+#endif
+
+#ifdef USE_ofxNDI_OUT
 				if (bGui_NDI_OUT) {
 					gui_NDI_Out.setPosition(p);
 				}
+#endif
 			}
 
 			//--
 
-			if (bMode_ofxGui)
-			{
-				// Main Gui 
+			if (bMode_ofxGui) {
+				// Main Gui
 				gui_Controls.draw();
 
 				// Other panels
 
-				// Webcam
-				if (bGui_Webcam) gui_Webcam.draw();
+#ifdef USE_WEBCAM
+				// WebCam
+				if (bGui_WebCam) gui_WebCam.draw();
+#endif
 
 #ifdef USE_ofxNDI_IN
 				// Inputs
 				NDI_Input1.drawGui();
 				NDI_Input2.drawGui();
 #endif
+
+#ifdef USE_ofxNDI_OUT
 				// Output
 				if (bGui_NDI_OUT) gui_NDI_Out.draw();
+#endif
 			}
 		}
 	}
@@ -730,12 +711,11 @@ void ofxNDIHelper::draw_Gui()
 
 // keys
 //--------------------------------------------------------------
-void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
-{
+void ofxNDIHelper::keyPressed(ofKeyEventArgs & eventArgs) {
 	// disabler for all keys. (independent from bActive)
 	if (!bKeys) return;
 
-	const int& key = eventArgs.key;
+	const int & key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << "keyPressed: " << (char)key << " [" << key << "]";
 
 	// modifiers
@@ -744,8 +724,7 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
 
-	if (0)
-	{
+	if (0) {
 		ofLogNotice(__FUNCTION__) << "mod_COMMAND : " << (mod_COMMAND ? "ON" : "OFF");
 		ofLogNotice(__FUNCTION__) << "mod_CONTROL : " << (mod_CONTROL ? "ON" : "OFF");
 		ofLogNotice(__FUNCTION__) << "mod_ALT     : " << (mod_ALT ? "ON" : "OFF");
@@ -772,10 +751,10 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 
 	//-
 
-	if (0) {}
+	if (0) {
+	}
 
-	else if (key == 'G')
-	{
+	else if (key == 'G') {
 		bGui = !bGui;
 	}
 	//else if (key == 'g')
@@ -790,18 +769,15 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	//	bEdit = !bEdit;
 	//}
 
-	else if (key == 'D')
-	{
+	else if (key == 'D') {
 		bDebug = !bDebug;
 	}
 
-	else if (key == 'H')
-	{
+	else if (key == 'H') {
 		bHelp = !bHelp;
 	}
 
-	else if (key == 'R')
-	{
+	else if (key == 'R') {
 		doReset_Mini_PreviewsLayout();
 	}
 
@@ -810,41 +786,34 @@ void ofxNDIHelper::keyPressed(ofKeyEventArgs& eventArgs)
 	// WEBCAM
 
 #ifdef USE_WEBCAM
-
-	else if (key == 'I')
-	{
+	else if (key == 'I') {
 		webcam_Next();
 	}
 
 	else if (mod_ALT)
-		//else if (key == key_ChildFrame)
+	//else if (key == key_ChildFrame)
 	{
 		bKeyChildFrameState = true;
 	}
-
 #endif
 
 	//--
 
 #ifdef USE_ofxNDI_IN
-
-	else if (key == ' ')
-	{
+	else if (key == ' ') {
 		NDI_Input1.doScan();
 		NDI_Input2.doScan();
 	}
-
 #endif
 
 	//--
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::keyReleased(ofKeyEventArgs& eventArgs)
-{
+void ofxNDIHelper::keyReleased(ofKeyEventArgs & eventArgs) {
 	if (!bKeys) return;
 
-	const int& key = eventArgs.key;
+	const int & key = eventArgs.key;
 	ofLogNotice(__FUNCTION__) << "keyReleased: " << (char)key << " [" << key << "]";
 
 	// modifiers
@@ -853,8 +822,7 @@ void ofxNDIHelper::keyReleased(ofKeyEventArgs& eventArgs)
 	bool mod_ALT = eventArgs.hasModifier(OF_KEY_ALT);
 	bool mod_SHIFT = eventArgs.hasModifier(OF_KEY_SHIFT);
 
-	if (0)
-	{
+	if (0) {
 		ofLogNotice(__FUNCTION__) << "mod_COMMAND : " << (mod_COMMAND ? "ON" : "OFF");
 		ofLogNotice(__FUNCTION__) << "mod_CONTROL : " << (mod_CONTROL ? "ON" : "OFF");
 		ofLogNotice(__FUNCTION__) << "mod_ALT     : " << (mod_ALT ? "ON" : "OFF");
@@ -866,67 +834,54 @@ void ofxNDIHelper::keyReleased(ofKeyEventArgs& eventArgs)
 	// WEBCAM
 
 #ifdef USE_WEBCAM
-
 	//if (key == key_ChildFrame)
-	if (mod_ALT || key == 4)
-	{
+	if (mod_ALT || key == 4) {
 		bKeyChildFrameState = false;
 	}
-
 #endif
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::addKeysListeners()
-{
+void ofxNDIHelper::addKeysListeners() {
 	ofAddListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
 	ofAddListener(ofEvents().keyReleased, this, &ofxNDIHelper::keyReleased);
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::removeKeysListeners()
-{
+void ofxNDIHelper::removeKeysListeners() {
 	ofRemoveListener(ofEvents().keyPressed, this, &ofxNDIHelper::keyPressed);
 	ofRemoveListener(ofEvents().keyReleased, this, &ofxNDIHelper::keyReleased);
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setActive(bool b)
-{
+void ofxNDIHelper::setActive(bool b) {
 	ofLogNotice(__FUNCTION__) << b;
 
 	bActive = b;
-	if (!b)
-	{
+	if (!b) {
 		removeKeysListeners();
-	}
-	else
-	{
+	} else {
 		addKeysListeners();
 	}
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setGuiVisible(bool b)
-{
+void ofxNDIHelper::setGuiVisible(bool b) {
 	bGui = b;
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setGuiInternalVisible(bool b)
-{
+void ofxNDIHelper::setGuiInternalVisible(bool b) {
 	bGui_Internal = b;
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setGuiToggleVisible()
-{
+void ofxNDIHelper::setGuiToggleVisible() {
 	bGui = !bGui;
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::doReset_Gui()
-{
+void ofxNDIHelper::doReset_Gui() {
 	// Positions
 	position_Gui = glm::vec2(padg, padg);
 	gui_Controls.setPosition(position_Gui.get().x, position_Gui.get().y);
@@ -934,11 +889,15 @@ void ofxNDIHelper::doReset_Gui()
 	float w = gui_Controls.getWidth();
 	glm::vec2 pg = glm::vec2(position_Gui.get());
 	glm::vec2 p = glm::vec2(pg.x + w + padg, pg.y);
-	gui_Webcam.setPosition(p.x, p.y);
-	gui_NDI_Out.setPosition(p.x + gui_Webcam.getWidth() + padg, p.y);
+
+#ifdef USE_WEBCAM
+	gui_WebCam.setPosition(p.x, p.y);
+	gui_NDI_Out.setPosition(p.x + gui_WebCam.getWidth() + padg, p.y);
+#else
+	gui_NDI_Out.setPosition(p.x, p.y);
+#endif
 
 #ifdef USE_ofxNDI_IN
-
 	glm::vec2 pTr = glm::vec2(gui_NDI_Out.getShape().getTopRight());
 
 	glm::vec2 p2 = glm::vec2(pTr.x + padg, pTr.y);
@@ -946,56 +905,47 @@ void ofxNDIHelper::doReset_Gui()
 
 	glm::vec2 p3 = glm::vec2(p2.x + padg + w, p2.y);
 	NDI_Input2.setPositionGui(p3);
-
 #endif
 }
 
-#ifdef USE_ofxNDI_OUT 
+#ifdef USE_ofxNDI_OUT
 //--------------------------------------------------------------
-void ofxNDIHelper::Changed_NDI_Out(ofAbstractParameter& e)
-{
+void ofxNDIHelper::Changed_NDI_Out(ofAbstractParameter & e) {
 	if (bDISABLE_CALLBACKS) return;
 
 	string name = e.getName();
 
 	// exclude debugs
-	if (name != scaleMode_Name.getName()
-		//	&& name != "exclude"
-		)
-	{
+	#ifdef USE_WEBCAM
+	if (name != scaleMode_Name.getName()) {
 		ofLogNotice(__FUNCTION__) << name << " : " << e;
 	}
+	#endif
 
-	if (0) {}
+	if (0) {
+	}
 
 	//----
 
 	// NDI OUT
 
 	else if (name == bNDI_Output_Enable.getName())
-		//else if (name == bNDI_Output_Enable.getName() && bNDI_Output_Enable.get())
+	//else if (name == bNDI_Output_Enable.getName() && bNDI_Output_Enable.get())
 	{
-		if (bNDI_Output_Enable.get())
-		{
+		if (bNDI_Output_Enable.get()) {
 			//setup_NDI_OUT();
-		}
-		else
-		{
+		} else {
 			//NDI_OUT_Sender.ReleaseSender();//?
 		}
-	}
-	else if (name == NDI_Output_Name.getName())
-	{
+	} else if (name == NDI_Output_Name.getName()) {
 		setup_NDI_OUT();
 	}
-
 }
 #endif
 
 #ifdef USE_WEBCAM
 //--------------------------------------------------------------
-void ofxNDIHelper::Changed_Webcam(ofAbstractParameter& e)
-{
+void ofxNDIHelper::Changed_WebCam(ofAbstractParameter & e) {
 	if (bDISABLE_CALLBACKS) return;
 
 	string name = e.getName();
@@ -1003,58 +953,54 @@ void ofxNDIHelper::Changed_Webcam(ofAbstractParameter& e)
 	// exclude debugs
 	if (name != scaleMode_Name.getName()
 		//	&& name != "exclude"
-		)
-	{
+	) {
 		ofLogNotice(__FUNCTION__) << name << " : " << e;
 	}
 
-	if (0) {}
+	if (0) {
+	}
 
 	//----
 
 	// WEBCAM
 
-	else if (name == bWebcam_Enable.getName())
-	{
-		if (bWebcam_Enable.get()) doRestart_Webcam();
-		else webcam_Grabber.close();
+	else if (name == bWebCam_Enable.getName()) {
+		if (bWebCam_Enable.get())
+			doRestart_WebCam();
+		else
+			webcam_Grabber.close();
 	}
 
-	else if (name == webcam_Name.getName())
-	{
+	else if (name == webcam_Name.getName()) {
 		//TODO:
 		// 1. get index for a name
 		// 2. setup cam for index
 	}
 
-	else if (name == webcam_Index_Device.getName() && bWebcam_Enable.get())
-	{
-		setup_Webcam(webcam_Index_Device.get());
+	else if (name == webcam_Index_Device.getName() && bWebCam_Enable.get()) {
+		setup_WebCam(webcam_Index_Device.get());
 	}
 
-	else if (name == bWebcam_Next.getName() && bWebcam_Next.get())
-	{
-		bWebcam_Next = false;
+	else if (name == bWebCam_Next.getName() && bWebCam_Next.get()) {
+		bWebCam_Next = false;
 		webcam_Next();
 	}
 
-	else if (name == bWebcam_Restart.getName() && bWebcam_Restart)
-	{
-		bWebcam_Restart = false;
+	else if (name == bWebCam_Restart.getName() && bWebCam_Restart) {
+		bWebCam_Restart = false;
 
-		bWebcam_Enable = false;
+		bWebCam_Enable = false;
 		// must close before reopen
 		webcam_Grabber.close();
-		//doRestart_Webcam();
-		setup_Webcam(webcam_Index_Device);
-		bWebcam_Enable = true;
+		//doRestart_WebCam();
+		setup_WebCam(webcam_Index_Device);
+		bWebCam_Enable = true;
 	}
 }
 #endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::Changed(ofAbstractParameter& e)
-{
+void ofxNDIHelper::Changed(ofAbstractParameter & e) {
 	if (bDISABLE_CALLBACKS) return;
 
 	string name = e.getName();
@@ -1068,17 +1014,16 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 
 	//----
 
-	if (0) {}
+	if (0) {
+	}
 
-	else if (name == bResetLayout.getName() && bResetLayout)
-	{
+	else if (name == bResetLayout.getName() && bResetLayout) {
 		bResetLayout = false;
 
 		doReset_Mini_PreviewsLayout();
 	}
 
-	else if (name == bResetGui.getName() && bResetGui)
-	{
+	else if (name == bResetGui.getName() && bResetGui) {
 		bResetGui = false;
 
 		doReset_Gui();
@@ -1086,12 +1031,9 @@ void ofxNDIHelper::Changed(ofAbstractParameter& e)
 
 	//----
 
-	else if (name == position_Gui.getName())
-	{
+	else if (name == position_Gui.getName()) {
 		gui_Controls.setPosition(position_Gui.get().x, position_Gui.get().y);
-	}
-	else if (name == bActive.getName())
-	{
+	} else if (name == bActive.getName()) {
 		setActive(bActive);
 	}
 }
@@ -1112,8 +1054,7 @@ void ofxNDIHelper::setPathGlobal(string s) // must call before setup.
 
 // TODO:
 //--------------------------------------------------------------
-void ofxNDIHelper::doRestart_Webcam()
-{
+void ofxNDIHelper::doRestart_WebCam() {
 	// must close before reopen
 	webcam_Grabber.close();
 
@@ -1126,9 +1067,8 @@ void ofxNDIHelper::doRestart_Webcam()
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Webcam(int index)
-{
-	// will load from index (webcam_Index_Device) not from name 
+void ofxNDIHelper::setup_WebCam(int index) {
+	// will load from index (webcam_Index_Device) not from name
 
 	// get back a list of devices.
 	webcam_Grabber.setVerbose(true);
@@ -1138,8 +1078,7 @@ void ofxNDIHelper::setup_Webcam(int index)
 	// get all dev names
 	webcam_Names_InputDevices = "";
 	webcam_Names.clear();
-	for (size_t i = 0; i < _devs.size(); i++)
-	{
+	for (size_t i = 0; i < _devs.size(); i++) {
 		// queue devices names
 		webcam_Names_InputDevices += ofToString(i) + " " + _devs[i].deviceName;
 		if (i != _devs.size() - 1) webcam_Names_InputDevices += "\n";
@@ -1151,8 +1090,7 @@ void ofxNDIHelper::setup_Webcam(int index)
 
 	// check valid index and clamp
 	bool bError = false;
-	if (webcam_Index_Device > _devs.size() - 1)
-	{
+	if (webcam_Index_Device > _devs.size() - 1) {
 		ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
 		webcam_Index_Device = -1;
 		webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
@@ -1161,8 +1099,7 @@ void ofxNDIHelper::setup_Webcam(int index)
 	}
 
 	// valid index
-	if (!bError)
-	{
+	if (!bError) {
 		// must close before reopen
 		webcam_Grabber.close();
 
@@ -1172,7 +1109,7 @@ void ofxNDIHelper::setup_Webcam(int index)
 
 			//TODO:
 			// now size is hardcoded
-			// 
+			//
 			//webcam_Grabber.setDesiredFrameRate(60);
 			webcam_Grabber.setup(1920, 1080);
 		}
@@ -1183,20 +1120,18 @@ void ofxNDIHelper::setup_Webcam(int index)
 		bool _isConnected = webcam_Grabber.isInitialized();
 		ofLogNotice(__FUNCTION__) << "webcam_Grabber INITIALIZED: " << (_isConnected ? "TRUE" : "FALSE");
 
-		if (!_isConnected)
-		{
+		if (!_isConnected) {
 			ofLogError(__FUNCTION__) << "CAN'T INITIALIZE webcam_Grabber!";
 			ofLogError(__FUNCTION__) << "CAMERA DISABLED";
 
-			bWebcam_Enable = false;
+			bWebCam_Enable = false;
 
 			//return;
 		}
 
 		//--
 
-		if (webcam_Index_Device < _devs.size())
-		{
+		if (webcam_Index_Device < _devs.size()) {
 			webcam_Name_ = _devs[webcam_Index_Device].deviceName;
 			webcam_Name = webcam_Name_;
 		}
@@ -1214,10 +1149,10 @@ void ofxNDIHelper::setup_Webcam(int index)
 	}
 }
 
-#ifdef USE_OFX_CHILD_FRAME
+	#ifdef USE_OFX_CHILD_FRAME
 
 //--------------------------------------------------------------
-void ofxNDIHelper::mouseDragged(ofMouseEventArgs& mouse) {
+void ofxNDIHelper::mouseDragged(ofMouseEventArgs & mouse) {
 
 	int x = mouse.x;
 	int y = mouse.y;
@@ -1226,25 +1161,21 @@ void ofxNDIHelper::mouseDragged(ofMouseEventArgs& mouse) {
 	if (!bEnable_ChildFrame) return;
 	if (!bKeyChildFrameState) return;
 
-	switch (button)
-	{
+	switch (button) {
 
 		//case OF_MOUSE_BUTTON_2:
-	case OF_MOUSE_BUTTON_LEFT:
-	{
-		TransformNode& node = frame_.getInnerTransformNode();
+	case OF_MOUSE_BUTTON_LEFT: {
+		TransformNode & node = frame_.getInnerTransformNode();
 		node.addTranslationX(x - ofGetPreviousMouseX());
 		node.addTranslationY(y - ofGetPreviousMouseY());
 
 		childFrame.anchor = node.getAnchorPoint();
 		childFrame.translat = node.getTranslation();
 		childFrame.scale = node.getScale();
-	}
-	break;
+	} break;
 
-	case OF_MOUSE_BUTTON_RIGHT:
-	{
-		TransformNode& node = frame_.getInnerTransformNode();
+	case OF_MOUSE_BUTTON_RIGHT: {
+		TransformNode & node = frame_.getInnerTransformNode();
 
 		float sz = -100;
 		float diff = y - ofGetPreviousMouseY();
@@ -1262,14 +1193,12 @@ void ofxNDIHelper::mouseDragged(ofMouseEventArgs& mouse) {
 		childFrame.anchor = node.getAnchorPoint();
 		childFrame.translat = node.getTranslation();
 		childFrame.scale = node.getTranslation();
-	}
-	break;
-
+	} break;
 	}
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::mouseScrolled(ofMouseEventArgs& mouse) {
+void ofxNDIHelper::mouseScrolled(ofMouseEventArgs & mouse) {
 	if (!bEnable_ChildFrame) return;
 	if (!bKeyChildFrameState) return;
 
@@ -1277,9 +1206,9 @@ void ofxNDIHelper::mouseScrolled(ofMouseEventArgs& mouse) {
 	float step = 5;
 	float st = ofMap(ms, -2, 2, -step, step);
 
-	TransformNode& node = frame_.getInnerTransformNode();
+	TransformNode & node = frame_.getInnerTransformNode();
 
-	float n = 100;//bigger is slower/sensible
+	float n = 100; //bigger is slower/sensible
 
 	ofVec3f v(n + st, n + st, n);
 
@@ -1302,10 +1231,10 @@ void ofxNDIHelper::mouseScrolled(ofMouseEventArgs& mouse) {
 	childFrame.scale = node.getTranslation();
 }
 
-#endif
+	#endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setup_Webcam() {
+void ofxNDIHelper::setup_WebCam() {
 	ofLogNotice(__FUNCTION__);
 
 	// List the cam devices. nothing more yet!
@@ -1326,8 +1255,7 @@ void ofxNDIHelper::setup_Webcam() {
 	webcam_Names.clear();
 
 	// log list devices
-	for (size_t i = 0; i < _devs.size(); i++)
-	{
+	for (size_t i = 0; i < _devs.size(); i++) {
 		////TODO:
 		////should skip names for not available devices...
 		//if (_devs[i].bAvailable)
@@ -1339,12 +1267,10 @@ void ofxNDIHelper::setup_Webcam() {
 		webcam_Names_InputDevices += "\n";
 		//if (i != _devs.size() - 1) webcam_Names_InputDevices += "\n";
 
-		if (_devs[i].bAvailable)
-		{
+		if (_devs[i].bAvailable) {
 			// log the device
 			ofLogNotice(__FUNCTION__) << _devs[i].id << ": " << _devs[i].deviceName;
-		}
-		else {
+		} else {
 			// log the device and note it as unavailable
 			ofLogNotice(__FUNCTION__) << _devs[i].id << ": " << _devs[i].deviceName << " - unavailable ";
 		}
@@ -1354,60 +1280,54 @@ void ofxNDIHelper::setup_Webcam() {
 
 	//--
 
-#ifdef USE_WEBCAM
+	#ifdef USE_WEBCAM
+	//rect_WebCam.loadSettings(path_rect_WebCam, path_GLOBAL, false);
+	rect_WebCam.setModeLayout(ofxSurfingBox::FREE_LAYOUT);
+	rect_WebCam.setName(path_rect_WebCam);
+	rect_WebCam.setPathGlobal(path_GLOBAL + path_WebCamSettings);
+	rect_WebCam.setup();
+	rect_WebCam.setUseBorder(true);
 
-	//rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
-	rect_Webcam.setModeLayout(ofxSurfingBox::FREE_LAYOUT);
-	rect_Webcam.setName(path_rect_Webcam);
-	rect_Webcam.setPathGlobal(path_GLOBAL + path_WebcamSettings);
-	rect_Webcam.setup();
-	rect_Webcam.setUseBorder(true);
-
-#ifdef USE_OFX_CHILD_FRAME
-
-	x = rect_Webcam.getX();
-	y = rect_Webcam.getY();
-	w = rect_Webcam.getWidth();
-	h = rect_Webcam.getHeight();
+		#ifdef USE_OFX_CHILD_FRAME
+	x = rect_WebCam.getX();
+	y = rect_WebCam.getY();
+	w = rect_WebCam.getWidth();
+	h = rect_WebCam.getHeight();
 	wc = w / 2.f;
 	hc = h / 2.f;
 
 	frame_.setSize(w, h);
 	frame_.getInnerTransformNode().setAnchorPoint(x + wc, y + hc, 0);
 	frame_.getInnerTransformNode().setTranslation(wc, hc, 0);
-
-#endif
-
-#endif
+		#endif
+	#endif
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
-{
-	if (!bWebcam_Enable) return;
-	if (!bWebcam_Draw) return;
-	if (!bWebcam_DrawMini) return;
+void ofxNDIHelper::draw_WebCam_MiniPreview(bool bInfo) {
+	if (!bWebCam_Enable) return;
+	if (!bWebCam_Draw) return;
+	if (!bWebCam_DrawMini) return;
 
 	//----
 
 	ofPushStyle();
 	//ofSetColor(255, 255);
 
-	//TODO: 
-#ifdef USE_OFX_CHILD_FRAME
+	//TODO:
+	#ifdef USE_OFX_CHILD_FRAME
 
 	//TODO: child frame
 
-	if (rect_Webcam.isChanged())
-	{
-		//cout << __FUNCTION__ << "rect_Webcam.isChanged()" << endl;
+	if (rect_WebCam.isChanged()) {
+		//cout << __FUNCTION__ << "rect_WebCam.isChanged()" << endl;
 
-		bEnable_ChildFrame = !rect_Webcam.isEditing();
+		bEnable_ChildFrame = !rect_WebCam.isEditing();
 
-		x = rect_Webcam.getX();
-		y = rect_Webcam.getY();
-		w = rect_Webcam.getWidth();
-		h = rect_Webcam.getHeight();
+		x = rect_WebCam.getX();
+		y = rect_WebCam.getY();
+		w = rect_WebCam.getWidth();
+		h = rect_WebCam.getHeight();
 		wc = w / 2.f;
 		hc = h / 2.f;
 
@@ -1427,16 +1347,16 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 
 	//if (bEnable_ChildFrame)
 	{
-		x = rect_Webcam.getX();
-		y = rect_Webcam.getY();
-		w = rect_Webcam.getWidth();
-		h = rect_Webcam.getHeight();
+		x = rect_WebCam.getX();
+		y = rect_WebCam.getY();
+		w = rect_WebCam.getWidth();
+		h = rect_WebCam.getHeight();
 		wc = w / 2.f;
 		hc = h / 2.f;
 
 		// required to mantain position after moving box..
 		//frame_.setSize(w, h);
-		TransformNode& node = frame_.getInnerTransformNode();
+		TransformNode & node = frame_.getInnerTransformNode();
 		node.setAnchorPoint(x + wc, y + hc, 0);
 		node.setTranslation(wc, hc, 0);
 
@@ -1456,24 +1376,24 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 	frame_.draw(x, y);
 
 	// debug
-	if (0)
-	{
+	if (0) {
 		stringstream ss;
 		ss << "anchor     : " << childFrame.anchor << endl;
 		ss << "translate  : " << childFrame.translat << endl;
-		ss << "scale      : " << childFrame.scale << endl << endl;
+		ss << "scale      : " << childFrame.scale << endl
+		   << endl;
 		ofDrawBitmapStringHighlight(ss.str(), x + w + 10, y + h + 10);
-}
-#endif
+	}
+	#endif
 
-#ifndef USE_OFX_CHILD_FRAME
-	x = rect_Webcam.getX();
-	y = rect_Webcam.getY();
-	w = rect_Webcam.getWidth();
-	h = rect_Webcam.getHeight();
+	#ifndef USE_OFX_CHILD_FRAME
+	x = rect_WebCam.getX();
+	y = rect_WebCam.getY();
+	w = rect_WebCam.getWidth();
+	h = rect_WebCam.getHeight();
 	//ofSetColor(255, 255);
 	webcam_Grabber.draw(x, y, w, h);
-#endif
+	#endif
 
 	//--
 
@@ -1482,21 +1402,31 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 	// Viewport
 
 	ofRectangle rSrc(0, 0, webcam_Grabber.getWidth(), webcam_Grabber.getHeight());
-	ofRectangle rOut(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+	ofRectangle rOut(rect_WebCam.getX(), rect_WebCam.getY(), rect_WebCam.getWidth(), rect_WebCam.getHeight());
 
-	if (bWebcam_LockRatio.get())
-	{
+	if (bWebCam_LockRatio.get()) {
 		float _ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
-		rect_Webcam.setHeight(rect_Webcam.getWidth() * _ratio);
+		rect_WebCam.setHeight(rect_WebCam.getWidth() * _ratio);
 	}
 
 	ofScaleMode scaleMode;
-	switch (scaleMode_Index)
-	{
-	case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
-	case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
-	case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
-	case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+	switch (scaleMode_Index) {
+	case 0:
+		scaleMode = OF_SCALEMODE_FIT;
+		scaleMode_Name = "FIT";
+		break;
+	case 1:
+		scaleMode = OF_SCALEMODE_FILL;
+		scaleMode_Name = "FILL";
+		break;
+	case 2:
+		scaleMode = OF_SCALEMODE_CENTER;
+		scaleMode_Name = "CENTER";
+		break;
+	case 3:
+		scaleMode = OF_SCALEMODE_STRETCH_TO_FILL;
+		scaleMode_Name = "STRETCH_TO_FILL";
+		break;
 	}
 
 	//rOut.scaleTo(rSrc, scaleMode);
@@ -1504,47 +1434,45 @@ void ofxNDIHelper::draw_Webcam_MiniPreview(bool bInfo)
 
 	// image
 
-	////webcam_Grabber.draw(rect_Webcam.getX(), rect_Webcam.getY(), rect_Webcam.getWidth(), rect_Webcam.getHeight());
+	////webcam_Grabber.draw(rect_WebCam.getX(), rect_WebCam.getY(), rect_WebCam.getWidth(), rect_WebCam.getHeight());
 
 	////webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
 	//webcam_Grabber.draw(rOut.getX(), rOut.getY(), rOut.getWidth(), rOut.getHeight());
 
 	// interactive box
-	rect_Webcam.draw();
+	rect_WebCam.draw();
 
 	ofPopStyle();
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::webcam_SaveSettings()
-{
+void ofxNDIHelper::webcam_SaveSettings() {
 	ofLogNotice(__FUNCTION__);
 
 	ofXml _xml;
 	ofSerialize(_xml, webcam_Name_);
-	ofxSurfingHelpers::CheckFolder(path_GLOBAL + path_WebcamSettings);
-	_xml.save(path_GLOBAL + path_WebcamSettings + name_WebcamSettings);
+	ofxSurfingHelpers::CheckFolder(path_GLOBAL + path_WebCamSettings);
+	_xml.save(path_GLOBAL + path_WebCamSettings + name_WebCamSettings);
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::webcam_LoadSettings()
-{
+void ofxNDIHelper::webcam_LoadSettings() {
 	ofLogNotice(__FUNCTION__) << endl;
-	ofLogNotice(__FUNCTION__) << endl << "--------------------------------";
+	ofLogNotice(__FUNCTION__) << endl
+							  << "--------------------------------";
 
 	//--
 
-#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes Webcam hangs on startup
+	#ifdef FIX_WORKAROUND_STARTUP_FREEZE // Sometimes WebCam hangs on startup
 
 	// fix workaround startup
-	if (bWebcam_Enable.get())
-	{
+	if (bWebCam_Enable.get()) {
 		bDoRestartup = true;
-		bWebcam_Enable = false;
+		bWebCam_Enable = false;
 		webcam_Grabber.close();
-}
+	}
 
-#endif	
+	#endif
 
 	//--
 
@@ -1552,25 +1480,26 @@ void ofxNDIHelper::webcam_LoadSettings()
 	//TODO: camera is loading from index on app settings...
 
 	ofXml _xml;
-	bool _isLoaded = _xml.load(path_GLOBAL + path_WebcamSettings + name_WebcamSettings);
+	bool _isLoaded = _xml.load(path_GLOBAL + path_WebCamSettings + name_WebCamSettings);
 	ofDeserialize(_xml, webcam_Name_);
 
-	ofLogNotice(__FUNCTION__) << endl << "XML CONTENT : \n" << _xml.toString();
-	ofLogNotice(__FUNCTION__) << endl << "LOOKING FOR DEVICE : \n" << webcam_Name_.get();
+	ofLogNotice(__FUNCTION__) << endl
+							  << "XML CONTENT : \n"
+							  << _xml.toString();
+	ofLogNotice(__FUNCTION__) << endl
+							  << "LOOKING FOR DEVICE : \n"
+							  << webcam_Name_.get();
 
 	//--
 
 	webcam_Index_Device.setWithoutEventNotifications(-1);
 
-	if (_isLoaded)
-	{
+	if (_isLoaded) {
 		// Iterate devices names to found the device name read from the file settings.
-		for (int i = 0; i < _devs.size(); i++)
-		{
+		for (int i = 0; i < _devs.size(); i++) {
 			ofLogNotice(__FUNCTION__) << "DEVICE #" << i << " " << _devs[i].deviceName;
 
-			if (_devs[i].deviceName == webcam_Name_.get())
-			{
+			if (_devs[i].deviceName == webcam_Name_.get()) {
 				webcam_Index_Device = i;
 
 				ofLogNotice(__FUNCTION__) << "DEVICE FROM SETTINGS FOUND!";
@@ -1580,31 +1509,25 @@ void ofxNDIHelper::webcam_LoadSettings()
 				break;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		ofLogError(__FUNCTION__) << "SETTINGS FILE NOT FOUND!";
 		ofLogError(__FUNCTION__) << "FORCE TRY TO LOAD THE FIRST AVAILABLE DEVICE";
 	}
 
-	// Error. Desired name is not on the current list of devices! 
+	// Error. Desired name is not on the current list of devices!
 	// Then we try to load the first device...
 
-	if (webcam_Index_Device == -1)
-	{
-		webcam_Index_Device = 0;// force select first cam device
+	if (webcam_Index_Device == -1) {
+		webcam_Index_Device = 0; // force select first cam device
 
-		if (webcam_Index_Device < _devs.size())
-		{
+		if (webcam_Index_Device < _devs.size()) {
 			webcam_Name_ = _devs[webcam_Index_Device].deviceName;
 			webcam_Name = _devs[webcam_Index_Device].deviceName;
-		}
-		else
-		{
+		} else {
 			ofLogError(__FUNCTION__) << "CAMERA INDEX OUT OF RANGE";
 			webcam_Name = webcam_Name_ = "UNKNOWN DEVICE";
 			webcam_Grabber.close();
-			return;//cancel and exit!
+			return; //cancel and exit!
 		}
 	}
 
@@ -1620,7 +1543,7 @@ void ofxNDIHelper::webcam_LoadSettings()
 
 	// 2. Start device
 
-	//if (bWebcam_Enable.get()) 
+	//if (bWebCam_Enable.get())
 	{
 		ofLogNotice(__FUNCTION__) << "OPENING DEVICE!";
 
@@ -1637,21 +1560,22 @@ void ofxNDIHelper::webcam_LoadSettings()
 	//if (!_isConnected) {
 	//	ofLogError(__FUNCTION__) << "CAN'T INITIALIZE webcam_Grabber!";
 	//	ofLogError(__FUNCTION__) << "CAMERA DISABLED";
-	//	bWebcam_Enable = false;
+	//	bWebCam_Enable = false;
 	//}
 }
 
 #endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::doReset_Mini_PreviewsLayout()
-{
-	// Align all the previews using Webcam as anchor!
-
-	//float _xx0 = 100;
-	//float _yy0 = 250;
-	float _xx0 = rect_Webcam.getX();
-	float _yy0 = rect_Webcam.getY();
+void ofxNDIHelper::doReset_Mini_PreviewsLayout() {
+	// Align all the previews using WebCam as anchor!
+#ifdef USE_WEBCAM
+	float _xx0 = rect_WebCam.getX();
+	float _yy0 = rect_WebCam.getY();
+#else
+	float _xx0 = 100;
+	float _yy0 = 250;
+#endif
 
 	float _ratio;
 	float _xx;
@@ -1663,17 +1587,17 @@ void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 
 #ifdef USE_WEBCAM
 
-	//rect_Webcam.reset();
+	//rect_WebCam.reset();
 
 	_ratio = webcam_Grabber.getHeight() / webcam_Grabber.getWidth();
 
 	_xx = _xx0;
 	_yy = _yy0;
-	_ww = rect_Webcam.getWidth();
+	_ww = rect_WebCam.getWidth();
 	//_ww = wPreview;
 	_hh = _ww * _ratio;
 
-	rect_Webcam.setShape(ofRectangle(_xx, _yy, _ww, _hh));
+	rect_WebCam.setShape(ofRectangle(_xx, _yy, _ww, _hh));
 
 #endif
 
@@ -1707,10 +1631,13 @@ void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 	//--
 
 #ifdef USE_ofxNDI_IN
-
 	//NDI_Input1.doReset_Mini_PreviewsSize();
+	#ifdef USE_WEBCAM
+	_xx = _xx0 + MAX(rect_WebCam.getWidth(), rect_NDI_OUT.getWidth()) + pad;
+	#else
+	_xx = _xx0 + rect_NDI_OUT.getWidth() + pad;
+	#endif
 
-	_xx = _xx0 + MAX(rect_Webcam.getWidth(), rect_NDI_OUT.getWidth()) + pad;
 	_yy = _yy0;
 	//_ww = wPreview;
 	_hh = _ww * _ratio;
@@ -1732,28 +1659,25 @@ void ofxNDIHelper::doReset_Mini_PreviewsLayout()
 	_ww = r2.getWidth();
 
 	NDI_Input2.setPositionPreview(glm::vec2(_xx, _yy));
-
 #endif
-
 }
 
 #ifdef USE_WEBCAM
-
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Webcam()
-{
-	if (!bWebcam_Enable) return;
-	if (!bWebcam_Draw) return;
+void ofxNDIHelper::draw_WebCam() {
+	if (!bWebCam_Enable) return;
+	if (!bWebCam_Draw) return;
 
-	if (bWebcam_DrawMini) draw_Webcam_MiniPreview(true);
-	else draw_Webcam_Full();
+	if (bWebCam_DrawMini)
+		draw_WebCam_MiniPreview(true);
+	else
+		draw_WebCam_Full();
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_Webcam_Full()
-{
-	if (!bWebcam_Enable) return;
-	if (!bWebcam_Draw) return;
+void ofxNDIHelper::draw_WebCam_Full() {
+	if (!bWebCam_Enable) return;
+	if (!bWebCam_Draw) return;
 
 	//TODO:
 	// making fit view ports
@@ -1762,12 +1686,23 @@ void ofxNDIHelper::draw_Webcam_Full()
 	ofSetColor(255, 255);
 
 	ofScaleMode scaleMode;
-	switch (scaleMode_Index)
-	{
-	case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
-	case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
-	case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
-	case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+	switch (scaleMode_Index) {
+	case 0:
+		scaleMode = OF_SCALEMODE_FIT;
+		scaleMode_Name = "FIT";
+		break;
+	case 1:
+		scaleMode = OF_SCALEMODE_FILL;
+		scaleMode_Name = "FILL";
+		break;
+	case 2:
+		scaleMode = OF_SCALEMODE_CENTER;
+		scaleMode_Name = "CENTER";
+		break;
+	case 3:
+		scaleMode = OF_SCALEMODE_STRETCH_TO_FILL;
+		scaleMode_Name = "STRETCH_TO_FILL";
+		break;
 	}
 
 	ofRectangle rOut(0, 0, NDI_OUT_Sender.GetWidth(), NDI_OUT_Sender.GetHeight());
@@ -1783,17 +1718,15 @@ void ofxNDIHelper::draw_Webcam_Full()
 
 	ofPopStyle();
 }
-
 #endif
 
 //--
 
 #ifdef USE_ofxNDI_OUT
-
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_NDI_OUT() {
 
-	NDI_OUT_Sender.ReleaseSender();//?
+	NDI_OUT_Sender.ReleaseSender(); //?
 
 	ofLogNotice(__FUNCTION__) << NDI_OUT_Sender.GetNDIversion() << " (http://ndi.tv/)";
 	//strcpy_s(senderName, 256, "OF NDI Sender"); // Set the sender name
@@ -1843,11 +1776,9 @@ void ofxNDIHelper::setup_NDI_OUT() {
 
 	ofLogNotice(__FUNCTION__) << "Created NDI sender [" << senderName << "] (" << senderWidth << "x" << senderHeight << ")";
 }
-
 #endif
 
 #ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN || USE_WEBCAM
-
 //--------------------------------------------------------------
 void ofxNDIHelper::draw_InfoDevices() {
 
@@ -1855,26 +1786,22 @@ void ofxNDIHelper::draw_InfoDevices() {
 
 	// WEBCAM
 
-#ifdef USE_WEBCAM
+	#ifdef USE_WEBCAM
 
-	if (bWebcam_Enable.get() && bWebcam_Draw.get() && bWebcam_DrawMini.get())
-	{
+	if (bWebCam_Enable.get() && bWebCam_Draw.get() && bWebCam_DrawMini.get()) {
 		//--
 
 		// Top info
 
-		if (bDebug)
-		{
+		if (bDebug) {
 			string s = "WEBCAM | " + webcam_Name_.get();
 			glm::vec2 p;
 
-			if (bLabelsInner)
-			{
+			if (bLabelsInner) {
 				int h = pad / 2 + font.getSize() + padLabel;
-				p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, h);
-			}
-			else {
-				p = rect_Webcam.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
+				p = rect_WebCam.getRectangle().getTopLeft() + glm::vec2(_padx, h);
+			} else {
+				p = rect_WebCam.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
 			}
 
 			ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, pad, round, -1, true);
@@ -1892,47 +1819,39 @@ void ofxNDIHelper::draw_InfoDevices() {
 		s += webcam_Names_InputDevices;
 
 		glm::vec2 p;
-		if (bLabelsInner)
-		{
+		if (bLabelsInner) {
 			int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, s);
-			p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2 - h + 32);
-		}
-		else
-		{
-			p = rect_Webcam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
+			p = rect_WebCam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2 - h + 32);
+		} else {
+			p = rect_WebCam.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
 		}
 
 		ofxSurfingHelpers::drawTextBoxed(font, s, p.x, p.y, 255, 0, false, 128, 20, round, -1, true);
 	}
 
-#endif
+	#endif
 
 	//--
 
 	// NDI OUTPUT
 
-#ifdef USE_ofxNDI_OUT
+	#ifdef USE_ofxNDI_OUT
 
-	if (bNDI_Output_Enable.get() && bNDI_Output_Draw.get() && bNDI_Output_Mini.get())
-	{
+	if (bNDI_Output_Enable.get() && bNDI_Output_Draw.get() && bNDI_Output_Mini.get()) {
 		// Show what it's sending
-		if (NDI_OUT_Sender.SenderCreated())
-		{
+		if (NDI_OUT_Sender.SenderCreated()) {
 			//--
 
 			// Top info
 
-			if (bDebug)
-			{
+			if (bDebug) {
 				string s = "NDI OUT | " + NDI_Output_Name.get();
 				glm::vec2 p;
 
-				if (bLabelsInner)
-				{
+				if (bLabelsInner) {
 					int h = pad / 2 + font.getSize() + padLabel;
 					p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, h);
-				}
-				else {
+				} else {
 					p = rect_NDI_OUT.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
 				}
 
@@ -1952,13 +1871,10 @@ void ofxNDIHelper::draw_InfoDevices() {
 			y2 = rect_NDI_OUT.getY() + rect_NDI_OUT.getHeight() + _pady2;
 
 			glm::vec2 p;
-			if (bLabelsInner)
-			{
+			if (bLabelsInner) {
 				int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, s);
 				p = rect_NDI_OUT.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2 - h + 32);
-			}
-			else
-			{
+			} else {
 				p = rect_NDI_OUT.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
 			}
 
@@ -1966,28 +1882,23 @@ void ofxNDIHelper::draw_InfoDevices() {
 		}
 	}
 
-#endif
+	#endif
 }
 
-//--
+	//--
 
-// NDI OUT
-
-#ifdef USE_ofxNDI_OUT
+	// NDI OUT
+	#ifdef USE_ofxNDI_OUT
 //--------------------------------------------------------------
-void ofxNDIHelper::begin_NDI_OUT()
-{
-	if (bNDI_Output_Enable.get())
-	{
+void ofxNDIHelper::begin_NDI_OUT() {
+	if (bNDI_Output_Enable.get()) {
 		fbo_NDI_Sender.begin();
 		ofClear(0, 0, 0, 255);
 	}
 }
 //--------------------------------------------------------------
-void ofxNDIHelper::end_NDI_OUT()
-{
-	if (bNDI_Output_Enable.get())
-	{
+void ofxNDIHelper::end_NDI_OUT() {
+	if (bNDI_Output_Enable.get()) {
 		// Overlay layer
 		//if (bDebug.get()) ofDrawBitmapStringHighlight("NDI OUT", 40, 60);
 
@@ -2008,17 +1919,17 @@ void ofxNDIHelper::end_NDI_OUT()
 
 // NDI Out
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_NDI_OUT()
-{
+void ofxNDIHelper::draw_NDI_OUT() {
 	if (!bNDI_Output_Enable.get()) return;
 
-	if (bNDI_Output_Mini.get()) draw_NDI_OUT_MiniPreview(true);
-	else draw_NDI_OUT_Full();
+	if (bNDI_Output_Mini.get())
+		draw_NDI_OUT_MiniPreview(true);
+	else
+		draw_NDI_OUT_Full();
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo)
-{
+void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo) {
 	if (!bNDI_Output_Enable.get()) return;
 
 	ofPushStyle();
@@ -2039,8 +1950,7 @@ void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo)
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::draw_NDI_OUT_Full()
-{
+void ofxNDIHelper::draw_NDI_OUT_Full() {
 	if (!bNDI_Output_Enable.get()) return;
 
 	ofPushStyle();
@@ -2057,13 +1967,16 @@ void ofxNDIHelper::draw_NDI_OUT_Full()
 	ofPopStyle();
 }
 
-#endif
-
+	#endif
+#else
+//to not break the examples when all are disabled!
+void ofxNDIHelper::begin_NDI_OUT() {};
+void ofxNDIHelper::end_NDI_OUT() {};
+void ofxNDIHelper::draw_InfoDevices() {};
 #endif
 
 //--------------------------------------------------------------
-void ofxNDIHelper::loadSettings()
-{
+void ofxNDIHelper::loadSettings() {
 	ofLogNotice(__FUNCTION__);
 
 	// load file settings
@@ -2076,21 +1989,20 @@ void ofxNDIHelper::loadSettings()
 
 	// Load Settings
 
-//#ifdef USE_ofxNDI_OUT
-//	rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
-//#endif
-//
-//#ifdef USE_WEBCAM
-//	rect_Webcam.loadSettings(path_rect_Webcam, path_GLOBAL, false);
-//#endif
+	//#ifdef USE_ofxNDI_OUT
+	//	rect_NDI_OUT.loadSettings(path_rect_NDI_OUT, path_GLOBAL, false);
+	//#endif
+	//
+	//#ifdef USE_WEBCAM
+	//	rect_WebCam.loadSettings(path_rect_WebCam, path_GLOBAL, false);
+	//#endif
 
 	// fix workaround startup
 	//bEdit_PRE = bEdit;
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::saveSettings()
-{
+void ofxNDIHelper::saveSettings() {
 	ofLogNotice(__FUNCTION__);
 
 	// Get gui position before save
@@ -2106,28 +2018,25 @@ void ofxNDIHelper::saveSettings()
 	//--
 
 #ifdef USE_WEBCAM
-
 	// Save settings file
 	webcam_SaveSettings();
-
 #endif
 
 	//--
 
 	// Viewports
 
-//#ifdef USE_WEBCAM
-//	rect_NDI_OUT.saveSettings(path_rect_NDI_OUT, path_GLOBAL, false);
-//#endif
-//
-//#ifdef USE_ofxNDI_OUT
-//	rect_Webcam.saveSettings(path_rect_Webcam, path_GLOBAL, false);
-//#endif
+	//#ifdef USE_WEBCAM
+	//	rect_NDI_OUT.saveSettings(path_rect_NDI_OUT, path_GLOBAL, false);
+	//#endif
+	//
+	//#ifdef USE_ofxNDI_OUT
+	//	rect_WebCam.saveSettings(path_rect_WebCam, path_GLOBAL, false);
+	//#endif
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::exit()
-{
+void ofxNDIHelper::exit() {
 	ofLogNotice(__FUNCTION__);
 
 	saveSettings();
@@ -2135,34 +2044,28 @@ void ofxNDIHelper::exit()
 	//--
 
 #ifdef USE_ofxNDI_OUT
-
-	// The sender must be released 
+	// The sender must be released
 	// or NDI sender discovery will still find it
 	NDI_OUT_Sender.ReleaseSender();
-
 #endif
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::setLogLevel(ofLogLevel level)
-{
+void ofxNDIHelper::setLogLevel(ofLogLevel level) {
 	ofSetLogLevel("ofxNDIHelper", level);
 }
 
 //--------------------------------------------------------------
-void ofxNDIHelper::windowResized(int w, int h)
-{
+void ofxNDIHelper::windowResized(int w, int h) {
 	screenW = w;
 	screenH = h;
 
 	//TODO:\
-	// don't does nothing yet! 
+	// don't does nothing yet!
 	//NDI_OUT_Sender.UpdateSender(1920, 1080);//update size
 
 #ifdef USE_ofxNDI_IN
-
 	NDI_Input1.windowResized(w, h);
 	NDI_Input2.windowResized(w, h);
-
 #endif
 }

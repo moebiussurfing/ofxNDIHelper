@@ -4,4 +4,3 @@ ofxNDI
 ofxNDIHelper
 ofxSurfingBox
 ofxSurfingHelpers
-ofxWindowApp
