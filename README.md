@@ -55,6 +55,7 @@ Look Examples for **ofxGui** or **ImGui** modes.
 
 ```.cpp
 #include "ofxNDIHelper.h"
+
 ofxNDIHelper NDIHelper;
 
 void ofApp::setup()
