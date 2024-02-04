@@ -1,8 +1,8 @@
 #pragma once
-
 #include "ofMain.h"
 
-#define USE_ofxNDI //-> ifdef directives stuff to help copy paste to your app projects.
+#define USE_ofxNDI
+//-> ifdef directives stuff to help copy paste to your app projects.
 
 #ifdef USE_ofxNDI
 	#include "SurfingNDIManager.h"
@@ -22,8 +22,8 @@ public:
 	void exit();
 
 public:
-	// NDI
 #ifdef USE_ofxNDI
+	// NDI
 	SurfingNDIManager ndi;
 #endif
 

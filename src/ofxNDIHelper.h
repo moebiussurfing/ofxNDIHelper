@@ -2,25 +2,23 @@
 //---
 
 /*
-
 	This add-on stills a bit WIP !!
 
 
 	TODO:
 
-	+ customize ui widgets better, not using groups!
+	+ Customize ImGui ui widgets better, not using groups!
 
 	+ Layout Canvas: Allow change layers sorting. store an int vector with position of each layer
 		now drawing order is: NDI in 1, 2, WebCam and out.
 
-	+ split NDI out to a class like for NDI input
+	+ Split NDI out to a class like for NDI input
 
 	+ Fix mode scale for WebCam
-		+ webcam mode scale move to params like NDI input class
+		+ webCam mode scale move to params like NDI input class
 
-	+ TODO: WIP
-	+ should replace by ofxComponent
-	+ child_frame: Finish make all transforms proportional to sizes
+	+ Should replace by ofxComponent
+	+ Child_frame: Finish make all transforms proportional to sizes
 		+ save load these settings.
 		only zoom works.
 
@@ -29,13 +27,10 @@
 		+ e.g. ndi out do not fits exactly the full width frame.
 
 	+ Split WebCam part as a new helper add-on. ?
-	+ make cam a class to allow multiple. check MSA cam add-on
+	+ Make cam a class to allow multiple. check MSA cam add-on
 	https://github.com/memo/ofxMSAMultiCam
 
-	+ We should use a vector of pointers to allow adding INPUT devices on runtime.
-
-	+ Fix directives+classes to allow use i.e. only the camera or only the Output.
-
+	+ We should use a vector of pointers to allow adding INPUT devices on runtime.?
 */
 
 //---
@@ -43,15 +38,27 @@
 #pragma once
 #include "ofMain.h"
 
-//----
+//------
 
 // MODULES / OPTIONAL / DEBUG
 
-//#define USE_WEBCAM // WebCam as camera input. //TODO: fails in OF 0.12+?
-//#define USE_ofxNDI_OUT // NDI output
-//#define USE_ofxNDI_IN // NDI input
+// 1. NDI output
+#define USE_ofxNDI_OUT 
 
-//--
+// 2. NDI input
+#define USE_ofxNDI_IN
+
+// 2. WebCam as camera input.
+//#define USE_WEBCAM
+//TODO: BUG:
+// currently main branch started fail in OF 0.12+?
+/*
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error	LNK2038	mismatch detected for 'RuntimeLibrary': value 'MD_DynamicRelease' doesn't match value 'MDd_DynamicDebug' in main.obj	1_Example_NDI-Basic	K:\Documents\of_12\openFrameworks\addons\ofxNDIHelper\1_Examples_ofxGui\1_Example_NDI-Basic\videoInput.lib(videoInput.obj)	1		
+Error	LNK2038	mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '0' doesn't match value '2' in main.obj	1_Example_NDI-Basic	K:\Documents\of_12\openFrameworks\addons\ofxNDIHelper\1_Examples_ofxGui\1_Example_NDI-Basic\videoInput.lib(videoInput.obj)	1		
+*/
+
+//------
 
 //TODO:
 // WIP: BUG: could break WebCam.
@@ -68,31 +75,21 @@
 //----
 
 // DEVICES
-//
+
 // 1. WebCam
 // 2. 2 x NDI INPUTS
 // 3. NDI OUTPUT
 
 //----
 
-//--
-
 // Dependencies
 
-#ifdef USE_ofxNDI_OUT || USE_ofxNDI_IN
+#if defined(USE_ofxNDI_OUT) || defined(USE_ofxNDI_IN)
 	#include "ofxNDI.h"
 	#ifdef USE_ofxNDI_IN
 		#include "NDI_input.h"
 	#endif
 #endif
-
-#include "ofxGui.h"
-#include "ofxSurfingBoxHelpText.h"
-#include "ofxSurfingBoxInteractive.h"
-#include "ofxSurfingHelpers.h"
-#include "ofxSurfing_ofxGui.h"
-//#include "TextBoxWidget.h"
-
 
 #ifdef USE_WEBCAM
 	#ifdef USE_OFX_CHILD_FRAME
@@ -103,9 +100,16 @@
 
 //--
 
+#include "ofxGui.h"
+#include "ofxSurfingBoxHelpText.h"
+#include "ofxSurfingBoxInteractive.h"
+#include "ofxSurfingHelpers.h"
+#include "ofxSurfing_ofxGui.h"
+
+//--
+
 class ofxNDIHelper /*: public ofBaseApp*/
 {
-
 private:
 	float x;
 	float y;
@@ -233,7 +237,7 @@ private:
 	// Text Box
 	ofTrueTypeFont font;
 
-	//-
+	//--
 
 private:
 	// Updating some params before save will trigs also the group callbacks
@@ -248,7 +252,7 @@ private:
 	uint64_t timerLast_Autosave = 0;
 	int timeToAutosave = 10000; //10 secs
 
-	//-
+	//--
 
 	void Changed(ofAbstractParameter & e);
 
@@ -260,7 +264,7 @@ private:
 	void Changed_NDI_Out(ofAbstractParameter & e);
 #endif
 
-	//-
+	//--
 
 	// Control Params
 
@@ -326,11 +330,9 @@ private:
 	void saveSettings();
 
 	//--
-	//
-	// 1. WebCam
 
 #ifdef USE_WEBCAM
-
+	// 1. WebCam
 private:
 	ofVideoGrabber webcam_Grabber;
 	void setup_WebCam(); // setup webcam from name device nor index
@@ -391,29 +393,22 @@ private:
 
 public:
 	ofxSurfingBoxInteractive rect_WebCam;
-
 #endif
 
 	//--
 
-	// 2. NDI INPUT
-
 #ifdef USE_ofxNDI_IN
-
+	// 2. NDI INPUT
 public:
 	NDI_input NDI_Input1;
 	NDI_input NDI_Input2;
-
 #endif
 
 	//--
 
-	//private:
 public:
 	// 3. NDI OUTPUT
-
 #ifdef USE_ofxNDI_OUT
-
 	ofParameter<bool> bNDI_Output_Enable;
 	ofParameter<bool> bNDI_Output_Draw;
 	ofParameter<bool> bNDI_Output_Mini;
@@ -444,6 +439,5 @@ public:
 	ofxSurfingBoxInteractive rect_NDI_OUT;
 
 	ofParameterGroup params_NDI_Output;
-
 #endif //USE_ofxNDI_OUT
 };

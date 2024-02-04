@@ -1,13 +1,11 @@
 #pragma once
-
 #include "ofMain.h"
 
 /*
 	This example is an NDI Sender
-	but you can play too with the other receivers and webcam managers.
-	Notice that on this example, this previews will not been sended to the NDI Out!
-	Only the image scene.
-
+	but you can play too with the other receivers and webCam managers.
+	Notice that on this example, this previews will can be sent to the NDI Out!
+	Or is allowed sending the image instead.
 	Draws an animated background image into an NDI Out to be broad casted into your network.
 	Then can be received into any NDI receiver like an NDI Monitor app.
 
@@ -33,8 +31,9 @@
 
 #include "ofxGui.h"
 
-class ofApp : public ofBaseApp {
+//--
 
+class ofApp : public ofBaseApp {
 public:
 	void setup();
 	void update();
@@ -51,5 +50,7 @@ public:
 
 	// Bg image
 	ofImage image;
-	ofParameter<bool> bDrawImage { "Image to feed NDI OUT", true };
+	ofParameter<bool> bDrawImage { "IMG to feed NDI_Out", true };
+
+	ofParameter<bool> bDrawSource { "Source NDI_Inputs/IMG", false };
 };

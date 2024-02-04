@@ -1,16 +1,13 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup()
-{
-	// NDI
+void ofApp::setup() {
 #ifdef USE_ofxNDI
-
+	// NDI
 	ndi.setup();
 	ndi.setMode_ImGui();
-	
-	//ndi.setGuiInternalVisible(true);//debug
 
+	//ndi.setGuiInternalVisible(true);//debug
 #endif
 
 	//--
@@ -25,14 +22,12 @@ void ofApp::setup()
 }
 
 //--------------------------------------------------------------
-void ofApp::update()
-{
+void ofApp::update() {
 	// Draw inside to feed the NDI Video Output.
-	// that's the signal we will send! 
-	
-	// NDI
-#ifdef USE_ofxNDI
+	// that's the signal we will send!
 
+#ifdef USE_ofxNDI
+	// NDI
 	ndi.begin_NDI_OUT();
 	{
 		drawBg();
@@ -40,37 +35,30 @@ void ofApp::update()
 		ndi.drawSignals();
 	}
 	ndi.end_NDI_OUT();
-
 #endif
 }
 
 //--------------------------------------------------------------
-void ofApp::drawBg()
-{
+void ofApp::drawBg() {
 	ofBackground(24);
 }
 
 //--------------------------------------------------------------
-void ofApp::draw()
-{
+void ofApp::draw() {
 	drawBg();
 
-	// NDI Preview
 #ifdef USE_ofxNDI
-
+	// NDI Preview
 	ndi.draw();
-
 #endif
-
-	// Gui
 
 	//----
 
-	// NDI Gui
+	// Gui
+
 #ifdef USE_ofxNDI
-
+	// NDI Gui
 	ndi.drawGui();
-
 #endif
 
 	//----
@@ -81,17 +69,12 @@ void ofApp::draw()
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
-
 #ifdef USE_ofxNDI
-
 	ndi.windowResized(w, h);
-
 #endif
-
 }
 
 //--------------------------------------------------------------
-void ofApp::exit()
-{
+void ofApp::exit() {
 	ofxSurfingHelpers::saveGroup(params);
 }

@@ -3,6 +3,9 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	//ofSetWindowPosition(-1920, 25);
+	
+	string s = "1_Example_NDI-Basic";
+	ofSetWindowTitle(s);
 
 	NDIHelper.setup();
 
@@ -11,8 +14,9 @@ void ofApp::setup() {
 	image.loadImage("assets/image.jpg");
 
 	gui.setup("ofApp");
-	gui.add(bDrawImage);
 	gui.add(NDIHelper.bGui);
+	gui.add(bDrawImage);
+	gui.add(bDrawSource);
 	gui.setPosition(10, ofGetHeight() - gui.getHeight() - 40);
 }
 
@@ -23,8 +27,14 @@ void ofApp::update() {
 
 	NDIHelper.begin_NDI_OUT();
 	{
-		// Draw a simple and animated scene:
-		drawScene();
+		if (bDrawSource) {
+			// Draw to send to the output
+			NDIHelper.draw_NDI_IN_1();
+			NDIHelper.draw_NDI_IN_2();
+		} else {
+			// Draw a simple and animated scene:
+			drawScene();
+		}
 	}
 	NDIHelper.end_NDI_OUT();
 }
@@ -41,12 +51,12 @@ void ofApp::draw() {
 
 	//----
 
-	// Gui Settings
+	// ui settings
 	NDIHelper.draw_Gui();
 
 	//----
 
-	// ofApp Gui
+	// ofApp
 	gui.draw();
 }
 

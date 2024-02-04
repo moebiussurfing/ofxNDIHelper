@@ -3,14 +3,12 @@
 #ifdef USE_ofxNDI_IN
 
 //--------------------------------------------------------------
-NDI_input::NDI_input()
-{
+NDI_input::NDI_input() {
 	ofAddListener(ofEvents().update, this, &NDI_input::update);
 }
 
 //--------------------------------------------------------------
-NDI_input::~NDI_input()
-{
+NDI_input::~NDI_input() {
 	ofRemoveListener(ofEvents().update, this, &NDI_input::update);
 
 	ofRemoveListener(params.parameterChangedE(), this, &NDI_input::Changed);
@@ -19,8 +17,7 @@ NDI_input::~NDI_input()
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup(string _name)
-{
+void NDI_input::setup(string _name) {
 	name = _name;
 	path_rect_NDI_IN = "NDI_IN_" + name + "_Mini";
 
@@ -65,8 +62,7 @@ void NDI_input::setup(string _name)
 }
 
 //--------------------------------------------------------------
-void NDI_input::startup()
-{
+void NDI_input::startup() {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
 	//loadSettings();
@@ -79,8 +75,7 @@ void NDI_input::startup()
 }
 
 //--------------------------------------------------------------
-void NDI_input::startupDelayed()
-{
+void NDI_input::startupDelayed() {
 	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
 
 	loadSettings();
@@ -89,8 +84,7 @@ void NDI_input::startupDelayed()
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup_Params()
-{
+void NDI_input::setup_Params() {
 	bGui.set("NDI IN " + name, true);
 
 	bGui_Internal.set("IN " + name, true);
@@ -98,20 +92,19 @@ void NDI_input::setup_Params()
 
 	bLoad.set("Load Settings");
 
-	bNext.set("NEXT", false);
-	bLockRatio.set("LOCK ASPECT", true);
-	bDebug.set("DEBUG", true);
+	bNext.set("Next", false);
+	bLockRatio.set("Lock Aspect", true);
+	bDebug.set("Debug", true);
 
-	position_Gui.set("GUI POSITION",
+	position_Gui.set("UI Position",
 		glm::vec2(screenW * 0.5, screenH * 0.5),
 		glm::vec2(0, 0),
-		glm::vec2(screenW, screenH)
-	);
+		glm::vec2(screenW, screenH));
 
-	scaleMode_Index.set("SCALE", 0, 0, 3);
-	scaleMode_Name.set("SCALE MODE", "");
+	scaleMode_Index.set("Scale", 0, 0, 3);
+	scaleMode_Name.set("Scale Mode", "");
 
-	bReset.set("RESET PREVIEW", false);
+	bReset.set("Reset Preview", false);
 
 	scaleMode_Names.clear();
 	scaleMode_Names.push_back("FIT");
@@ -123,11 +116,11 @@ void NDI_input::setup_Params()
 
 	// Exclude
 
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+	#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 	indexDevice.setSerializable(false);
-#else
+	#else
 	nameDevice.setSerializable(false);
-#endif
+	#endif
 	bLoad.setSerializable(false);
 	bReset.setSerializable(false);
 	bNext.setSerializable(false);
@@ -137,12 +130,12 @@ void NDI_input::setup_Params()
 
 	// NDI IN
 
-	bEnable.set("ENABLE", false);
-	bDraw.set("DRAW", true);
-	bDrawMini.set("MINI", true);
-	indexDevice.set("DEVICE", 0, 0, 1);
-	nameDevice.set("NAME", "ofxNDIHelperIN");
-	bScan.set("SCAN", false);
+	bEnable.set("Enable", false);
+	bDraw.set("Draw", true);
+	bDrawMini.set("Mini", true);
+	indexDevice.set("Device", 0, 0, 1);
+	nameDevice.set("Name", "ofxNDIHelperIN");
+	bScan.set("Scan", false);
 	bScan.setSerializable(false);
 
 	params_Settings.setName("NDI INPUT");
@@ -152,14 +145,14 @@ void NDI_input::setup_Params()
 	params_Settings.add(indexDevice);
 	params_Settings.add(nameDevice);
 	params_Settings.add(bNext);
-	params_Settings.add(bScan);//now is automatic
+	params_Settings.add(bScan); //now is automatic
 
 	//--
 
 	// Input
 
 	params_Control.setName("CONTROL");
-	params_Control.add(bDebug);//TODO: BUG: not linking when makeReference from parent scope..
+	params_Control.add(bDebug); //TODO: BUG: not linking when makeReference from parent scope..
 	params_Control.add(rect_NDI_IN.bEdit);
 	params_Control.add(bReset);
 	params_Control.add(bLockRatio);
@@ -185,12 +178,12 @@ void NDI_input::setup_Params()
 	gui_Control.setup("IN " + name);
 	gui_Control.add(params);
 
-	auto& gc = gui_Control.getGroup(params.getName()).getGroup(params_Control.getName());
-	auto& gp = gc.getGroup(position_Gui.getName());
+	auto & gc = gui_Control.getGroup(params.getName()).getGroup(params_Control.getName());
+	auto & gp = gc.getGroup(position_Gui.getName());
 	gc.minimize();
 	gp.minimize();
 
-	auto& gg = gui_Control.getGroup(params.getName());
+	auto & gg = gui_Control.getGroup(params.getName());
 	gg.minimize();
 
 	//--
@@ -203,9 +196,8 @@ void NDI_input::setup_Params()
 //--
 
 //--------------------------------------------------------------
-void NDI_input::setup_Fbo()
-{
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+void NDI_input::setup_Fbo() {
+	ofLogNotice(__FUNCTION__);
 
 	//--
 
@@ -237,9 +229,8 @@ void NDI_input::setup_Fbo()
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup_ByIndex()
-{
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+void NDI_input::setup_ByIndex() {
+	ofLogNotice(__FUNCTION__);
 
 	//--
 
@@ -248,31 +239,27 @@ void NDI_input::setup_ByIndex()
 
 	int i = indexDevice.get();
 
-	if (nsenders > 0 && i >= 0 && i < nsenders)
-	{
+	if (nsenders > 0 && i >= 0 && i < nsenders) {
 		// Update the receiver with the returned index
 		// Returns false if the current sender is selected
 
-		if (NDI_Receiver.SetSenderIndex(i))
-		{
+		if (NDI_Receiver.SetSenderIndex(i)) {
 			nameDevice.setWithoutEventNotifications(NDI_Receiver.GetSenderName(i));
 
 			ofLogNotice(__FUNCTION__) << "Device Name: " << nameDevice.get() << " #" << i;
 		}
 
-		else ofLogWarning(__FUNCTION__) << "Stay in same sender #" << i;
-	}
-	else
-	{
+		else
+			ofLogWarning(__FUNCTION__) << "Stay in same sender #" << i;
+	} else {
 		ofLogError(__FUNCTION__) << "NOT ANY NDI SENDERS!";
 		ofLogError(__FUNCTION__) << "OR INDEX OUT OF RANGE.";
 	}
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup_ByIndex(int _indexDevice)
-{
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+void NDI_input::setup_ByIndex(int _indexDevice) {
+	ofLogNotice(__FUNCTION__);
 
 	// Search the device by index
 
@@ -282,9 +269,8 @@ void NDI_input::setup_ByIndex(int _indexDevice)
 }
 
 //--------------------------------------------------------------
-void NDI_input::setup_ByName(string _nameDevice)
-{
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+void NDI_input::setup_ByName(string _nameDevice) {
+	ofLogNotice(__FUNCTION__);
 
 	// Search the device by name
 
@@ -301,16 +287,13 @@ void NDI_input::setup_ByName(string _nameDevice)
 
 	// List all the senders
 
-	if (nsenders > 0)
-	{
+	if (nsenders > 0) {
 		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
 
-		for (int i = 0; i < nsenders; i++)
-		{
+		for (int i = 0; i < nsenders; i++) {
 			// Same name found!
 
-			if (nameDevice.get() == NDI_Receiver.GetSenderName(i))
-			{
+			if (nameDevice.get() == NDI_Receiver.GetSenderName(i)) {
 				_indexTarget = i;
 
 				indexDevice.setWithoutEventNotifications(i);
@@ -321,11 +304,10 @@ void NDI_input::setup_ByName(string _nameDevice)
 
 			ofLogNotice(__FUNCTION__) << "Sender: #" << ofToString(i) + " " + name;
 		}
-	}
-	else ofLogNotice(__FUNCTION__) << "No NDI senders found";
+	} else
+		ofLogNotice(__FUNCTION__) << "No NDI senders found";
 
-	if (_indexTarget == -1)
-	{
+	if (_indexTarget == -1) {
 		ofLogError(__FUNCTION__) << "Device name not found on NDI senders names list!";
 
 		return;
@@ -335,8 +317,7 @@ void NDI_input::setup_ByName(string _nameDevice)
 //--
 
 //--------------------------------------------------------------
-void NDI_input::drawGui()
-{
+void NDI_input::drawGui() {
 	//if (!bGui) return;
 	if (!bGui_Internal) return;
 
@@ -344,16 +325,14 @@ void NDI_input::drawGui()
 }
 
 //--------------------------------------------------------------
-void NDI_input::update(ofEventArgs& args)
-{
+void NDI_input::update(ofEventArgs & args) {
 	updateWorkaround();
 }
 
 //--------------------------------------------------------------
-void NDI_input::updateWorkaround()
-{
+void NDI_input::updateWorkaround() {
 	//TODO: need to improve the startup process to correctly load settings
-	// when scanning is ready done and corrent NDI sender name is found 
+	// when scanning is ready done and corrent NDI sender name is found
 	// currently broadcasting on the network.
 
 	static int timerStartupDone = 0;
@@ -362,24 +341,21 @@ void NDI_input::updateWorkaround()
 		static int nsenders_PRE = 0;
 		if (nsenders != nsenders_PRE) {
 			nsenders_PRE = nsenders;
-			if (ofGetFrameNum() % 60 == 0) doListDevices();//make slower. check once per sec
+			if (ofGetFrameNum() % 60 == 0) doListDevices(); //make slower. check once per sec
 		}
 	}
 
 	if (bEnable)
-		if (nsenders == 0 && (ofGetFrameNum() % 120 == 0))
-		{
+		if (nsenders == 0 && (ofGetFrameNum() % 120 == 0)) {
 			ofLogWarning(__FUNCTION__) << "NO DEVICES FOUND...";
 		}
 
 	//--
 
 	// Startup phases:
- 
-	if (ofGetFrameNum() >= (int)DEFAULT_STARTUP_WAITING_TIME)
-	{
-		if (!bLoadedStartupDone)
-		{
+
+	if (ofGetFrameNum() >= (int)DEFAULT_STARTUP_WAITING_TIME) {
+		if (!bLoadedStartupDone) {
 			ofLogNotice(__FUNCTION__) << "DEFAULT_STARTUP_WAITING_TIME Done!" << endl;
 
 			startup(); // fix
@@ -388,10 +364,8 @@ void NDI_input::updateWorkaround()
 		}
 	}
 
-	if (!bFoundSendersDone && bLoadedStartupDone)
-	{
-		if (nsenders > 0)
-		{
+	if (!bFoundSendersDone && bLoadedStartupDone) {
+		if (nsenders > 0) {
 			bFoundSendersDone = true;
 
 			// reload settings again when senders are found!
@@ -399,16 +373,13 @@ void NDI_input::updateWorkaround()
 		}
 	}
 
-	if (bLoadedStartupDone && bFoundSendersDone)
-	{
-		if ((ofGetFrameNum() - timerStartupDone) == (int)DEFAULT_STARTUP_WAITING_TIME)
-		{
+	if (bLoadedStartupDone && bFoundSendersDone) {
+		if ((ofGetFrameNum() - timerStartupDone) == (int)DEFAULT_STARTUP_WAITING_TIME) {
 			startupDelayed();
 		}
 	}
 
-	if (bStartupDelayedDone) 
-	{
+	if (bStartupDelayedDone) {
 		bStartupDelayedDone = false;
 		doScan();
 	}
@@ -426,8 +397,7 @@ void NDI_input::draw() {
 
 	draw_Main();
 
-	if (bDebug)
-	{
+	if (bDebug) {
 		// Show what it is receiving
 		draw_InfoDevices();
 	}
@@ -440,17 +410,13 @@ void NDI_input::draw_InfoDevices() {
 
 	// NDI IN
 
-	if (bEnable.get() && bDraw.get())
-	{
+	if (bEnable.get() && bDraw.get()) {
 		string str = "";
 
 		nsenders = NDI_Receiver.GetSenderCount();
-		if (nsenders > 0)
-		{
-			if (NDI_Receiver.ReceiverCreated())
-			{
-				if (NDI_Receiver.ReceiverConnected())
-				{
+		if (nsenders > 0) {
+			if (NDI_Receiver.ReceiverCreated()) {
+				if (NDI_Receiver.ReceiverConnected()) {
 					// Show received sender information and received fps
 					str += ofToString(NDI_Receiver.GetSenderName().c_str());
 					str += " " + ofToString(indexDevice.get()) + "\n";
@@ -458,16 +424,12 @@ void NDI_input::draw_InfoDevices() {
 					str += "x" + ofToString(NDI_Receiver.GetSenderHeight()) + "px | ";
 					str += "FPS " + ofToString(NDI_Receiver.GetSenderFps()) + " / ";
 					str += ofToString(NDI_Receiver.GetFps()) + "";
-				}
-				else
-				{
+				} else {
 					// Nothing received
 					str += "" + ofToString(NDI_Receiver.GetSenderName().c_str());
 				}
 			}
-		}
-		else
-		{
+		} else {
 			str += "\n";
 			str += "CONNECTING...";
 		}
@@ -476,8 +438,7 @@ void NDI_input::draw_InfoDevices() {
 
 		// NDI input devices list
 
-		if (NDI_INPUT_Names_Devices.size() > 0)
-		{
+		if (NDI_INPUT_Names_Devices.size() > 0) {
 			str += NDI_INPUT_Names_Devices;
 		}
 
@@ -488,18 +449,13 @@ void NDI_input::draw_InfoDevices() {
 		// Top info
 		//int px = 2;
 
-		if (!bDrawMini.get())
-		{
+		if (!bDrawMini.get()) {
 			p = glm::vec2(20 + _padx, 40 + _pady);
-		}
-		else
-		{
-			if (bLabelsInner)
-			{
+		} else {
+			if (bLabelsInner) {
 				int h = pad / 2 + font.getSize() + padLabel;
 				p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, h);
-			}
-			else {
+			} else {
 				p = rect_NDI_IN.getRectangle().getTopLeft() + glm::vec2(_padx, _pady);
 			}
 		}
@@ -510,47 +466,38 @@ void NDI_input::draw_InfoDevices() {
 
 		// Devices
 
-		if (bDrawMini.get())
-		{
+		if (bDrawMini.get()) {
 			p = rect_NDI_IN.getRectangle().getBottomLeft() + glm::vec2(_padx2, _pady2);
-		}
-		else
-		{
+		} else {
 			auto shape = ofxSurfingHelpers::getShapeBBtextBoxed(font, str);
 			p = glm::vec2(ofGetWidth() - (shape.x), ofGetHeight() - (shape.y));
 		}
 
-		if (bLabelsInner)
-		{
+		if (bLabelsInner) {
 			int h = ofxSurfingHelpers::getHeightBBtextBoxed(font, str);
 			//int h = pad / 2 + font.getSize() + padLabel;
 			p = p - glm::vec2(0, h - 33);
-		}
-		else
-		{
+		} else {
 		}
 		ofxSurfingHelpers::drawTextBoxed(font, str, p.x, p.y, 255, 0, false, 128, 20, round, -1, true);
-
 	}
 }
 
 //--
 
 //--------------------------------------------------------------
-void NDI_input::draw_MiniPreview()
-{
+void NDI_input::draw_MiniPreview() {
 	if (!bEnable.get()) return;
 	if (!bDraw) return;
 	if (!bDrawMini) return;
 
 	// Receive ofTexture
-	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
+	NDI_Receiver.ReceiveImage(tex_NDI_Receiver); //read to texture
 
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	if (bLockRatio.get())
-	{
+	if (bLockRatio.get()) {
 		float _ratio = tex_NDI_Receiver.getHeight() / tex_NDI_Receiver.getWidth();
 		rect_NDI_IN.setHeight(rect_NDI_IN.getWidth() * _ratio);
 	}
@@ -565,7 +512,7 @@ void NDI_input::draw_MiniPreview()
 	tex_NDI_Receiver.draw(rSrc.getX(), rSrc.getY(), rSrc.getWidth(), rSrc.getHeight());
 	//tex_NDI_Receiver.draw(rTar.getX(), rTar.getY(), rTar.getWidth(), rTar.getHeight());
 
-	// Rect container 
+	// Rect container
 	// (overlay changes when editing)
 	rect_NDI_IN.draw();
 
@@ -580,14 +527,13 @@ void NDI_input::draw_MiniPreview()
 }
 
 //--------------------------------------------------------------
-void NDI_input::draw_FullScreen()
-{
+void NDI_input::draw_FullScreen() {
 	if (!bEnable.get()) return;
 	if (!bDraw) return;
 	//if (!bDrawMini) return;
 
 	// Receive ofTexture
-	NDI_Receiver.ReceiveImage(tex_NDI_Receiver);//read to texture
+	NDI_Receiver.ReceiveImage(tex_NDI_Receiver); //read to texture
 
 	ofPushStyle();
 	ofSetColor(255, 255);
@@ -601,22 +547,23 @@ void NDI_input::draw_FullScreen()
 }
 
 //--------------------------------------------------------------
-void NDI_input::draw_Main()
-{
-	if (bDrawMini.get()) draw_MiniPreview();
-	else draw_FullScreen();
+void NDI_input::draw_Main() {
+	if (bDrawMini.get())
+		draw_MiniPreview();
+	else
+		draw_FullScreen();
 }
 
 //--------------------------------------------------------------
-void NDI_input::doListDevices()//list devices
+void NDI_input::doListDevices() //list devices
 {
-	ofLogNotice(__FUNCTION__) << "--------------------------------------------------------------";
+	ofLogNotice(__FUNCTION__);
 
-#ifdef _WIN64
+	#ifdef _WIN64
 	ofLogNotice(__FUNCTION__) << "\n ofxNDI example receiver - 64 bit";
-#else //_WIN64
+	#else //_WIN64
 	ofLogNotice(__FUNCTION__) << "\n ofxNDI example receiver - 32 bit";
-#endif //_WIN64
+	#endif //_WIN64
 	ofLogNotice(__FUNCTION__) << NDI_Receiver.GetNDIversion() << " (http://ndi.tv/)";
 	ofLogNotice(__FUNCTION__) << "Press 'SPACE' to list NDI senders";
 
@@ -631,14 +578,12 @@ void NDI_input::doListDevices()//list devices
 
 	namesDevices.clear();
 
-	if (nsenders > 0)
-	{
+	if (nsenders > 0) {
 		ofLogNotice(__FUNCTION__) << "Number of NDI senders found: " << nsenders;
 
 		NDI_INPUT_Names_Devices = "";
 
-		for (int i = 0; i < nsenders; i++)
-		{
+		for (int i = 0; i < nsenders; i++) {
 			string str = ofToString(i) + " " + NDI_Receiver.GetSenderName(i);
 			ofLogNotice(__FUNCTION__) << str;
 
@@ -647,13 +592,12 @@ void NDI_input::doListDevices()//list devices
 			NDI_INPUT_Names_Devices += str;
 			NDI_INPUT_Names_Devices += "\n";
 		}
-	}
-	else ofLogError(__FUNCTION__) << "No NDI senders found";
+	} else
+		ofLogError(__FUNCTION__) << "No NDI senders found";
 }
 
 //--------------------------------------------------------------
-void NDI_input::loadSettings()
-{
+void NDI_input::loadSettings() {
 	ofLogNotice(__FUNCTION__);
 
 	// load file settings
@@ -671,8 +615,7 @@ void NDI_input::loadSettings()
 }
 
 //--------------------------------------------------------------
-void NDI_input::saveSettings()
-{
+void NDI_input::saveSettings() {
 	ofLogNotice(__FUNCTION__);
 
 	// get gui position before save
@@ -690,8 +633,7 @@ void NDI_input::saveSettings()
 //--
 
 //--------------------------------------------------------------
-void NDI_input::doNext()
-{
+void NDI_input::doNext() {
 	ofLogNotice(__FUNCTION__);
 
 	int i = indexDevice;
@@ -701,16 +643,14 @@ void NDI_input::doNext()
 }
 
 //--------------------------------------------------------------
-void NDI_input::doScan()
-{
+void NDI_input::doScan() {
 	ofLogNotice(__FUNCTION__);
 
 	doListDevices();
 }
 
 //--------------------------------------------------------------
-void NDI_input::exit()
-{
+void NDI_input::exit() {
 	ofLogNotice(__FUNCTION__);
 
 	saveSettings();
@@ -723,8 +663,7 @@ void NDI_input::doReset_Mini_PreviewsSize() {
 }
 
 //--------------------------------------------------------------
-void NDI_input::Changed(ofAbstractParameter& e)
-{
+void NDI_input::Changed(ofAbstractParameter & e) {
 	if (bDISABLE_CALLBACKS) return;
 
 	string name = e.getName();
@@ -738,20 +677,20 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//----
 
-	if (0) {}
+	if (0) {
+	}
 
 	//--
 
 	// Device
-	// NDI IN 
+	// NDI IN
 
-	else if (name == bEnable.getName() && bEnable.get())
-	{
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+	else if (name == bEnable.getName() && bEnable.get()) {
+	#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
 		setup_ByName(nameDevice);
-#else
+	#else
 		setup_ByIndex(indexDevice);
-#endif
+	#endif
 		//--
 
 		////TODO:
@@ -763,30 +702,38 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//--
 
-#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
-	else if (name == nameDevice.getName())
-	{
+	#ifdef DEVICES_BY_NAME_INSTEAD_OF_BY_INDEX
+	else if (name == nameDevice.getName()) {
 		setup_ByName(nameDevice);
 	}
-#endif
+	#endif
 
 	//--
 
-	else if (name == indexDevice.getName())
-	{
+	else if (name == indexDevice.getName()) {
 		setup_ByIndex(indexDevice);
 	}
 
 	//--
 
-	else if (name == scaleMode_Index.getName())
-	{
-		switch (scaleMode_Index)
-		{
-		case 0: scaleMode = OF_SCALEMODE_FIT; scaleMode_Name = "FIT"; break;
-		case 1: scaleMode = OF_SCALEMODE_FILL; scaleMode_Name = "FILL"; break;
-		case 2: scaleMode = OF_SCALEMODE_CENTER; scaleMode_Name = "CENTER"; break;
-		case 3: scaleMode = OF_SCALEMODE_STRETCH_TO_FILL; scaleMode_Name = "STRETCH_TO_FILL"; break;
+	else if (name == scaleMode_Index.getName()) {
+		switch (scaleMode_Index) {
+		case 0:
+			scaleMode = OF_SCALEMODE_FIT;
+			scaleMode_Name = "FIT";
+			break;
+		case 1:
+			scaleMode = OF_SCALEMODE_FILL;
+			scaleMode_Name = "FILL";
+			break;
+		case 2:
+			scaleMode = OF_SCALEMODE_CENTER;
+			scaleMode_Name = "CENTER";
+			break;
+		case 3:
+			scaleMode = OF_SCALEMODE_STRETCH_TO_FILL;
+			scaleMode_Name = "STRETCH_TO_FILL";
+			break;
 		}
 	}
 
@@ -798,7 +745,7 @@ void NDI_input::Changed(ofAbstractParameter& e)
 	//	{
 	//		rect_NDI_IN.enableEdit();
 	//		//--
-	//		//if (bEnable.get()) 
+	//		//if (bEnable.get())
 	//		//{
 	//		//	doRefresh_NDI_IN();
 	//		//}
@@ -811,22 +758,19 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//--
 
-	else if (name == bReset.getName() && bReset)
-	{
+	else if (name == bReset.getName() && bReset) {
 		bReset = false;
 
 		doReset_Mini_PreviewsSize();
 	}
 
-	else if (name == bLoad.getName())
-	{
+	else if (name == bLoad.getName()) {
 		loadSettings();
 	}
 
 	//--
 
-	else if (name == bScan.getName() && bScan.get())
-	{
+	else if (name == bScan.getName() && bScan.get()) {
 		bScan = false;
 
 		doScan();
@@ -834,8 +778,7 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//--
 
-	else if (name == bNext.getName() && bNext.get())
-	{
+	else if (name == bNext.getName() && bNext.get()) {
 		bNext = false;
 
 		doNext();
@@ -843,15 +786,13 @@ void NDI_input::Changed(ofAbstractParameter& e)
 
 	//--
 
-	else if (name == position_Gui.getName())
-	{
+	else if (name == position_Gui.getName()) {
 		gui_Control.setPosition(position_Gui.get().x, position_Gui.get().y);
 	}
 }
 
 //--------------------------------------------------------------
-void NDI_input::windowResized(int w, int h)
-{
+void NDI_input::windowResized(int w, int h) {
 	screenW = w;
 	screenH = h;
 
