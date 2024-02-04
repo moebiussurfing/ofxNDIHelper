@@ -93,8 +93,8 @@ void ofApp::draw()
 - [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
 - [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
 - [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
-- ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
 - [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui) / Optional. We can use ofxGui.
+- ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
 
 
 <details>
@@ -129,20 +129,13 @@ while looking at the **NDI OUT Preview** or the **NDI Studio Monitor** video.
 
 </details>
 
-
 ## Tested Systems
-
-- **Windows 10** / **VS 2022** / **oF 0.12+**
+- **Windows 10** / **VS 2022** / **OF 0.12+**
 - **macOS 11.6.7 Big Sur** / **Xcode 13.2.1** / **oF 0.11.2**  
 
-
 ## Author
-
 moebiusSurfing, 2020-2022.  
-
 ( ManuMolina ) 
 
-
 ## License
-
 MIT License
