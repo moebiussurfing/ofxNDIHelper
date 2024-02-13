@@ -191,7 +191,7 @@ void ofxNDIHelper::setup() {
 	params_AppsSettings.add(params_Panels);
 #endif
 
-	//params_AppsSettings.add(bLockRatio);
+	//params_AppsSettings.add(bLockAspect);
 	//params_AppsSettings.add(params_Helper); //-> crashes. why??
 
 	//--
@@ -288,15 +288,15 @@ void ofxNDIHelper::webcam_Next() {
 
 //--------------------------------------------------------------
 void ofxNDIHelper::setup_WebCam_Params() {
-	bWebCam_Restart.set("RESTART", false);
-	bWebCam_Next.set("NEXT", false);
-	bWebCam_Enable.set("ENABLE", false);
-	bWebCam_LockRatio.set("LOCK ASPECT", true);
-	bWebCam_Draw.set("DRAW", true);
-	bWebCam_DrawMini.set("MINI", true);
-	webcam_Index_Device.set("DEVICE", 0, 0, 1);
-	scaleMode_Index.set("SCALE", 0, 0, 3);
-	scaleMode_Name.set("NAME", "");
+	bWebCam_Restart.set("Restart", false);
+	bWebCam_Next.set("Next", false);
+	bWebCam_Enable.set("Enable", false);
+	bWebCam_LockRatio.set("Lock Aspect", true);
+	bWebCam_Draw.set("Draw", true);
+	bWebCam_DrawMini.set("Mini", true);
+	webcam_Index_Device.set("Device", 0, 0, 1);
+	scaleMode_Index.set("Scale", 0, 0, 3);
+	scaleMode_Name.set("Name", "");
 	webcam_Name.set("", "");
 
 	webcam_Index_Device.setSerializable(false);
@@ -340,7 +340,7 @@ void ofxNDIHelper::setup_Params() {
 	bGui_NDI_OUT.set("OUT", true);
 
 	//bEdit.set("LAYOUT EDIT", true);
-	//bLockRatio.set("LOCK ASPECT", true);
+	//bLockAspect.set("LOCK ASPECT", true);
 	bResetLayout.set("Reset Layout", false);
 	bResetGui.set("Reset UI", false);
 	bKeys.set("Keys", true);
@@ -393,7 +393,7 @@ void ofxNDIHelper::setup_Params() {
 	params_Helper.add(bResetLayout);
 	params_Helper.add(bResetGui);
 	//TODO: BUG: not linking when makeReference from parent scope..
-	//params_Helper.add(bLockRatio);
+	//params_Helper.add(bLockAspect);
 
 	params_Helper.add(bDebug);
 	params_Helper.add(bKeys);
@@ -1928,7 +1928,7 @@ void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo) {
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	//if (bLockRatio.get())
+	//if (bLockAspect.get())
 	{
 		float _ratio = fbo_NDI_Sender.getHeight() / fbo_NDI_Sender.getWidth();
 		rect_NDI_OUT.setHeight(rect_NDI_OUT.getWidth() * _ratio);
@@ -1938,6 +1938,11 @@ void ofxNDIHelper::draw_NDI_OUT_MiniPreview(bool bInfo) {
 	rect_NDI_OUT.draw();
 
 	//fbo_NDI_Sender.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	ofSetColor(ofColor::yellow);
+	ofNoFill();
+	ofSetLineWidth(2);
+	ofDrawRectangle(rect_NDI_OUT.getRectangle());
 
 	ofPopStyle();
 }

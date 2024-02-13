@@ -566,3 +566,4 @@ ofxNDIHelper_example/bin/data/ofxNDIHelper/webcam_Settings.xml
 1_Examples_ofxGui/1_Example_NDI-Basic/openFrameworks-Info.plist
 1_Examples_ofxGui/1_Example_NDI-Basic/Project.xcconfig
 *.ini
+*.ini

@@ -93,7 +93,7 @@ void NDI_input::setup_Params() {
 	bLoad.set("Load Settings");
 
 	bNext.set("Next", false);
-	bLockRatio.set("Lock Aspect", true);
+	bLockAspect.set("Lock Aspect", true);
 	bDebug.set("Debug", true);
 
 	position_Gui.set("UI Position",
@@ -155,7 +155,7 @@ void NDI_input::setup_Params() {
 	params_Control.add(bDebug); //TODO: BUG: not linking when makeReference from parent scope..
 	params_Control.add(rect_NDI_IN.bEdit);
 	params_Control.add(bReset);
-	params_Control.add(bLockRatio);
+	params_Control.add(bLockAspect);
 	params_Control.add(scaleMode_Index);
 	params_Control.add(scaleMode_Name);
 	params_Control.add(bLoad);
@@ -497,7 +497,7 @@ void NDI_input::draw_MiniPreview() {
 	ofPushStyle();
 	ofSetColor(255, 255);
 
-	if (bLockRatio.get()) {
+	if (bLockAspect.get()) {
 		float _ratio = tex_NDI_Receiver.getHeight() / tex_NDI_Receiver.getWidth();
 		rect_NDI_IN.setHeight(rect_NDI_IN.getWidth() * _ratio);
 	}

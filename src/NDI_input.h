@@ -93,7 +93,7 @@ public:
 	ofParameter<int> scaleMode_Index;
 	vector<std::string> scaleMode_Names;
 
-	ofParameter<bool> bLockRatio;
+	ofParameter<bool> bLockAspect;
 
 	ofParameter<bool> bReset;
 private:

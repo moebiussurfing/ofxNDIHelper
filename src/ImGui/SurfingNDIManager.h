@@ -41,7 +41,7 @@ public:
 		NDIGui.ui.addWindowSpecial(NDIHelper.bGui);
 
 #ifdef USE_WEBCAM
-		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_Webcam);
+		NDIGui.ui.addWindowSpecial(NDIHelper.bGui_WebCam);
 #endif
 
 #ifdef USE_ofxNDI_IN
@@ -64,7 +64,7 @@ public:
 		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_Panels, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
 
 #ifdef USE_WEBCAM
-		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_Webcam, OFX_IM_TOGGLE_SMALL);
+		NDIGui.ui.AddStyleGroupForBools(NDIHelper.params_WebCam, OFX_IM_TOGGLE_SMALL);
 #endif
 
 #ifdef USE_ofxNDI_IN
@@ -92,7 +92,7 @@ public:
 #endif
 
 #ifdef USE_WEBCAM
-		NDIHelper.draw_Webcam();
+		NDIHelper.draw_WebCam();
 #endif
 	}
 
@@ -106,7 +106,7 @@ public:
 #endif
 
 #ifdef USE_WEBCAM
-		NDIHelper.draw_Webcam_Full();
+		NDIHelper.draw_WebCam_Full();
 #endif
 	}
 
@@ -125,9 +125,9 @@ public:
 #endif
 	}
 
-	void draw_Webcam_Full() {
+	void draw_WebCam_Full() {
 #ifdef USE_WEBCAM
-		NDIHelper.draw_Webcam_Full();
+		NDIHelper.draw_WebCam_Full();
 #endif
 	}
 
@@ -144,9 +144,9 @@ public:
 #endif
 	}
 
-	void draw_Webcam() {
+	void draw_WebCam() {
 #ifdef USE_WEBCAM
-		NDIHelper.draw_Webcam();
+		NDIHelper.draw_WebCam();
 #endif
 	}
 
@@ -189,7 +189,7 @@ public:
 					if (NDIGui.ui.bMinimize) {
 						void Changed_WebCam(ofAbstractParameter & e);
 #ifdef USE_WEBCAM
-						if (NDIHelper.bWebcam_Enable) NDIGui.ui.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
+						if (NDIHelper.bWebCam_Enable) NDIGui.ui.Add(NDIHelper.bGui_WebCam, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
 #endif
 
 #ifdef USE_ofxNDI_IN
@@ -201,7 +201,7 @@ public:
 #endif
 					} else {
 #ifdef USE_WEBCAM
-						NDIGui.ui.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
+						NDIGui.ui.Add(NDIHelper.bGui_WebCam, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
 #endif
 #ifdef USE_ofxNDI_IN
 						NDIGui.ui.Add(NDIHelper.bGui_NDI_IN1, OFX_IM_TOGGLE_ROUNDED_MEDIUM);
@@ -219,16 +219,16 @@ public:
 
 #ifdef USE_WEBCAM
 				// Webcam
-				if (NDIHelper.bGui_Webcam || !NDIGui.ui.bMinimize) {
-					if (NDIHelper.bGui_Webcam) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
-					if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_Webcam)) {
+				if (NDIHelper.bGui_WebCam || !NDIGui.ui.bMinimize) {
+					if (NDIHelper.bGui_WebCam) ImGui::SetNextWindowSizeConstraints(size_min, size_max);
+					if (NDIGui.ui.BeginWindowSpecial(NDIHelper.bGui_WebCam)) {
 						//NDIGui.ui.AddGroup(NDIHelper.params_Webcam, flags);
 
-						NDIGui.ui.Add(NDIHelper.bWebcam_Enable, OFX_IM_TOGGLE);
-						NDIGui.ui.Add(NDIHelper.bWebcam_Draw, OFX_IM_TOGGLE_ROUNDED);
+						NDIGui.ui.Add(NDIHelper.bWebCam_Enable, OFX_IM_TOGGLE);
+						NDIGui.ui.Add(NDIHelper.bWebCam_Draw, OFX_IM_TOGGLE_ROUNDED);
 						if (!NDIGui.ui.bMinimize)
-							if (NDIHelper.bWebcam_Draw && !bUsingFullScreen)
-								NDIGui.ui.Add(NDIHelper.bWebcam_DrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
+							if (NDIHelper.bWebCam_Draw && !bUsingFullScreen)
+								NDIGui.ui.Add(NDIHelper.bWebCam_DrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
 						//NDIGui.ui.Add(NDIHelper.bWebcam_Next, OFX_IM_BUTTON_SMALL);
 						//NDIGui.ui.Add(NDIHelper.webcam_Index_Device, OFX_IM_STEPPER);
 						//NDIGui.ui.Add(NDIHelper.webcam_Name, OFX_IM_TEXT_DISPLAY);
@@ -237,9 +237,9 @@ public:
 						ofxImGuiSurfing::AddCombo(NDIHelper.scaleMode_Index, NDIHelper.scaleMode_Names);
 
 						if (!NDIGui.ui.bMinimize) {
-							NDIGui.ui.Add(NDIHelper.bWebcam_LockRatio, OFX_IM_TOGGLE_ROUNDED_MINI);
-							NDIGui.ui.Add(NDIHelper.rect_Webcam.bEdit, OFX_IM_TOGGLE);
-							NDIGui.ui.Add(NDIHelper.bWebcam_Restart, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
+							NDIGui.ui.Add(NDIHelper.bWebCam_LockRatio, OFX_IM_TOGGLE_ROUNDED_MINI);
+							NDIGui.ui.Add(NDIHelper.rect_WebCam.bEdit, OFX_IM_TOGGLE);
+							NDIGui.ui.Add(NDIHelper.bWebCam_Restart, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
 						}
 
 						NDIGui.ui.EndWindowSpecial();
@@ -288,16 +288,16 @@ public:
 								NDIGui.ui.Add(NDIHelper.NDI_Input1.bDrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
 						//NDIGui.ui.Add(NDIHelper.NDI_Input1.bNext, OFX_IM_BUTTON_SMALL);
 
+						if (!NDIGui.ui.bMinimize)
+							NDIGui.ui.Add(NDIHelper.NDI_Input1.bScan, OFX_IM_TOGGLE_SMALL);
+
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input1.indexDevice, NDIHelper.NDI_Input1.namesDevices);
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input1.scaleMode_Index, NDIHelper.NDI_Input1.scaleMode_Names);
 						if (!NDIGui.ui.bMinimize) {
-							NDIGui.ui.Add(NDIHelper.NDI_Input1.bLockRatio, OFX_IM_TOGGLE_ROUNDED_MINI);
+							NDIGui.ui.Add(NDIHelper.NDI_Input1.bLockAspect, OFX_IM_TOGGLE_ROUNDED_MINI);
 							NDIGui.ui.Add(NDIHelper.NDI_Input1.rect_NDI_IN.bEdit, OFX_IM_TOGGLE);
 							NDIGui.ui.Add(NDIHelper.NDI_Input1.bReset, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
 						}
-
-						if (!NDIGui.ui.bMinimize)
-							NDIGui.ui.Add(NDIHelper.NDI_Input1.bScan, OFX_IM_TOGGLE_SMALL);
 
 						NDIGui.ui.EndWindowSpecial();
 					}
@@ -318,16 +318,16 @@ public:
 								NDIGui.ui.Add(NDIHelper.NDI_Input2.bDrawMini, OFX_IM_TOGGLE_ROUNDED_MINI);
 						//NDIGui.ui.Add(NDIHelper.NDI_Input2.bNext, OFX_IM_BUTTON_SMALL);
 
+						if (!NDIGui.ui.bMinimize)
+							NDIGui.ui.Add(NDIHelper.NDI_Input2.bScan, OFX_IM_TOGGLE_SMALL);
+
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input2.indexDevice, NDIHelper.NDI_Input2.namesDevices);
 						ofxImGuiSurfing::AddCombo(NDIHelper.NDI_Input2.scaleMode_Index, NDIHelper.NDI_Input2.scaleMode_Names);
 						if (!NDIGui.ui.bMinimize) {
-							NDIGui.ui.Add(NDIHelper.NDI_Input2.bLockRatio, OFX_IM_TOGGLE_ROUNDED_MINI);
+							NDIGui.ui.Add(NDIHelper.NDI_Input2.bLockAspect, OFX_IM_TOGGLE_ROUNDED_MINI);
 							NDIGui.ui.Add(NDIHelper.NDI_Input2.rect_NDI_IN.bEdit, OFX_IM_TOGGLE);
 							NDIGui.ui.Add(NDIHelper.NDI_Input2.bReset, OFX_IM_BUTTON_SMALL_BORDER_BLINK);
 						}
-
-						if (!NDIGui.ui.bMinimize)
-							NDIGui.ui.Add(NDIHelper.NDI_Input2.bScan, OFX_IM_TOGGLE_SMALL);
 
 						NDIGui.ui.EndWindowSpecial();
 					}
@@ -337,7 +337,7 @@ public:
 				//--
 
 				//if (NDIGui.ui.BeginWindow("NDIHelper")) {
-				//	NDIGui.ui.Add(NDIHelper.bGui_Webcam, OFX_IM_TOGGLE);
+				//	NDIGui.ui.Add(NDIHelper.bGui_WebCam, OFX_IM_TOGGLE);
 				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_IN2, OFX_IM_TOGGLE);
 				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_IN2, OFX_IM_TOGGLE);
 				//	NDIGui.ui.Add(NDIHelper.bGui_NDI_OUT, OFX_IM_TOGGLE);

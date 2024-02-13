@@ -7,6 +7,8 @@
 
 	TODO:
 
+	+ out colorize rect yellow
+
 	+ Customize ImGui ui widgets better, not using groups!
 
 	+ Layout Canvas: Allow change layers sorting. store an int vector with position of each layer
@@ -49,7 +51,7 @@
 #define USE_ofxNDI_IN
 
 // 2. WebCam as camera input.
-//#define USE_WEBCAM
+#define USE_WEBCAM
 //TODO: BUG:
 // currently main branch started fail in OF 0.12+?
 /*
@@ -196,7 +198,7 @@ public:
 private:
 	ofParameterGroup params_AppsSettings;
 
-	//ofParameter<bool> bLockRatio;
+	//ofParameter<bool> bLockAspect;
 	ofParameter<bool> bResetLayout;
 	ofParameter<bool> bResetGui;
 
