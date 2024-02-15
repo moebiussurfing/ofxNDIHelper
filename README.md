@@ -90,8 +90,8 @@ void ofApp::draw()
 ## Dependencies
 
 - [ofxNDI](https://github.com/leadedge/ofxNDI) / (macOS requires installing the [Runtime](https://ndi.palakis.fr/runtime/), not just NDI Tools)
-- [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers)
-- [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox)
+- [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers) / For WebCam class helper and serializers.
+- [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox) / For preview rectangle  editing.
 - [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
 - [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui) / Optional. We can use ofxGui.
 - ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
