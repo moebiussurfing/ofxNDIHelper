@@ -11,7 +11,7 @@ Distribute your **NDI** and **Webcam Inputs** to the **Canvas Layout**,
 at full screen or mini **previews**:  
 _draggable and scalable_ by using the mouse.  
 
-Feed your **oF** drawing easy into a **NDI Output** Broadcasted to the Network.
+Feed your **oF** drawing easily into a **NDI Output** Broadcasted to the Network.
 
 ## Usage
 
@@ -89,12 +89,12 @@ void ofApp::draw()
 
 ## Dependencies
 
-- [ofxNDI](https://github.com/leadedge/ofxNDI) / (macOS requires installing the [Runtime](https://ndi.palakis.fr/runtime/), not just NDI Tools)
-- [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers) / For WebCam class helper and serializers.
-- [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox) / For preview rectangle  editing.
-- [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. Can be disabled.
-- [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui) / Optional. We can use ofxGui.
-- ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**)  
+- [ofxNDI](https://github.com/leadedge/ofxNDI) / (macOS requires installing the [Runtime](https://ndi.palakis.fr/runtime/), not only NDI Tools)
+- [ofxSurfingHelpers](https://github.com/moebiussurfing/ofxSurfingHelpers) / For WebCam class helper and settings serializers.
+- [ofxSurfingBox](https://github.com/moebiussurfing/ofxSurfingBox) / For preview rectangle editing: scale and drag the viewports panels.
+- [ofxChildFrame](https://github.com/nariakiiwatani/ofxChildFrame) / Optional. It can be disabled. Used to zoom/pan the WebCam viewport.
+- [ofxSurfingImGui](https://github.com/moebiussurfing/ofxSurfingImGui) / Optional. We can use only ofxGui too.
+- ofxGui / OF Core (Remove **ofxNDIHelper/src/ImGui** from the project when not using **ofxSurfingImGui**. WIP/TODO improve approach)  
 
 
 <details>
