@@ -40,7 +40,7 @@ void ofApp::update()
 		// Feed the NDI Helper Previews too:
 		NDIHelper.draw_NDI_IN_1();
 		NDIHelper.draw_NDI_IN_2();
-		NDIHelper.draw_Webcam();
+		NDIHelper.draw_WebCam();
 	}
 	NDIHelper.end_NDI_OUT();
 

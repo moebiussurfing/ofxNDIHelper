@@ -12,7 +12,7 @@ void ofApp::setup()
 	// We won't need the other channels. 
 	// Then overwrite the previous sessions states, in case they were enabled...
 	if (1) {
-		NDIHelper.bGui_Webcam = true;
+		NDIHelper.bGui_WebCam = true;
 		NDIHelper.bGui_NDI_OUT = true;
 		NDIHelper.bGui_NDI_IN1 = false;
 		NDIHelper.bGui_NDI_IN2 = false;
@@ -25,7 +25,7 @@ void ofApp::update()
 	NDIHelper.begin_NDI_OUT();
 	{
 		// Draw Webcam at full screen size
-		NDIHelper.draw_Webcam_Full();
+		NDIHelper.draw_WebCam_Full();
 	}
 	NDIHelper.end_NDI_OUT();
 }
