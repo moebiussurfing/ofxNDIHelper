@@ -67,7 +67,7 @@ Error	LNK2038	mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '0' doesn't m
 // Requires ofxChildFrame.
 // For transform the WebCam content:
 // zoom and translate / crop viewport to send.
-#define USE_OFX_CHILD_FRAME
+//#define USE_OFX_CHILD_FRAME
 #ifndef USE_WEBCAM
 	#ifdef USE_OFX_CHILD_FRAME
 		#undef USE_OFX_CHILD_FRAME
