@@ -1743,8 +1743,13 @@ void ofxNDIHelper::setup_NDI_OUT() {
 	//TODO:
 	//senderWidth = (unsigned char)ofGetWidth();
 	//senderHeight = (unsigned char)ofGetHeight();
+
+	// landscape FHD
 	senderWidth = 1920;
 	senderHeight = 1080;
+	//// Portrait FHD
+	//senderWidth = 1080;
+	//senderHeight = 1920;
 
 	// Fbo settings
 	ofFbo::Settings settings;
