@@ -51,7 +51,7 @@
 #define USE_ofxNDI_IN
 
 // 2. WebCam as camera input.
-#define USE_WEBCAM
+//#define USE_WEBCAM
 //TODO: BUG:
 // currently main branch started fail in OF 0.12+?
 /*
